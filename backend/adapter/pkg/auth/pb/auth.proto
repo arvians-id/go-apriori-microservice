@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package auth;
+
+option go_package = "./adapter/pkg/jwt/pb";
+
+import "google/protobuf/Empty.proto";
+
+service PasswordResetService {
+  rpc CreateOrUpdateByEmail(GetPasswordResetByEmailRequest) returns (GetPasswordResetResponse);
+  rpc Verify(PasswordReset) returns (google.protobuf.Empty);
+}
+
+message PasswordReset {
+  string Email = 1;
+  string Token = 2;
+  int64 Expired = 3;
+}
+
+message GetPasswordResetResponse {
+  PasswordReset password_reset = 1;
+}
+
+message GetPasswordResetByEmailRequest {
+  string Email = 1;
+}
+
+message GetVerifyRequest {
+  string Email = 1;
+  string Password = 2;
+  string Token = 3;
+}

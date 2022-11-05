@@ -8,7 +8,7 @@ import "google/protobuf/Empty.proto";
 import "google/protobuf/Timestamp.proto";
 
 service NotificationService {
-  rpc FindALl(google.protobuf.Empty) returns (ListNotificationResponse);
+  rpc FindAll(google.protobuf.Empty) returns (ListNotificationResponse);
   rpc FindAllByUserId(GetNotificationByUserIdRequest) returns (ListNotificationResponse);
   rpc Create(CreateNotificationRequest) returns (GetNotificationResponse);
   rpc MarkAll(GetNotificationByUserIdRequest) returns (google.protobuf.Empty);

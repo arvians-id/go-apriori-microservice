@@ -1,4 +1,4 @@
-package auth
+package jwt
 
 import (
 	"errors"
@@ -11,8 +11,8 @@ import (
 )
 
 type jwtCustomClaim struct {
-	IdUser   int `json:"id_user"`
-	RoleUser int `json:"role"`
+	IdUser   int64 `json:"id_user"`
+	RoleUser int32 `json:"role"`
 	jwt.StandardClaims
 }
 
@@ -44,7 +44,7 @@ func getRefreshSecretKey() string {
 	return os.Getenv("JWT_SECRET_REFRESH_KEY")
 }
 
-func (auth *JsonWebToken) GenerateToken(id int, role int, expirationTime time.Time) (*TokenDetails, error) {
+func (auth *JsonWebToken) GenerateToken(id int64, role int32, expirationTime time.Time) (*TokenDetails, error) {
 	tokens := &TokenDetails{}
 	tokens.AtExpires = expirationTime.Unix()
 	expiredTimeRefresh, err := strconv.Atoi(os.Getenv("JWT_REFRESH_EXPIRED_TIME"))
@@ -118,8 +118,8 @@ func (auth *JsonWebToken) RefreshToken(refreshToken string) (*TokenDetails, erro
 	}
 
 	// Get id user
-	id := int(claims["id_user"].(float64))
-	role := int(claims["role"].(float64))
+	id := int64(claims["id_user"].(float64))
+	role := int32(claims["role"].(float64))
 
 	// Delete the previous Refresh Token
 	// --

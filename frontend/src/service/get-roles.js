@@ -1,5 +1,5 @@
 import axios from "axios";
-import authHeader from "@/service/auth-header";
+import authHeader from "@/service/jwt-header";
 
 export default async function getRoles() {
     let getRole = null;

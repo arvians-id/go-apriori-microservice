@@ -1017,7 +1017,7 @@ var file_adapter_pkg_notification_pb_notification_proto_rawDesc = []byte{
 	0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x50, 0x61, 0x79, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x07, 0x70, 0x61,
 	0x79, 0x6d, 0x65, 0x6e, 0x74, 0x32, 0xbe, 0x03, 0x0a, 0x13, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69,
 	0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x49, 0x0a,
-	0x07, 0x46, 0x69, 0x6e, 0x64, 0x41, 0x4c, 0x6c, 0x12, 0x16, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c,
+	0x07, 0x46, 0x69, 0x6e, 0x64, 0x41, 0x6c, 0x6c, 0x12, 0x16, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c,
 	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79,
 	0x1a, 0x26, 0x2e, 0x6e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e,
 	0x4c, 0x69, 0x73, 0x74, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e,
@@ -1086,12 +1086,12 @@ var file_adapter_pkg_notification_pb_notification_proto_depIdxs = []int32{
 	9,  // 8: notification.User.UpdatedAt:type_name -> google.protobuf.Timestamp
 	0,  // 9: notification.User.notification:type_name -> notification.Notification
 	7,  // 10: notification.User.payment:type_name -> notification.Payment
-	10, // 11: notification.NotificationService.FindALl:input_type -> google.protobuf.Empty
+	10, // 11: notification.NotificationService.FindAll:input_type -> google.protobuf.Empty
 	4,  // 12: notification.NotificationService.FindAllByUserId:input_type -> notification.GetNotificationByUserIdRequest
 	5,  // 13: notification.NotificationService.Create:input_type -> notification.CreateNotificationRequest
 	4,  // 14: notification.NotificationService.MarkAll:input_type -> notification.GetNotificationByUserIdRequest
 	3,  // 15: notification.NotificationService.Mark:input_type -> notification.GetNotificationByIdRequest
-	1,  // 16: notification.NotificationService.FindALl:output_type -> notification.ListNotificationResponse
+	1,  // 16: notification.NotificationService.FindAll:output_type -> notification.ListNotificationResponse
 	1,  // 17: notification.NotificationService.FindAllByUserId:output_type -> notification.ListNotificationResponse
 	2,  // 18: notification.NotificationService.Create:output_type -> notification.GetNotificationResponse
 	10, // 19: notification.NotificationService.MarkAll:output_type -> google.protobuf.Empty
@@ -1250,7 +1250,7 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type NotificationServiceClient interface {
-	FindALl(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListNotificationResponse, error)
+	FindAll(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListNotificationResponse, error)
 	FindAllByUserId(ctx context.Context, in *GetNotificationByUserIdRequest, opts ...grpc.CallOption) (*ListNotificationResponse, error)
 	Create(ctx context.Context, in *CreateNotificationRequest, opts ...grpc.CallOption) (*GetNotificationResponse, error)
 	MarkAll(ctx context.Context, in *GetNotificationByUserIdRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -1265,9 +1265,9 @@ func NewNotificationServiceClient(cc grpc.ClientConnInterface) NotificationServi
 	return &notificationServiceClient{cc}
 }
 
-func (c *notificationServiceClient) FindALl(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListNotificationResponse, error) {
+func (c *notificationServiceClient) FindAll(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListNotificationResponse, error) {
 	out := new(ListNotificationResponse)
-	err := c.cc.Invoke(ctx, "/notification.NotificationService/FindALl", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/notification.NotificationService/FindAll", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1312,7 +1312,7 @@ func (c *notificationServiceClient) Mark(ctx context.Context, in *GetNotificatio
 
 // NotificationServiceServer is the server API for NotificationService service.
 type NotificationServiceServer interface {
-	FindALl(context.Context, *emptypb.Empty) (*ListNotificationResponse, error)
+	FindAll(context.Context, *emptypb.Empty) (*ListNotificationResponse, error)
 	FindAllByUserId(context.Context, *GetNotificationByUserIdRequest) (*ListNotificationResponse, error)
 	Create(context.Context, *CreateNotificationRequest) (*GetNotificationResponse, error)
 	MarkAll(context.Context, *GetNotificationByUserIdRequest) (*emptypb.Empty, error)
@@ -1323,8 +1323,8 @@ type NotificationServiceServer interface {
 type UnimplementedNotificationServiceServer struct {
 }
 
-func (*UnimplementedNotificationServiceServer) FindALl(context.Context, *emptypb.Empty) (*ListNotificationResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method FindALl not implemented")
+func (*UnimplementedNotificationServiceServer) FindAll(context.Context, *emptypb.Empty) (*ListNotificationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindAll not implemented")
 }
 func (*UnimplementedNotificationServiceServer) FindAllByUserId(context.Context, *GetNotificationByUserIdRequest) (*ListNotificationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FindAllByUserId not implemented")
@@ -1343,20 +1343,20 @@ func RegisterNotificationServiceServer(s *grpc.Server, srv NotificationServiceSe
 	s.RegisterService(&_NotificationService_serviceDesc, srv)
 }
 
-func _NotificationService_FindALl_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _NotificationService_FindAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(NotificationServiceServer).FindALl(ctx, in)
+		return srv.(NotificationServiceServer).FindAll(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/notification.NotificationService/FindALl",
+		FullMethod: "/notification.NotificationService/FindAll",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NotificationServiceServer).FindALl(ctx, req.(*emptypb.Empty))
+		return srv.(NotificationServiceServer).FindAll(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1438,8 +1438,8 @@ var _NotificationService_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*NotificationServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "FindALl",
-			Handler:    _NotificationService_FindALl_Handler,
+			MethodName: "FindAll",
+			Handler:    _NotificationService_FindAll_Handler,
 		},
 		{
 			MethodName: "FindAllByUserId",

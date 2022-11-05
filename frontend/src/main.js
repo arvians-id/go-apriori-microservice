@@ -3,7 +3,7 @@ import App from "./App.vue";
 import router from "./router";
 import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client/core'
 import { createApolloProvider } from '@vue/apollo-option'
-import authHeader from "@/service/auth-header";
+import authHeader from "@/service/jwt-header";
 
 const httpLink = createHttpLink({
     uri: process.env.VUE_APP_SERVICE_URL_GRAPHQL,

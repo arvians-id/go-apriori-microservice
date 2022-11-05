@@ -4,7 +4,18 @@ import (
 	"database/sql"
 	"github.com/arvians-id/go-apriori-microservice/adapter/middleware"
 	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/apriori"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/auth"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/category"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/comment"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/notification"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/payment"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/product"
+	raja_ongkir "github.com/arvians-id/go-apriori-microservice/adapter/pkg/raja-ongkir"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/transaction"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/user"
+	user_order "github.com/arvians-id/go-apriori-microservice/adapter/pkg/user-order"
 	"github.com/arvians-id/go-apriori-microservice/config"
+	"github.com/arvians-id/go-apriori-microservice/third-party/jwt"
 	"github.com/gin-gonic/gin"
 	"log"
 )
@@ -33,9 +44,20 @@ func main() {
 	router.Use(middleware.PrometheusMetricsMiddleware())
 
 	// Third Party
+	jwtAuth := jwt.NewJsonWebToken()
 
 	// Services
+	userService := user.RegisterRoutes(router, configuration)
 	apriori.RegisterRoutes(router, configuration)
+	auth.RegisterRoutes(router, configuration, userService, jwtAuth)
+	category.RegisterRoutes(router, configuration)
+	comment.RegisterRoutes(router, configuration)
+	notification.RegisterRoutes(router, configuration)
+	payment.RegisterRoutes(router, configuration)
+	product.RegisterRoutes(router, configuration)
+	raja_ongkir.RegisterRoutes(router)
+	transaction.RegisterRoutes(router, configuration)
+	user_order.RegisterRoutes(router, configuration)
 
 	err = router.Run(configuration.Port)
 	if err != nil {

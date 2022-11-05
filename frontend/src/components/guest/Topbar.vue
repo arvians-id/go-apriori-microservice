@@ -162,7 +162,7 @@
         </ul>
         <ul class="navbar-nav align-items-center ml-auto ml-md-0" v-else>
           <li class="nav-item dropdown">
-            <router-link class="nav-link pr-0" :to="{ name: 'auth.login' }" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <router-link class="nav-link pr-0" :to="{ name: 'jwt.login' }" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <div class="media align-items-center">
                 <div class="media-body ml-2">
                   <span class="mb-0 text-sm text-white font-weight-bold">Login</span>
@@ -178,7 +178,7 @@
 
 <script>
 
-import authHeader from "@/service/auth-header";
+import authHeader from "@/service/jwt-header";
 import axios from "axios";
 import getRoles from "@/service/get-roles";
 
@@ -224,7 +224,7 @@ export default {
               localStorage.removeItem("refresh-token")
               alert(response.data.status)
               this.$router.push({
-                name: 'auth.login'
+                name: 'jwt.login'
               })
             }
           }).catch(error => {

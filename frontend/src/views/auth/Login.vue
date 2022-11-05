@@ -45,11 +45,11 @@
 </template>
 
 <script>
-import Footer from "@/components/auth/Footer.vue"
-import Navbar from "@/components/auth/Navbar.vue"
-import Header from "@/components/auth/Header.vue"
+import Footer from "@/components/jwt/Footer.vue"
+import Navbar from "@/components/jwt/Navbar.vue"
+import Header from "@/components/jwt/Header.vue"
 import axios from "axios";
-import authHeader from "@/service/auth-header";
+import authHeader from "@/service/jwt-header";
 
 export default {
   components: {
