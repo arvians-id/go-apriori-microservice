@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package category;
+
+option go_package = "./adapter/pkg/category/pb";
+
+import "google/protobuf/Empty.proto";
+import "google/protobuf/Timestamp.proto";
+
+service CategoryService {
+  rpc FindAll(google.protobuf.Empty) returns (ListCategoryResponse);
+  rpc FindById(GetCategoryByIdRequest) returns (GetCategoryResponse);
+  rpc Create(CreateCategoryRequest) returns (GetCategoryResponse);
+  rpc Update(UpdateCategoryRequest) returns (GetCategoryResponse);
+  rpc Delete(GetCategoryByIdRequest) returns (google.protobuf.Empty);
+}
+
+message Category {
+  int64 IdCategory = 1;
+  string Name = 2;
+  google.protobuf.Timestamp CreatedAt = 3;
+  google.protobuf.Timestamp UpdatedAt = 4;
+}
+
+message ListCategoryResponse {
+  repeated Category Categories = 1;
+}
+
+message GetCategoryResponse {
+  Category Category = 1;
+}
+
+message GetCategoryByIdRequest {
+  int64 Id = 1;
+}
+
+message CreateCategoryRequest {
+  string Name = 1;
+}
+
+message UpdateCategoryRequest {
+  int64 IdCategory = 1;
+  string Name = 2;
+}
