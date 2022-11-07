@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"github.com/arvians-id/go-apriori-microservice/adapter/middleware"
 	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/apriori"
 	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/auth"
@@ -15,19 +14,12 @@ import (
 	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/user"
 	user_order "github.com/arvians-id/go-apriori-microservice/adapter/pkg/user-order"
 	"github.com/arvians-id/go-apriori-microservice/config"
+	"github.com/arvians-id/go-apriori-microservice/third-party/aws"
 	"github.com/arvians-id/go-apriori-microservice/third-party/jwt"
+	messaging "github.com/arvians-id/go-apriori-microservice/third-party/message-queue"
 	"github.com/gin-gonic/gin"
 	"log"
 )
-
-func NewInitializedDatabase(configuration *config.Config) (*sql.DB, error) {
-	db, err := config.NewPostgresSQL(configuration)
-	if err != nil {
-		return nil, err
-	}
-
-	return db, nil
-}
 
 func main() {
 	configuration, err := config.LoadConfig()
@@ -45,18 +37,22 @@ func main() {
 
 	// Third Party
 	jwtAuth := jwt.NewJsonWebToken()
+	storageS3 := aws.NewStorageS3(configuration)
+	messagingProducer := messaging.NewProducer(messaging.ProducerConfig{
+		NsqdAddress: "nsqd:4150",
+	})
 
 	// Services
-	userService := user.RegisterRoutes(router, configuration)
+	user.RegisterRoutes(router, configuration)
 	apriori.RegisterRoutes(router, configuration)
-	auth.RegisterRoutes(router, configuration, userService, jwtAuth)
+	auth.RegisterRoutes(router, configuration, jwtAuth, messagingProducer)
 	category.RegisterRoutes(router, configuration)
 	comment.RegisterRoutes(router, configuration)
 	notification.RegisterRoutes(router, configuration)
-	payment.RegisterRoutes(router, configuration)
-	product.RegisterRoutes(router, configuration)
+	payment.RegisterRoutes(router, configuration, messagingProducer)
+	product.RegisterRoutes(router, configuration, storageS3)
 	raja_ongkir.RegisterRoutes(router)
-	transaction.RegisterRoutes(router, configuration)
+	transaction.RegisterRoutes(router, configuration, storageS3)
 	user_order.RegisterRoutes(router, configuration)
 
 	err = router.Run(configuration.Port)

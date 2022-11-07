@@ -60,7 +60,6 @@ func (client *ServiceClient) FindAllByProductCode(c *gin.Context) {
 			response.ReturnErrorNotFound(c, err, nil)
 			return
 		}
-
 		response.ReturnErrorInternalServerError(c, err, nil)
 		return
 	}
@@ -83,7 +82,6 @@ func (client *ServiceClient) FindById(c *gin.Context) {
 			response.ReturnErrorNotFound(c, err, nil)
 			return
 		}
-
 		response.ReturnErrorInternalServerError(c, err, nil)
 		return
 	}
@@ -101,7 +99,6 @@ func (client *ServiceClient) FindAllRatingByProductCode(c *gin.Context) {
 			response.ReturnErrorNotFound(c, err, nil)
 			return
 		}
-
 		response.ReturnErrorInternalServerError(c, err, nil)
 		return
 	}
@@ -124,7 +121,6 @@ func (client *ServiceClient) FindByUserOrderId(c *gin.Context) {
 			response.ReturnErrorNotFound(c, err, nil)
 			return
 		}
-
 		response.ReturnErrorInternalServerError(c, err, nil)
 		return
 	}

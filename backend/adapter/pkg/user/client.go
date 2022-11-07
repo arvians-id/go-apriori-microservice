@@ -92,7 +92,6 @@ func (client *ServiceClient) UpdateProfile(c *gin.Context) {
 			response.ReturnErrorNotFound(c, err, nil)
 			return
 		}
-
 		response.ReturnErrorInternalServerError(c, err, nil)
 		return
 	}
@@ -125,7 +124,6 @@ func (client *ServiceClient) FindById(c *gin.Context) {
 			response.ReturnErrorNotFound(c, err, nil)
 			return
 		}
-
 		response.ReturnErrorInternalServerError(c, err, nil)
 		return
 	}
@@ -184,7 +182,6 @@ func (client *ServiceClient) Update(c *gin.Context) {
 			response.ReturnErrorNotFound(c, err, nil)
 			return
 		}
-
 		response.ReturnErrorInternalServerError(c, err, nil)
 		return
 	}
@@ -207,7 +204,6 @@ func (client *ServiceClient) Delete(c *gin.Context) {
 			response.ReturnErrorNotFound(c, err, nil)
 			return
 		}
-
 		response.ReturnErrorInternalServerError(c, err, nil)
 		return
 	}

@@ -15,7 +15,7 @@ import (
 
 type ServiceClient struct {
 	TransactionService pb.TransactionServiceClient
-	StorageS3          aws.StorageS3
+	StorageS3          *aws.StorageS3
 }
 
 func NewTransactionServiceClient(configuration *config.Config) pb.TransactionServiceClient {
@@ -27,7 +27,7 @@ func NewTransactionServiceClient(configuration *config.Config) pb.TransactionSer
 	return pb.NewTransactionServiceClient(connection)
 }
 
-func RegisterRoutes(router *gin.Engine, configuration *config.Config, storageS3 aws.StorageS3) *ServiceClient {
+func RegisterRoutes(router *gin.Engine, configuration *config.Config, storageS3 *aws.StorageS3) *ServiceClient {
 	serviceClient := &ServiceClient{
 		TransactionService: NewTransactionServiceClient(configuration),
 		StorageS3:          storageS3,
@@ -67,7 +67,6 @@ func (client *ServiceClient) FindByNoTransaction(c *gin.Context) {
 			response.ReturnErrorNotFound(c, err, nil)
 			return
 		}
-
 		response.ReturnErrorInternalServerError(c, err, nil)
 		return
 	}
@@ -125,7 +124,7 @@ func (client *ServiceClient) CreateByCSV(c *gin.Context) {
 
 	defer func(StorageS3 *aws.StorageS3, filePath string) {
 		_ = StorageS3.DeleteFromAWS(filePath)
-	}(&client.StorageS3, filePath)
+	}(client.StorageS3, filePath)
 
 	response.ReturnSuccessOK(c, "created", nil)
 }
@@ -150,7 +149,6 @@ func (client *ServiceClient) Update(c *gin.Context) {
 			response.ReturnErrorNotFound(c, err, nil)
 			return
 		}
-
 		response.ReturnErrorInternalServerError(c, err, nil)
 		return
 	}

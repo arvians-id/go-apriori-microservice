@@ -153,7 +153,6 @@ func (client *ServiceClient) Update(c *gin.Context) {
 			response.ReturnErrorNotFound(c, err, nil)
 			return
 		}
-
 		response.ReturnErrorInternalServerError(c, err, nil)
 		return
 	}

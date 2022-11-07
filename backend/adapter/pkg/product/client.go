@@ -16,7 +16,7 @@ import (
 
 type ServiceClient struct {
 	ProductService pb.ProductServiceClient
-	StorageS3      aws.StorageS3
+	StorageS3      *aws.StorageS3
 }
 
 func NewCommentServiceClient(configuration *config.Config) pb.ProductServiceClient {
@@ -28,7 +28,7 @@ func NewCommentServiceClient(configuration *config.Config) pb.ProductServiceClie
 	return pb.NewProductServiceClient(connection)
 }
 
-func RegisterRoutes(router *gin.Engine, configuration *config.Config, storageS3 aws.StorageS3) *ServiceClient {
+func RegisterRoutes(router *gin.Engine, configuration *config.Config, storageS3 *aws.StorageS3) *ServiceClient {
 	serviceClient := &ServiceClient{
 		ProductService: NewCommentServiceClient(configuration),
 		StorageS3:      storageS3,
@@ -73,7 +73,6 @@ func (client *ServiceClient) FindAllSimilarCategory(c *gin.Context) {
 			response.ReturnErrorNotFound(c, err, nil)
 			return
 		}
-
 		response.ReturnErrorInternalServerError(c, err, nil)
 		return
 	}
@@ -106,7 +105,6 @@ func (client *ServiceClient) FindAllRecommendation(c *gin.Context) {
 			response.ReturnErrorNotFound(c, err, nil)
 			return
 		}
-
 		response.ReturnErrorInternalServerError(c, err, nil)
 		return
 	}
@@ -124,7 +122,6 @@ func (client *ServiceClient) FindByCode(c *gin.Context) {
 			response.ReturnErrorNotFound(c, err, nil)
 			return
 		}
-
 		response.ReturnErrorInternalServerError(c, err, nil)
 		return
 	}
@@ -206,7 +203,6 @@ func (client *ServiceClient) Update(c *gin.Context) {
 			response.ReturnErrorNotFound(c, err, nil)
 			return
 		}
-
 		response.ReturnErrorInternalServerError(c, err, nil)
 		return
 	}
@@ -224,7 +220,6 @@ func (client *ServiceClient) Delete(c *gin.Context) {
 			response.ReturnErrorNotFound(c, err, nil)
 			return
 		}
-
 		response.ReturnErrorInternalServerError(c, err, nil)
 		return
 	}

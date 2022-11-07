@@ -4,8 +4,6 @@ package user_order;
 
 option go_package = "./adapter/pkg/user-order/pb";
 
-import "google/protobuf/Timestamp.proto";
-
 service UserOrderService {
   rpc FindAllByPayloadId(GetUserOrderByPayloadIdRequest) returns (ListUserOrderResponse);
   rpc FindAllByUserId(GetUserOrderByUserIdRequest) returns (ListUserOrderResponse);
@@ -15,13 +13,12 @@ service UserOrderService {
 message UserOrder {
   int64 IdOrder = 1;
   int64 PayloadId = 2;
-  string Code = 3;
-  string Name = 4;
-  int64 Price = 5;
-  string Image = 6;
-  int32 Quantity = 7;
-  int64 TotalPriceItem = 8;
-  Payment payment = 9;
+  optional string Code = 3;
+  optional string Name = 4;
+  optional int64 Price = 5;
+  optional string Image = 6;
+  optional int32 Quantity = 7;
+  optional int64 TotalPriceItem = 8;
 }
 
 message ListUserOrderResponse {
@@ -42,56 +39,4 @@ message GetUserOrderByUserIdRequest {
 
 message GetUserOrderByIdRequest {
   int64 Id = 1;
-}
-
-// Other Proto
-message Payment {
-  int64 IdPayload = 1;
-  int64 UserId = 2;
-  string OrderId = 3;
-  string TransactionTime = 4;
-  string TransactionStatus = 5;
-  string TransactionId = 6;
-  string StatusCode = 7;
-  string SignatureKey = 8;
-  string SettlementTime = 9;
-  string PaymentType = 10;
-  string MerchantId = 11;
-  string GrossAmount = 12;
-  string FraudStatus = 13;
-  string BankType = 14;
-  string VANumber = 15;
-  string BillerCode = 16;
-  string BillKey = 17;
-  string ReceiptNumber = 18;
-  string Address = 19;
-  string Courier = 20;
-  string CourierService = 21;
-  User user = 22;
-  repeated UserOrder user_order = 23;
-}
-
-message User {
-  int64 IdUser = 1;
-  int32 Role = 2;
-  string Name = 3;
-  string Email = 4;
-  string Address = 5;
-  string Phone = 6;
-  string Password = 7;
-  google.protobuf.Timestamp CreatedAt = 8;
-  google.protobuf.Timestamp UpdatedAt = 9;
-  repeated Notification notification = 10;
-  repeated Payment payment = 11;
-}
-
-message Notification {
-  int64 IdNotification = 1;
-  int64 UserId = 2;
-  string Title = 3;
-  string Description = 4;
-  string URL = 5;
-  bool IsRead = 6;
-  google.protobuf.Timestamp CreatedAt = 7;
-  User user = 8;
 }

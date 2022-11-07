@@ -3,12 +3,15 @@ package payment
 import (
 	"encoding/json"
 	"github.com/arvians-id/go-apriori-microservice/adapter/middleware"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/notification"
 	pbnotification "github.com/arvians-id/go-apriori-microservice/adapter/pkg/notification/pb"
 	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/payment/pb"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/user"
 	pbuser "github.com/arvians-id/go-apriori-microservice/adapter/pkg/user/pb"
 	"github.com/arvians-id/go-apriori-microservice/adapter/response"
 	"github.com/arvians-id/go-apriori-microservice/config"
 	"github.com/arvians-id/go-apriori-microservice/model"
+	messaging "github.com/arvians-id/go-apriori-microservice/third-party/message-queue"
 	"github.com/arvians-id/go-apriori-microservice/util"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/protobuf/ptypes/empty"
@@ -21,6 +24,7 @@ type ServiceClient struct {
 	PaymentService      pb.PaymentServiceClient
 	UserService         pbuser.UserServiceClient
 	NotificationService pbnotification.NotificationServiceClient
+	Producer            *messaging.Producer
 }
 
 func NewCommentServiceClient(configuration *config.Config) pb.PaymentServiceClient {
@@ -32,11 +36,12 @@ func NewCommentServiceClient(configuration *config.Config) pb.PaymentServiceClie
 	return pb.NewPaymentServiceClient(connection)
 }
 
-func RegisterRoutes(router *gin.Engine, configuration *config.Config, userService pbuser.UserServiceClient, notificationService pbnotification.NotificationServiceClient) *ServiceClient {
+func RegisterRoutes(router *gin.Engine, configuration *config.Config, producer *messaging.Producer) *ServiceClient {
 	serviceClient := &ServiceClient{
 		PaymentService:      NewCommentServiceClient(configuration),
-		UserService:         userService,
-		NotificationService: notificationService,
+		UserService:         user.NewUserServiceClient(configuration),
+		NotificationService: notification.NewNotificationServiceClient(configuration),
+		Producer:            producer,
 	}
 
 	authorized := router.Group("/api", middleware.AuthJwtMiddleware())
@@ -76,7 +81,6 @@ func (client *ServiceClient) FindByOrderId(c *gin.Context) {
 			response.ReturnErrorNotFound(c, err, nil)
 			return
 		}
-
 		response.ReturnErrorInternalServerError(c, err, nil)
 		return
 	}
@@ -102,13 +106,12 @@ func (client *ServiceClient) UpdateReceiptNumber(c *gin.Context) {
 			response.ReturnErrorNotFound(c, err, nil)
 			return
 		}
-
 		response.ReturnErrorInternalServerError(c, err, nil)
 		return
 	}
 
 	// Send Notification
-	notification, err := client.NotificationService.Create(c.Request.Context(), &pbnotification.CreateNotificationRequest{
+	notificationResponse, err := client.NotificationService.Create(c.Request.Context(), &pbnotification.CreateNotificationRequest{
 		UserId:      payment.Payment.UserId,
 		Title:       "Receipt number arrived",
 		Description: "Your receipt number had been entered by admin",
@@ -119,7 +122,7 @@ func (client *ServiceClient) UpdateReceiptNumber(c *gin.Context) {
 		return
 	}
 
-	user, err := client.UserService.FindById(c.Request.Context(), &pbuser.FindByIdRequest{
+	userResponse, err := client.UserService.FindById(c.Request.Context(), &pbuser.FindByIdRequest{
 		Id: payment.Payment.UserId,
 	})
 	if err != nil {
@@ -129,9 +132,9 @@ func (client *ServiceClient) UpdateReceiptNumber(c *gin.Context) {
 
 	// Send Email
 	emailService := model.EmailService{
-		ToEmail: user.User.Email,
-		Subject: notification.Notification.Title,
-		Message: notification.Notification.Description,
+		ToEmail: userResponse.User.Email,
+		Subject: notificationResponse.Notification.Title,
+		Message: notificationResponse.Notification.Description,
 	}
 	err = client.Producer.Publish("mail_topic", emailService)
 	if err != nil {
@@ -202,7 +205,7 @@ func (client *ServiceClient) Notification(c *gin.Context) {
 	if isSettlement.IsSuccess {
 		idUser := util.StrToInt(resArray["custom_field1"].(string))
 		// Send Notification
-		notification, err := client.NotificationService.Create(c.Request.Context(), &pbnotification.CreateNotificationRequest{
+		notificationResponse, err := client.NotificationService.Create(c.Request.Context(), &pbnotification.CreateNotificationRequest{
 			UserId:      int64(idUser),
 			Title:       "Transaction Successfully",
 			Description: "You have successfully made a payment. Thank you for shopping at Ryzy Shop",
@@ -213,7 +216,7 @@ func (client *ServiceClient) Notification(c *gin.Context) {
 			return
 		}
 
-		user, err := client.UserService.FindById(c.Request.Context(), &pbuser.FindByIdRequest{
+		userResponse, err := client.UserService.FindById(c.Request.Context(), &pbuser.FindByIdRequest{
 			Id: int64(idUser),
 		})
 		if err != nil {
@@ -223,9 +226,9 @@ func (client *ServiceClient) Notification(c *gin.Context) {
 
 		// Send Email
 		emailService := model.EmailService{
-			ToEmail: user.User.Email,
-			Subject: notification.Notification.Title,
-			Message: notification.Notification.Description,
+			ToEmail: userResponse.User.Email,
+			Subject: notificationResponse.Notification.Title,
+			Message: notificationResponse.Notification.Description,
 		}
 		err = client.Producer.Publish("mail_topic", emailService)
 		if err != nil {

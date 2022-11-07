@@ -3,6 +3,7 @@ package user_order
 import (
 	"errors"
 	"github.com/arvians-id/go-apriori-microservice/adapter/middleware"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/payment"
 	pbpayment "github.com/arvians-id/go-apriori-microservice/adapter/pkg/payment/pb"
 	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/user-order/pb"
 	"github.com/arvians-id/go-apriori-microservice/adapter/response"
@@ -30,10 +31,10 @@ func NewUserOrderServiceClient(configuration *config.Config) pb.UserOrderService
 	return pb.NewUserOrderServiceClient(connection)
 }
 
-func RegisterRoutes(router *gin.Engine, configuration *config.Config, paymentService pbpayment.PaymentServiceClient) *ServiceClient {
+func RegisterRoutes(router *gin.Engine, configuration *config.Config) *ServiceClient {
 	serviceClient := &ServiceClient{
 		UserOrderService: NewUserOrderServiceClient(configuration),
-		PaymentService:   paymentService,
+		PaymentService:   payment.NewCommentServiceClient(configuration),
 	}
 
 	authorized := router.Group("/api", middleware.AuthJwtMiddleware())
@@ -85,7 +86,7 @@ func (client *ServiceClient) FindAllByUserId(c *gin.Context) {
 
 func (client *ServiceClient) FindAllById(c *gin.Context) {
 	orderIdParam := c.Param("order_id")
-	payment, err := client.PaymentService.FindByOrderId(c.Request.Context(), &pbpayment.GetPaymentByOrderIdRequest{
+	paymentResponse, err := client.PaymentService.FindByOrderId(c.Request.Context(), &pbpayment.GetPaymentByOrderIdRequest{
 		OrderId: orderIdParam,
 	})
 	if err != nil {
@@ -93,13 +94,12 @@ func (client *ServiceClient) FindAllById(c *gin.Context) {
 			response.ReturnErrorNotFound(c, err, nil)
 			return
 		}
-
 		response.ReturnErrorInternalServerError(c, err, nil)
 		return
 	}
 
 	userOrder, err := client.UserOrderService.FindAllByPayloadId(c.Request.Context(), &pb.GetUserOrderByPayloadIdRequest{
-		PayloadId: payment.Payment.IdPayload,
+		PayloadId: paymentResponse.Payment.IdPayload,
 	})
 	if err != nil {
 		response.ReturnErrorInternalServerError(c, err, nil)
@@ -124,7 +124,6 @@ func (client *ServiceClient) FindById(c *gin.Context) {
 			response.ReturnErrorNotFound(c, err, nil)
 			return
 		}
-
 		response.ReturnErrorInternalServerError(c, err, nil)
 		return
 	}

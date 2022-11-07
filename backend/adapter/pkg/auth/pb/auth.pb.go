@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.28.1
 // 	protoc        v3.21.9
-// source: adapter/pkg/jwt/pb/jwt.proto
+// source: adapter/pkg/auth/pb/auth.proto
 
 package pb
 
@@ -302,18 +302,18 @@ func file_adapter_pkg_auth_pb_auth_proto_rawDescGZIP() []byte {
 
 var file_adapter_pkg_auth_pb_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_adapter_pkg_auth_pb_auth_proto_goTypes = []interface{}{
-	(*PasswordReset)(nil),                  // 0: jwt.PasswordReset
-	(*GetPasswordResetResponse)(nil),       // 1: jwt.GetPasswordResetResponse
-	(*GetPasswordResetByEmailRequest)(nil), // 2: jwt.GetPasswordResetByEmailRequest
-	(*GetVerifyRequest)(nil),               // 3: jwt.GetVerifyRequest
+	(*PasswordReset)(nil),                  // 0: auth.PasswordReset
+	(*GetPasswordResetResponse)(nil),       // 1: auth.GetPasswordResetResponse
+	(*GetPasswordResetByEmailRequest)(nil), // 2: auth.GetPasswordResetByEmailRequest
+	(*GetVerifyRequest)(nil),               // 3: auth.GetVerifyRequest
 	(*emptypb.Empty)(nil),                  // 4: google.protobuf.Empty
 }
 var file_adapter_pkg_auth_pb_auth_proto_depIdxs = []int32{
-	0, // 0: jwt.GetPasswordResetResponse.password_reset:type_name -> jwt.PasswordReset
-	2, // 1: jwt.PasswordResetService.CreateOrUpdateByEmail:input_type -> jwt.GetPasswordResetByEmailRequest
-	0, // 2: jwt.PasswordResetService.Verify:input_type -> jwt.PasswordReset
-	1, // 3: jwt.PasswordResetService.CreateOrUpdateByEmail:output_type -> jwt.GetPasswordResetResponse
-	4, // 4: jwt.PasswordResetService.Verify:output_type -> google.protobuf.Empty
+	0, // 0: auth.GetPasswordResetResponse.password_reset:type_name -> auth.PasswordReset
+	2, // 1: auth.PasswordResetService.CreateOrUpdateByEmail:input_type -> auth.GetPasswordResetByEmailRequest
+	0, // 2: auth.PasswordResetService.Verify:input_type -> auth.PasswordReset
+	1, // 3: auth.PasswordResetService.CreateOrUpdateByEmail:output_type -> auth.GetPasswordResetResponse
+	4, // 4: auth.PasswordResetService.Verify:output_type -> google.protobuf.Empty
 	3, // [3:5] is the sub-list for method output_type
 	1, // [1:3] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
@@ -422,7 +422,7 @@ func NewPasswordResetServiceClient(cc grpc.ClientConnInterface) PasswordResetSer
 
 func (c *passwordResetServiceClient) CreateOrUpdateByEmail(ctx context.Context, in *GetPasswordResetByEmailRequest, opts ...grpc.CallOption) (*GetPasswordResetResponse, error) {
 	out := new(GetPasswordResetResponse)
-	err := c.cc.Invoke(ctx, "/jwt.PasswordResetService/CreateOrUpdateByEmail", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/auth.PasswordResetService/CreateOrUpdateByEmail", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -431,7 +431,7 @@ func (c *passwordResetServiceClient) CreateOrUpdateByEmail(ctx context.Context, 
 
 func (c *passwordResetServiceClient) Verify(ctx context.Context, in *PasswordReset, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/jwt.PasswordResetService/Verify", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/auth.PasswordResetService/Verify", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -469,7 +469,7 @@ func _PasswordResetService_CreateOrUpdateByEmail_Handler(srv interface{}, ctx co
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/jwt.PasswordResetService/CreateOrUpdateByEmail",
+		FullMethod: "/auth.PasswordResetService/CreateOrUpdateByEmail",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PasswordResetServiceServer).CreateOrUpdateByEmail(ctx, req.(*GetPasswordResetByEmailRequest))
@@ -487,7 +487,7 @@ func _PasswordResetService_Verify_Handler(srv interface{}, ctx context.Context, 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/jwt.PasswordResetService/Verify",
+		FullMethod: "/auth.PasswordResetService/Verify",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PasswordResetServiceServer).Verify(ctx, req.(*PasswordReset))
@@ -496,7 +496,7 @@ func _PasswordResetService_Verify_Handler(srv interface{}, ctx context.Context, 
 }
 
 var _PasswordResetService_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "jwt.PasswordResetService",
+	ServiceName: "auth.PasswordResetService",
 	HandlerType: (*PasswordResetServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -509,5 +509,5 @@ var _PasswordResetService_serviceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "adapter/pkg/jwt/pb/jwt.proto",
+	Metadata: "adapter/pkg/auth/pb/auth.proto",
 }

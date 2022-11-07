@@ -22,12 +22,12 @@ message Product {
   int64 IdProduct = 1;
   string Code = 2;
   string Name = 3;
-  string Description = 4;
+  optional string Description = 4;
   int32 Price = 5;
   string Category = 6;
   bool IsEmpty = 7;
   int32 Mass = 8;
-  string Image = 9;
+  optional string Image = 9;
   google.protobuf.Timestamp CreatedAt = 10;
   google.protobuf.Timestamp UpdatedAt = 11;
 }
@@ -37,8 +37,8 @@ message ProductRecommendation {
   string AprioriCode = 2;
   string AprioriItem = 3;
   float AprioriDiscount = 4;
-  string AprioriDescription = 5;
-  string AprioriImage = 6;
+  optional string AprioriDescription = 5;
+  optional string AprioriImage = 6;
   int32 ProductTotalPrice = 7;
   int32 PriceDiscount = 8;
   int32 Mass = 9;

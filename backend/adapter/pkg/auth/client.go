@@ -11,6 +11,7 @@ import (
 	"github.com/arvians-id/go-apriori-microservice/config"
 	"github.com/arvians-id/go-apriori-microservice/model"
 	"github.com/arvians-id/go-apriori-microservice/third-party/jwt"
+	messaging "github.com/arvians-id/go-apriori-microservice/third-party/message-queue"
 	"github.com/arvians-id/go-apriori-microservice/util"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
@@ -25,7 +26,8 @@ import (
 type ServiceClient struct {
 	PasswordResetService pb.PasswordResetServiceClient
 	UserService          pbuser.UserServiceClient
-	Jwt                  jwt.JsonWebToken
+	Jwt                  *jwt.JsonWebToken
+	Producer             *messaging.Producer
 }
 
 func NewAuthServiceClient(configuration *config.Config) pb.PasswordResetServiceClient {
@@ -37,11 +39,12 @@ func NewAuthServiceClient(configuration *config.Config) pb.PasswordResetServiceC
 	return pb.NewPasswordResetServiceClient(connection)
 }
 
-func RegisterRoutes(router *gin.Engine, configuration *config.Config, userService *user.ServiceClient, jwt jwt.JsonWebToken) *ServiceClient {
+func RegisterRoutes(router *gin.Engine, configuration *config.Config, jwt *jwt.JsonWebToken, producer *messaging.Producer) *ServiceClient {
 	serviceClient := &ServiceClient{
 		PasswordResetService: NewAuthServiceClient(configuration),
-		UserService:          *userService,
+		UserService:          user.NewUserServiceClient(configuration),
 		Jwt:                  jwt,
+		Producer:             producer,
 	}
 
 	authorized := router.Group("/api/jwt", middleware.AuthJwtMiddleware())
@@ -70,7 +73,7 @@ func (client *ServiceClient) Login(c *gin.Context) {
 		return
 	}
 
-	user, err := client.UserService.FindByEmail(c.Request.Context(), &pbuser.FindByEmailRequest{
+	userResponse, err := client.UserService.FindByEmail(c.Request.Context(), &pbuser.FindByEmailRequest{
 		Email:    requestCredential.Email,
 		Password: requestCredential.Password,
 	})
@@ -97,7 +100,7 @@ func (client *ServiceClient) Login(c *gin.Context) {
 	}
 
 	expirationTime := time.Now().Add(time.Duration(expiredTimeAccess) * 24 * time.Hour)
-	token, err := client.Jwt.GenerateToken(user.User.IdUser, user.User.Role, expirationTime)
+	token, err := client.Jwt.GenerateToken(userResponse.User.IdUser, userResponse.User.Role, expirationTime)
 	if err != nil {
 		response.ReturnErrorInternalServerError(c, err, nil)
 		return
@@ -161,7 +164,7 @@ func (client *ServiceClient) Register(c *gin.Context) {
 		return
 	}
 
-	user, err := client.UserService.Create(c.Request.Context(), &pbuser.CreateRequest{
+	userResponse, err := client.UserService.Create(c.Request.Context(), &pbuser.CreateRequest{
 		Name:     requestCreate.Name,
 		Email:    requestCreate.Email,
 		Password: requestCreate.Password,
@@ -173,7 +176,7 @@ func (client *ServiceClient) Register(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "created", user)
+	response.ReturnSuccessOK(c, "created", userResponse)
 }
 
 func (client *ServiceClient) ForgotPassword(c *gin.Context) {

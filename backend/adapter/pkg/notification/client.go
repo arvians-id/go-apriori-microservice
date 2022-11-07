@@ -17,7 +17,7 @@ type ServiceClient struct {
 	NotificationService pb.NotificationServiceClient
 }
 
-func NewCommentServiceClient(configuration *config.Config) pb.NotificationServiceClient {
+func NewNotificationServiceClient(configuration *config.Config) pb.NotificationServiceClient {
 	connection, err := grpc.Dial(configuration.NotificationSvcUrl, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalln(err)
@@ -28,7 +28,7 @@ func NewCommentServiceClient(configuration *config.Config) pb.NotificationServic
 
 func RegisterRoutes(router *gin.Engine, configuration *config.Config) *ServiceClient {
 	serviceClient := &ServiceClient{
-		NotificationService: NewCommentServiceClient(configuration),
+		NotificationService: NewNotificationServiceClient(configuration),
 	}
 
 	authorized := router.Group("/api", middleware.AuthJwtMiddleware())

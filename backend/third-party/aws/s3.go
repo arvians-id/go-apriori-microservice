@@ -2,8 +2,8 @@ package aws
 
 import (
 	"fmt"
-	"github.com/arvians-id/go-microservice/config"
-	"github.com/arvians-id/go-microservice/util"
+	"github.com/arvians-id/go-apriori-microservice/config"
+	"github.com/arvians-id/go-apriori-microservice/util"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
