@@ -89,13 +89,13 @@ func FindConfidence(apriori []*model.GenerateApriori, productName map[string]flo
 	var confidence []*model.GenerateApriori
 	for _, value := range apriori {
 		if value.Iterate == apriori[len(apriori)-1].Iterate {
-			if val, ok := productName[value.ItemSet[0]]; ok && value.Support >= minSupport && float64(value.Transaction)/val*100 >= minConfidence {
+			if val, ok := productName[value.ItemSet[0]]; ok && value.Support >= float32(minSupport) && float64(value.Transaction)/val*100 >= minConfidence {
 				confidence = append(confidence, &model.GenerateApriori{
 					ItemSet:     value.ItemSet,
 					Support:     value.Support,
 					Iterate:     value.Iterate,
 					Transaction: value.Transaction,
-					Confidence:  float64(value.Transaction) / val * 100,
+					Confidence:  float32(float64(value.Transaction) / val * 100),
 				})
 			}
 		}
@@ -156,7 +156,7 @@ func FindDiscount(apriori []*model.GenerateApriori, minDiscount float64, maxDisc
 			Iterate:     value.Iterate,
 			Transaction: value.Transaction,
 			Confidence:  value.Confidence,
-			Discount:    minDiscount,
+			Discount:    float32(minDiscount),
 		})
 	}
 

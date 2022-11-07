@@ -6,6 +6,7 @@ option go_package = "./adapter/pkg/apriori/pb";
 
 import "google/protobuf/Empty.proto";
 import "google/protobuf/Timestamp.proto";
+import "adapter/pkg/product/pb/product.proto";
 
 service AprioriService {
   rpc FindAll(google.protobuf.Empty) returns (ListAprioriResponse);
@@ -67,7 +68,7 @@ message GetAprioriByCodeAndIdRequest {
 }
 
 message GetAprioriByCodeAndIdResponse {
-  Apriori apriori = 1;
+  product.ProductRecommendation productRecommendation = 1;
 }
 
 message CreateAprioriRequest {

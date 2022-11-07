@@ -13,6 +13,7 @@ service ProductService {
   rpc FindAllBySimilarCategory(GetProductByProductCodeRequest) returns (ListProductResponse);
   rpc FindAllRecommendation(GetProductByProductCodeRequest) returns (ListProductRecommendationResponse);
   rpc FindByCode(GetProductByProductCodeRequest) returns (GetProductResponse);
+  rpc FindByName(GetProductByProductNameRequest) returns (GetProductResponse);
   rpc Create(CreateProductRequest) returns (GetProductResponse);
   rpc Update(UpdateProductRequest) returns (GetProductResponse);
   rpc Delete(GetProductByProductCodeRequest) returns (google.protobuf.Empty);
@@ -58,6 +59,10 @@ message GetProductResponse {
 
 message GetProductByProductCodeRequest {
   string Code = 1;
+}
+
+message GetProductByProductNameRequest {
+  string Name = 1;
 }
 
 message GetProductByFiltersRequest {

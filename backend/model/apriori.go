@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/apriori/pb"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"time"
+)
 
 type Apriori struct {
 	IdApriori   int64     `json:"id_apriori"`
@@ -15,6 +19,23 @@ type Apriori struct {
 	Mass        int32     `json:"mass"`
 	Image       *string   `json:"image"`
 	CreatedAt   time.Time `json:"created_at"`
+}
+
+func (apriori *Apriori) ToProtoBuf() *pb.Apriori {
+	return &pb.Apriori{
+		IdApriori:   apriori.IdApriori,
+		Code:        apriori.Code,
+		Item:        apriori.Item,
+		Discount:    apriori.Discount,
+		Support:     apriori.Support,
+		Confidence:  apriori.Confidence,
+		RangeDate:   apriori.RangeDate,
+		IsActive:    apriori.IsActive,
+		Description: apriori.Description,
+		Mass:        apriori.Mass,
+		Image:       apriori.Image,
+		CreatedAt:   timestamppb.New(apriori.CreatedAt),
+	}
 }
 
 type GenerateApriori struct {

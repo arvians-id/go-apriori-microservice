@@ -9,6 +9,7 @@ import "google/protobuf/Timestamp.proto";
 
 service TransactionService {
   rpc FindAll(google.protobuf.Empty) returns (ListTransactionsResponse);
+  rpc FindAllItemSet(GetAllItemSetTransactionRequest) returns (ListTransactionsResponse);
   rpc FindByNoTransaction(GetTransactionByNoTransactionRequest) returns (GetTransactionResponse);
   rpc Create(CreateTransactionRequest) returns (GetTransactionResponse);
   rpc CreateByCSV(CreateTransactionByCSVRequest) returns (google.protobuf.Empty);
@@ -32,6 +33,11 @@ message ListTransactionsResponse {
 
 message GetTransactionResponse {
   Transaction Transaction = 1;
+}
+
+message GetAllItemSetTransactionRequest {
+  string StartDate = 1;
+  string EndDate = 2;
 }
 
 message GetTransactionByNoTransactionRequest {

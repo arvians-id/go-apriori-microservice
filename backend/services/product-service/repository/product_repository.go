@@ -246,7 +246,7 @@ func (repository *ProductRepositoryImpl) Create(ctx context.Context, tx *sql.Tx,
 		return nil, err
 	}
 
-	product.IdProduct = id
+	product.IdProduct = int64(id)
 
 	return product, nil
 }
