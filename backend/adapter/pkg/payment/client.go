@@ -122,7 +122,7 @@ func (client *ServiceClient) UpdateReceiptNumber(c *gin.Context) {
 		return
 	}
 
-	userResponse, err := client.UserService.FindById(c.Request.Context(), &pbuser.FindByIdRequest{
+	userResponse, err := client.UserService.FindById(c.Request.Context(), &pbuser.GetUserByIdRequest{
 		Id: payment.Payment.UserId,
 	})
 	if err != nil {
@@ -195,7 +195,7 @@ func (client *ServiceClient) Notification(c *gin.Context) {
 	}
 
 	isSettlement, err := client.PaymentService.CreateOrUpdate(c.Request.Context(), &pb.CreatePaymentRequest{
-		Payment: resArray,
+		Payment: encode,
 	})
 	if err != nil {
 		response.ReturnErrorInternalServerError(c, err, nil)
@@ -216,7 +216,7 @@ func (client *ServiceClient) Notification(c *gin.Context) {
 			return
 		}
 
-		userResponse, err := client.UserService.FindById(c.Request.Context(), &pbuser.FindByIdRequest{
+		userResponse, err := client.UserService.FindById(c.Request.Context(), &pbuser.GetUserByIdRequest{
 			Id: int64(idUser),
 		})
 		if err != nil {

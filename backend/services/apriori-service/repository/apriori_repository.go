@@ -143,7 +143,7 @@ func (repository *AprioriRepositoryImpl) FindAllByCode(ctx context.Context, tx *
 	return apriories, nil
 }
 
-func (repository *AprioriRepositoryImpl) FindByCodeAndId(ctx context.Context, tx *sql.Tx, code string, id int) (*model.Apriori, error) {
+func (repository *AprioriRepositoryImpl) FindByCodeAndId(ctx context.Context, tx *sql.Tx, code string, id int64) (*model.Apriori, error) {
 	query := `SELECT * FROM apriories WHERE code = $1 AND id_apriori = $2`
 	row := tx.QueryRowContext(ctx, query, code, id)
 

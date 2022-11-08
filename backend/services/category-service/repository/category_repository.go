@@ -44,7 +44,7 @@ func (repository *CategoryRepositoryImpl) FindAll(ctx context.Context, tx *sql.T
 	return categories, nil
 }
 
-func (repository *CategoryRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id int) (*model.Category, error) {
+func (repository *CategoryRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id int64) (*model.Category, error) {
 	query := "SELECT * FROM categories WHERE id_category = $1"
 	row := tx.QueryRowContext(ctx, query, id)
 
@@ -59,7 +59,7 @@ func (repository *CategoryRepositoryImpl) FindById(ctx context.Context, tx *sql.
 }
 
 func (repository *CategoryRepositoryImpl) Create(ctx context.Context, tx *sql.Tx, category *model.Category) (*model.Category, error) {
-	id := 0
+	var id int64
 	query := "INSERT INTO categories (name,created_at,updated_at) VALUES($1,$2,$3) RETURNING id_category"
 	row := tx.QueryRowContext(ctx, query, category.Name, category.CreatedAt, category.UpdatedAt)
 	err := row.Scan(&id)
@@ -84,7 +84,7 @@ func (repository *CategoryRepositoryImpl) Update(ctx context.Context, tx *sql.Tx
 	return category, nil
 }
 
-func (repository *CategoryRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, id int) error {
+func (repository *CategoryRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, id int64) error {
 	query := "DELETE FROM categories WHERE id_category = $1"
 	_, err := tx.ExecContext(ctx, query, id)
 	if err != nil {

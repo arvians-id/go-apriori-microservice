@@ -3,34 +3,36 @@ package service
 import (
 	"context"
 	"database/sql"
-	"github.com/arvians-id/apriori/internal/model"
-	"github.com/arvians-id/apriori/internal/repository"
-	"github.com/arvians-id/apriori/util"
+	pbpayment "github.com/arvians-id/go-apriori-microservice/adapter/pkg/payment/pb"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/user-order/pb"
+	pbuser "github.com/arvians-id/go-apriori-microservice/adapter/pkg/user/pb"
+	"github.com/arvians-id/go-apriori-microservice/services/user-order-service/repository"
+	"github.com/arvians-id/go-apriori-microservice/util"
 	"log"
 )
 
-type UserOrderServiceImpl struct {
-	PaymentRepository   repository.PaymentRepository
+type UserOrderService struct {
 	UserOrderRepository repository.UserOrderRepository
-	UserRepository      repository.UserRepository
+	PaymentService      pbpayment.PaymentServiceClient
+	UserService         pbuser.UserServiceClient
 	DB                  *sql.DB
 }
 
 func NewUserOrderService(
-	paymentRepository *repository.PaymentRepository,
 	userOrderRepository *repository.UserOrderRepository,
-	userRepository *repository.UserRepository,
+	PpaymentService pbpayment.PaymentServiceClient,
+	userService pbuser.UserServiceClient,
 	db *sql.DB,
-) UserOrderService {
-	return &UserOrderServiceImpl{
-		PaymentRepository:   *paymentRepository,
+) pb.UserOrderServiceServer {
+	return &UserOrderService{
 		UserOrderRepository: *userOrderRepository,
-		UserRepository:      *userRepository,
+		PaymentService:      PpaymentService,
+		UserService:         userService,
 		DB:                  db,
 	}
 }
 
-func (service *UserOrderServiceImpl) FindAllByPayloadId(ctx context.Context, payloadId int) ([]*model.UserOrder, error) {
+func (service *UserOrderService) FindAllByPayloadId(ctx context.Context, req *pb.GetUserOrderByPayloadIdRequest) (*pb.ListUserOrderResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[UserOrderService][FindAllByPayloadId] problem in db transaction, err: ", err.Error())
@@ -47,7 +49,7 @@ func (service *UserOrderServiceImpl) FindAllByPayloadId(ctx context.Context, pay
 	return userOrders, nil
 }
 
-func (service *UserOrderServiceImpl) FindAllByUserId(ctx context.Context, userId int) ([]*model.UserOrder, error) {
+func (service *UserOrderService) FindAllByUserId(ctx context.Context, req *pb.GetUserOrderByUserIdRequest) (*pb.ListUserOrderResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[UserOrderService][FindAllByUserId] problem in db transaction, err: ", err.Error())
@@ -70,7 +72,7 @@ func (service *UserOrderServiceImpl) FindAllByUserId(ctx context.Context, userId
 	return userOrders, nil
 }
 
-func (service *UserOrderServiceImpl) FindById(ctx context.Context, id int) (*model.UserOrder, error) {
+func (service *UserOrderService) FindById(ctx context.Context, req *pb.GetUserOrderByIdRequest) (*pb.GetUserOrderResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[UserOrderService][FindById] problem in db transaction, err: ", err.Error())
@@ -81,6 +83,23 @@ func (service *UserOrderServiceImpl) FindById(ctx context.Context, id int) (*mod
 	userOrder, err := service.UserOrderRepository.FindById(ctx, tx, id)
 	if err != nil {
 		log.Println("[UserOrderService][FindById][FindById] problem in getting from repository, err: ", err.Error())
+		return nil, err
+	}
+
+	return userOrder, nil
+}
+
+func (service *UserOrderService) Create(ctx context.Context, req *pb.CreateUserOrderRequest) (*pb.GetUserOrderResponse, error) {
+	tx, err := service.DB.Begin()
+	if err != nil {
+		log.Println("[UserOrderService][Create] problem in db transaction, err: ", err.Error())
+		return nil, err
+	}
+	defer util.CommitOrRollback(tx)
+
+	userOrder, err := service.UserOrderRepository.Create(ctx, tx, req)
+	if err != nil {
+		log.Println("[UserOrderService][Create][Create] problem in getting from repository, err: ", err.Error())
 		return nil, err
 	}
 

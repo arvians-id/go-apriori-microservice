@@ -25,9 +25,13 @@ message Comment {
 }
 
 message ListRatingFromCommentResponse {
+  message RatingFromComment {
     int32 Rating = 1;
     int32 ResultRating = 2;
     int32 ResultComment = 3;
+  }
+
+  repeated RatingFromComment RatingFromComments = 1;
 }
 
 message ListCommentResponse {

@@ -10,7 +10,7 @@ type AprioriRepository interface {
 	FindAll(ctx context.Context, tx *sql.Tx) ([]*model.Apriori, error)
 	FindAllByActive(ctx context.Context, tx *sql.Tx) ([]*model.Apriori, error)
 	FindAllByCode(ctx context.Context, tx *sql.Tx, code string) ([]*model.Apriori, error)
-	FindByCodeAndId(ctx context.Context, tx *sql.Tx, code string, id int) (*model.Apriori, error)
+	FindByCodeAndId(ctx context.Context, tx *sql.Tx, code string, id int64) (*model.Apriori, error)
 	Create(ctx context.Context, tx *sql.Tx, apriories []*model.Apriori) error
 	Update(ctx context.Context, tx *sql.Tx, apriori *model.Apriori) (*model.Apriori, error)
 	Delete(ctx context.Context, tx *sql.Tx, code string) error

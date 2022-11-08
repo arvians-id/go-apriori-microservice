@@ -28,12 +28,6 @@ type ProductRecommendation struct {
 	Mass               int32   `json:"mass"`
 }
 
-type RatingFromComment struct {
-	Rating        int32 `json:"rating"`
-	ResultRating  int32 `json:"result_rating"`
-	ResultComment int32 `json:"result_comment"`
-}
-
 type GetProductNameTransactionResponse struct {
 	ProductName []string `json:"product_name"`
 }

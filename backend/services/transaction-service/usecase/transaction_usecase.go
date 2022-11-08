@@ -3,34 +3,37 @@ package usecase
 import (
 	"context"
 	"database/sql"
-	"github.com/arvians-id/apriori/internal/http/presenter/request"
-	"github.com/arvians-id/apriori/internal/model"
-	"github.com/arvians-id/apriori/internal/repository"
-	"github.com/arvians-id/apriori/util"
+	pbproduct "github.com/arvians-id/go-apriori-microservice/adapter/pkg/product/pb"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/transaction/pb"
+	"github.com/arvians-id/go-apriori-microservice/model"
+	"github.com/arvians-id/go-apriori-microservice/services/transaction-service/repository"
+	"github.com/arvians-id/go-apriori-microservice/util"
+	"github.com/golang/protobuf/ptypes/empty"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"log"
 	"strings"
 	"time"
 )
 
-type TransactionServiceImpl struct {
+type TransactionService struct {
 	TransactionRepository repository.TransactionRepository
-	ProductRepository     repository.ProductRepository
+	ProductService        pbproduct.ProductServiceClient
 	DB                    *sql.DB
 }
 
 func NewTransactionService(
 	transactionRepository *repository.TransactionRepository,
-	productRepository *repository.ProductRepository,
+	productService pbproduct.ProductServiceClient,
 	db *sql.DB,
-) TransactionService {
-	return &TransactionServiceImpl{
+) pb.TransactionServiceClient {
+	return &TransactionService{
 		TransactionRepository: *transactionRepository,
-		ProductRepository:     *productRepository,
+		ProductService:        productService,
 		DB:                    db,
 	}
 }
 
-func (service *TransactionServiceImpl) FindAll(ctx context.Context) ([]*model.Transaction, error) {
+func (service *TransactionService) FindAll(ctx context.Context, empty *empty.Empty) (*pb.ListTransactionsResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[TransactionService][FindAll] problem in db transaction, err: ", err.Error())
@@ -47,7 +50,24 @@ func (service *TransactionServiceImpl) FindAll(ctx context.Context) ([]*model.Tr
 	return transactions, nil
 }
 
-func (service *TransactionServiceImpl) FindByNoTransaction(ctx context.Context, noTransaction string) (*model.Transaction, error) {
+func (service *TransactionService) FindAllItemSet(ctx context.Context, req *pb.GetAllItemSetTransactionRequest) (*pb.ListTransactionsResponse, error) {
+	tx, err := service.DB.Begin()
+	if err != nil {
+		log.Println("[TransactionService][FindAll] problem in db transaction, err: ", err.Error())
+		return nil, err
+	}
+	defer util.CommitOrRollback(tx)
+
+	transactions, err := service.TransactionRepository.FindAll(ctx, tx)
+	if err != nil {
+		log.Println("[TransactionService][FindAll][FindAll] problem in getting from repository, err: ", err.Error())
+		return nil, err
+	}
+
+	return transactions, nil
+}
+
+func (service *TransactionService) FindByNoTransaction(ctx context.Context, req *pb.GetTransactionByNoTransactionRequest) (*pb.GetTransactionResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[TransactionService][FindByNoTransaction] problem in db transaction, err: ", err.Error())
@@ -64,7 +84,7 @@ func (service *TransactionServiceImpl) FindByNoTransaction(ctx context.Context, 
 	return transaction, nil
 }
 
-func (service *TransactionServiceImpl) Create(ctx context.Context, request *request.CreateTransactionRequest) (*model.Transaction, error) {
+func (service *TransactionService) Create(ctx context.Context, req *pb.CreateTransactionRequest) (*pb.GetTransactionResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[TransactionService][Create] problem in db transaction, err: ", err.Error())
@@ -78,10 +98,15 @@ func (service *TransactionServiceImpl) Create(ctx context.Context, request *requ
 		return nil, err
 	}
 
+	noTransaction := util.CreateTransaction()
+	if req.NoTransaction != nil {
+		noTransaction = *req.NoTransaction
+	}
+
 	transactionRequest := model.Transaction{
 		ProductName:   strings.ToLower(request.ProductName),
 		CustomerName:  request.CustomerName,
-		NoTransaction: util.CreateTransaction(),
+		NoTransaction: noTransaction,
 		CreatedAt:     timeNow,
 		UpdatedAt:     timeNow,
 	}
@@ -95,7 +120,7 @@ func (service *TransactionServiceImpl) Create(ctx context.Context, request *requ
 	return transaction, nil
 }
 
-func (service *TransactionServiceImpl) CreateByCsv(ctx context.Context, data [][]string) error {
+func (service *TransactionService) CreateByCSV(ctx context.Context, req *pb.CreateTransactionByCSVRequest) (*empty.Empty, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[TransactionService][CreateByCsv] problem in db transaction, err: ", err.Error())
@@ -124,7 +149,7 @@ func (service *TransactionServiceImpl) CreateByCsv(ctx context.Context, data [][
 	return nil
 }
 
-func (service *TransactionServiceImpl) Update(ctx context.Context, request *request.UpdateTransactionRequest) (*model.Transaction, error) {
+func (service *TransactionService) Update(ctx context.Context, req *pb.UpdateTransactionRequest) (*pb.GetTransactionResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[TransactionService][Update] problem in db transaction, err: ", err.Error())
@@ -159,7 +184,7 @@ func (service *TransactionServiceImpl) Update(ctx context.Context, request *requ
 	return transaction, nil
 }
 
-func (service *TransactionServiceImpl) Delete(ctx context.Context, noTransaction string) error {
+func (service *TransactionService) Delete(ctx context.Context, req *pb.GetTransactionByNoTransactionRequest) (*emptypb.Empty, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[TransactionService][Delete] problem in db transaction, err: ", err.Error())
@@ -182,7 +207,7 @@ func (service *TransactionServiceImpl) Delete(ctx context.Context, noTransaction
 	return nil
 }
 
-func (service *TransactionServiceImpl) Truncate(ctx context.Context) error {
+func (service *TransactionService) Truncate(ctx context.Context, empty *empty.Empty) (*emptypb.Empty, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[TransactionService][Truncate] problem in db transaction, err: ", err.Error())

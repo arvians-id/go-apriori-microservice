@@ -56,7 +56,7 @@ func (repository *NotificationRepositoryImpl) FindAll(ctx context.Context, tx *s
 	return notifications, nil
 }
 
-func (repository *NotificationRepositoryImpl) FindAllByUserId(ctx context.Context, tx *sql.Tx, userId int) ([]*model.Notification, error) {
+func (repository *NotificationRepositoryImpl) FindAllByUserId(ctx context.Context, tx *sql.Tx, userId int64) ([]*model.Notification, error) {
 	query := `SELECT * FROM notifications WHERE user_id = $1 ORDER BY created_at DESC`
 	rows, err := tx.QueryContext(ctx, query, userId)
 	if err != nil {
@@ -95,7 +95,7 @@ func (repository *NotificationRepositoryImpl) FindAllByUserId(ctx context.Contex
 }
 
 func (repository *NotificationRepositoryImpl) Create(ctx context.Context, tx *sql.Tx, notification *model.Notification) (*model.Notification, error) {
-	id := 0
+	var id int64
 	query := `INSERT INTO notifications (user_id, title, description, url, is_read, created_at) VALUES($1, $2, $3, $4, $5, $6) RETURNING id_notification`
 	row := tx.QueryRowContext(
 		ctx,
@@ -118,7 +118,7 @@ func (repository *NotificationRepositoryImpl) Create(ctx context.Context, tx *sq
 	return notification, nil
 }
 
-func (repository *NotificationRepositoryImpl) Mark(ctx context.Context, tx *sql.Tx, id int) error {
+func (repository *NotificationRepositoryImpl) Mark(ctx context.Context, tx *sql.Tx, id int64) error {
 	query := `UPDATE notifications SET is_read = TRUE WHERE id_notification = $1`
 	_, err := tx.ExecContext(ctx, query, id)
 	if err != nil {
@@ -129,7 +129,7 @@ func (repository *NotificationRepositoryImpl) Mark(ctx context.Context, tx *sql.
 	return nil
 }
 
-func (repository *NotificationRepositoryImpl) MarkAll(ctx context.Context, tx *sql.Tx, userId int) error {
+func (repository *NotificationRepositoryImpl) MarkAll(ctx context.Context, tx *sql.Tx, userId int64) error {
 	query := `UPDATE notifications SET is_read = TRUE WHERE user_id = $1`
 	_, err := tx.ExecContext(ctx, query, userId)
 	if err != nil {

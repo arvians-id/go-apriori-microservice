@@ -4,28 +4,29 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"github.com/arvians-id/apriori/internal/http/presenter/request"
-	"github.com/arvians-id/apriori/internal/model"
-	"github.com/arvians-id/apriori/internal/repository"
-	"github.com/arvians-id/apriori/util"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/user/pb"
+	"github.com/arvians-id/go-apriori-microservice/model"
+	"github.com/arvians-id/go-apriori-microservice/services/user-service/repository"
+	"github.com/arvians-id/go-apriori-microservice/util"
+	"github.com/golang/protobuf/ptypes/empty"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"time"
 )
 
-type UserServiceImpl struct {
+type UserService struct {
 	UserRepository repository.UserRepository
 	DB             *sql.DB
 }
 
-func NewUserService(userRepository *repository.UserRepository, db *sql.DB) UserService {
-	return &UserServiceImpl{
+func NewUserService(userRepository *repository.UserRepository, db *sql.DB) pb.UserServiceServer {
+	return &UserService{
 		UserRepository: *userRepository,
 		DB:             db,
 	}
 }
 
-func (service *UserServiceImpl) FindAll(ctx context.Context) ([]*model.User, error) {
+func (service *UserService) FindAll(ctx context.Context, empty *empty.Empty) (*pb.ListUserResponse, error) {
 	var tx *sql.Tx
 	if service.DB != nil {
 		transaction, err := service.DB.Begin()
@@ -46,7 +47,7 @@ func (service *UserServiceImpl) FindAll(ctx context.Context) ([]*model.User, err
 	return users, nil
 }
 
-func (service *UserServiceImpl) FindById(ctx context.Context, id int) (*model.User, error) {
+func (service *UserService) FindById(ctx context.Context, req *pb.GetUserByIdRequest) (*pb.GetUserResponse, error) {
 	var tx *sql.Tx
 	if service.DB != nil {
 		transaction, err := service.DB.Begin()
@@ -67,7 +68,7 @@ func (service *UserServiceImpl) FindById(ctx context.Context, id int) (*model.Us
 	return user, nil
 }
 
-func (service *UserServiceImpl) FindByEmail(ctx context.Context, request *request.GetUserCredentialRequest) (*model.User, error) {
+func (service *UserService) FindByEmail(ctx context.Context, req *pb.GetUserByEmailRequest) (*pb.GetUserResponse, error) {
 	var tx *sql.Tx
 	if service.DB != nil {
 		transaction, err := service.DB.Begin()
@@ -94,7 +95,7 @@ func (service *UserServiceImpl) FindByEmail(ctx context.Context, request *reques
 	return user, nil
 }
 
-func (service *UserServiceImpl) Create(ctx context.Context, request *request.CreateUserRequest) (*model.User, error) {
+func (service *UserService) Create(ctx context.Context, req *pb.CreateUserRequest) (*pb.GetUserResponse, error) {
 	var tx *sql.Tx
 	if service.DB != nil {
 		transaction, err := service.DB.Begin()
@@ -137,7 +138,7 @@ func (service *UserServiceImpl) Create(ctx context.Context, request *request.Cre
 	return user, nil
 }
 
-func (service *UserServiceImpl) Update(ctx context.Context, request *request.UpdateUserRequest) (*model.User, error) {
+func (service *UserService) Update(ctx context.Context, req *pb.UpdateUserRequest) (*pb.GetUserResponse, error) {
 	var tx *sql.Tx
 	if service.DB != nil {
 		transaction, err := service.DB.Begin()
@@ -188,7 +189,7 @@ func (service *UserServiceImpl) Update(ctx context.Context, request *request.Upd
 	return user, nil
 }
 
-func (service *UserServiceImpl) Delete(ctx context.Context, id int) error {
+func (service *UserService) Delete(ctx context.Context, req *pb.GetUserByIdRequest) (*empty.Empty, error) {
 	var tx *sql.Tx
 	if service.DB != nil {
 		transaction, err := service.DB.Begin()

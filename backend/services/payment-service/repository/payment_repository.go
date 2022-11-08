@@ -72,7 +72,7 @@ func (repository *PaymentRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx
 	return payments, nil
 }
 
-func (repository *PaymentRepositoryImpl) FindAllByUserId(ctx context.Context, tx *sql.Tx, userId int) ([]*model.Payment, error) {
+func (repository *PaymentRepositoryImpl) FindAllByUserId(ctx context.Context, tx *sql.Tx, userId int64) ([]*model.Payment, error) {
 	query := `SELECT * FROM payloads 
 			  WHERE user_id = $1 
 			  ORDER BY settlement_time DESC, bank_type DESC`
@@ -163,7 +163,7 @@ func (repository *PaymentRepositoryImpl) FindByOrderId(ctx context.Context, tx *
 }
 
 func (repository *PaymentRepositoryImpl) Create(ctx context.Context, tx *sql.Tx, payment *model.Payment) (*model.Payment, error) {
-	id := 0
+	var id int64
 	query := `INSERT INTO payloads(user_id,order_id,transaction_time,transaction_status,transaction_id,status_code,signature_key,settlement_time,payment_type,merchant_id,gross_amount,fraud_status,bank_type,va_number,biller_code,bill_key,receipt_number,address,courier,courier_service) 
 			  VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)  RETURNING id_payload`
 	row := tx.QueryRowContext(

@@ -21,7 +21,7 @@ type Apriori struct {
 	CreatedAt   time.Time `json:"created_at"`
 }
 
-func (apriori *Apriori) ToProtoBuf() *pb.Apriori {
+func (apriori *Apriori) ToProtoBuff() *pb.Apriori {
 	return &pb.Apriori{
 		IdApriori:   apriori.IdApriori,
 		Code:        apriori.Code,

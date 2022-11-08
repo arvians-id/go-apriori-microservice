@@ -12,7 +12,6 @@ import (
 	"github.com/arvians-id/go-apriori-microservice/third-party/aws"
 	"github.com/arvians-id/go-apriori-microservice/util"
 	"google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"log"
 	"math"
 	"os"
@@ -60,20 +59,7 @@ func (service *AprioriService) FindAll(ctx context.Context, empty *emptypb.Empty
 
 	var aprioriResponse []*pb.Apriori
 	for _, apriori := range apriories {
-		aprioriResponse = append(aprioriResponse, &pb.Apriori{
-			IdApriori:   apriori.IdApriori,
-			Code:        apriori.Code,
-			Item:        apriori.Item,
-			Discount:    apriori.Discount,
-			Support:     apriori.Support,
-			Confidence:  apriori.Confidence,
-			RangeDate:   apriori.RangeDate,
-			IsActive:    apriori.IsActive,
-			Description: apriori.Description,
-			Mass:        apriori.Mass,
-			Image:       apriori.Image,
-			CreatedAt:   timestamppb.New(apriori.CreatedAt),
-		})
+		aprioriResponse = append(aprioriResponse, apriori.ToProtoBuff())
 	}
 
 	return &pb.ListAprioriResponse{
@@ -97,20 +83,7 @@ func (service *AprioriService) FindAllByActive(ctx context.Context, empty *empty
 
 	var aprioriResponse []*pb.Apriori
 	for _, apriori := range apriories {
-		aprioriResponse = append(aprioriResponse, &pb.Apriori{
-			IdApriori:   apriori.IdApriori,
-			Code:        apriori.Code,
-			Item:        apriori.Item,
-			Discount:    apriori.Discount,
-			Support:     apriori.Support,
-			Confidence:  apriori.Confidence,
-			RangeDate:   apriori.RangeDate,
-			IsActive:    apriori.IsActive,
-			Description: apriori.Description,
-			Mass:        apriori.Mass,
-			Image:       apriori.Image,
-			CreatedAt:   timestamppb.New(apriori.CreatedAt),
-		})
+		aprioriResponse = append(aprioriResponse, apriori.ToProtoBuff())
 	}
 
 	return &pb.ListAprioriResponse{
@@ -134,20 +107,7 @@ func (service *AprioriService) FindAllByCode(ctx context.Context, req *pb.GetApr
 
 	var aprioriResponse []*pb.Apriori
 	for _, apriori := range apriories {
-		aprioriResponse = append(aprioriResponse, &pb.Apriori{
-			IdApriori:   apriori.IdApriori,
-			Code:        apriori.Code,
-			Item:        apriori.Item,
-			Discount:    apriori.Discount,
-			Support:     apriori.Support,
-			Confidence:  apriori.Confidence,
-			RangeDate:   apriori.RangeDate,
-			IsActive:    apriori.IsActive,
-			Description: apriori.Description,
-			Mass:        apriori.Mass,
-			Image:       apriori.Image,
-			CreatedAt:   timestamppb.New(apriori.CreatedAt),
-		})
+		aprioriResponse = append(aprioriResponse, apriori.ToProtoBuff())
 	}
 
 	return &pb.ListAprioriResponse{
@@ -163,7 +123,7 @@ func (service *AprioriService) FindByCodeAndId(ctx context.Context, req *pb.GetA
 	}
 	defer util.CommitOrRollback(tx)
 
-	apriori, err := service.AprioriRepository.FindByCodeAndId(ctx, tx, req.Code, int(req.Id))
+	apriori, err := service.AprioriRepository.FindByCodeAndId(ctx, tx, req.Code, req.Id)
 	if err != nil {
 		log.Println("[AprioriService][FindByCodeAndId][FindByCodeAndId] problem in getting from repository, err: ", err.Error())
 		return nil, err
@@ -242,7 +202,7 @@ func (service *AprioriService) Update(ctx context.Context, req *pb.UpdateApriori
 	}
 	defer util.CommitOrRollback(tx)
 
-	apriori, err := service.AprioriRepository.FindByCodeAndId(ctx, tx, req.Code, int(req.IdApriori))
+	apriori, err := service.AprioriRepository.FindByCodeAndId(ctx, tx, req.Code, req.IdApriori)
 	if err != nil {
 		log.Println("[AprioriService][Update][FindByCodeAndId] problem in getting from repository, err: ", err.Error())
 		return nil, err
@@ -264,7 +224,7 @@ func (service *AprioriService) Update(ctx context.Context, req *pb.UpdateApriori
 	}
 
 	return &pb.GetAprioriResponse{
-		Apriori: apriori.ToProtoBuf(),
+		Apriori: apriori.ToProtoBuff(),
 	}, nil
 }
 
@@ -361,16 +321,16 @@ func (service *AprioriService) Generate(ctx context.Context, req *pb.GenerateApr
 	}
 
 	// Find first item set
-	transactions, productName, propertyProduct := util.FindFirstItemSet(transactionsModel, float64(req.MinimumSupport))
+	transactions, productName, propertyProduct := util.FindFirstItemSet(transactionsModel, req.MinimumSupport)
 
 	// Handle random maps problem
-	oneSet, support, totalTransaction, isEligible, cleanSet := util.HandleMapsProblem(propertyProduct, float64(req.MinimumSupport))
+	oneSet, support, totalTransaction, isEligible, cleanSet := util.HandleMapsProblem(propertyProduct, req.MinimumSupport)
 
 	// Get one item set
 	for i := 0; i < len(oneSet); i++ {
 		apriori = append(apriori, &model.GenerateApriori{
 			ItemSet:     []string{oneSet[i]},
-			Support:     float32(support[i]),
+			Support:     support[i],
 			Iterate:     1,
 			Transaction: int32(totalTransaction[i]),
 			Description: isEligible[i],
@@ -477,10 +437,10 @@ func (service *AprioriService) Generate(ctx context.Context, req *pb.GenerateApr
 
 	// Find Association rules
 	// Set confidence
-	confidence := util.FindConfidence(apriori, productName, float64(req.MinimumSupport), float64(req.MinimumConfidence))
+	confidence := util.FindConfidence(apriori, productName, req.MinimumSupport, req.MinimumConfidence)
 
 	// Set discount
-	discount := util.FindDiscount(confidence, float64(req.MinimumDiscount), float64(req.MaximumDiscount))
+	discount := util.FindDiscount(confidence, float32(req.MinimumDiscount), float32(req.MaximumDiscount))
 
 	//// Remove last element in apriori as many association rules
 	//for i := 0; i < len(discount); i++ {

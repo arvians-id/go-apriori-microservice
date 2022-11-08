@@ -103,7 +103,7 @@ func (repository *UserRepositoryImpl) FindByEmail(ctx context.Context, tx *sql.T
 }
 
 func (repository *UserRepositoryImpl) Create(ctx context.Context, tx *sql.Tx, user *model.User) (*model.User, error) {
-	id := 0
+	var id int64
 	query := "INSERT INTO users (role,name,email,address,phone,password,created_at,updated_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id_user"
 	row := tx.QueryRowContext(
 		ctx,

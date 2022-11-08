@@ -47,6 +47,7 @@ message GetTransactionByNoTransactionRequest {
 message CreateTransactionRequest {
   string ProductName = 1;
   string CustomerName = 2;
+  optional string NoTransaction = 3;
 }
 
 message CSVRequest {

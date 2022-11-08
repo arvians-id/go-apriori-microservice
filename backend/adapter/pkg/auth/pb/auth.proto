@@ -8,7 +8,7 @@ import "google/protobuf/Empty.proto";
 
 service PasswordResetService {
   rpc CreateOrUpdateByEmail(GetPasswordResetByEmailRequest) returns (GetPasswordResetResponse);
-  rpc Verify(PasswordReset) returns (google.protobuf.Empty);
+  rpc Verify(GetVerifyRequest) returns (google.protobuf.Empty);
 }
 
 message PasswordReset {

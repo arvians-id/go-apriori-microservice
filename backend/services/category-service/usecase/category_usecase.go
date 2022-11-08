@@ -3,27 +3,28 @@ package usecase
 import (
 	"context"
 	"database/sql"
-	"github.com/arvians-id/apriori/internal/http/presenter/request"
-	"github.com/arvians-id/apriori/internal/model"
-	"github.com/arvians-id/apriori/internal/repository"
-	"github.com/arvians-id/apriori/util"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/category/pb"
+	"github.com/arvians-id/go-apriori-microservice/model"
+	"github.com/arvians-id/go-apriori-microservice/services/category-service/repository"
+	"github.com/arvians-id/go-apriori-microservice/util"
+	"github.com/golang/protobuf/ptypes/empty"
 	"log"
 	"time"
 )
 
-type CategoryServiceImpl struct {
+type CategoryService struct {
 	CategoryRepository repository.CategoryRepository
 	DB                 *sql.DB
 }
 
-func NewCategoryService(categoryRepository *repository.CategoryRepository, db *sql.DB) CategoryService {
-	return &CategoryServiceImpl{
+func NewCategoryService(categoryRepository *repository.CategoryRepository, db *sql.DB) pb.CategoryServiceServer {
+	return &CategoryService{
 		CategoryRepository: *categoryRepository,
 		DB:                 db,
 	}
 }
 
-func (service *CategoryServiceImpl) FindAll(ctx context.Context) ([]*model.Category, error) {
+func (service *CategoryService) FindAll(ctx context.Context, empty *empty.Empty) (*pb.ListCategoryResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[CategoryService][FindAll] problem in db transaction, err: ", err.Error())
@@ -37,10 +38,17 @@ func (service *CategoryServiceImpl) FindAll(ctx context.Context) ([]*model.Categ
 		return nil, err
 	}
 
-	return categories, nil
+	var categoriesResponse []*pb.Category
+	for _, category := range categories {
+		categoriesResponse = append(categoriesResponse, category.ToProtoBuff())
+	}
+
+	return &pb.ListCategoryResponse{
+		Categories: categoriesResponse,
+	}, nil
 }
 
-func (service *CategoryServiceImpl) FindById(ctx context.Context, id int) (*model.Category, error) {
+func (service *CategoryService) FindById(ctx context.Context, req *pb.GetCategoryByIdRequest) (*pb.GetCategoryResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[CategoryService][FindById] problem in db transaction, err: ", err.Error())
@@ -48,16 +56,18 @@ func (service *CategoryServiceImpl) FindById(ctx context.Context, id int) (*mode
 	}
 	defer util.CommitOrRollback(tx)
 
-	category, err := service.CategoryRepository.FindById(ctx, tx, id)
+	category, err := service.CategoryRepository.FindById(ctx, tx, req.Id)
 	if err != nil {
 		log.Println("[CategoryService][FindById][FindById] problem in getting from repository, err: ", err.Error())
 		return nil, err
 	}
 
-	return category, nil
+	return &pb.GetCategoryResponse{
+		Category: category.ToProtoBuff(),
+	}, nil
 }
 
-func (service *CategoryServiceImpl) Create(ctx context.Context, request *request.CreateCategoryRequest) (*model.Category, error) {
+func (service *CategoryService) Create(ctx context.Context, req *pb.CreateCategoryRequest) (*pb.GetCategoryResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[CategoryService][Create] problem in db transaction, err: ", err.Error())
@@ -72,7 +82,7 @@ func (service *CategoryServiceImpl) Create(ctx context.Context, request *request
 	}
 
 	categoryRequest := model.Category{
-		Name:      util.UpperWords(request.Name),
+		Name:      util.UpperWords(req.Name),
 		CreatedAt: timeNow,
 		UpdatedAt: timeNow,
 	}
@@ -83,11 +93,13 @@ func (service *CategoryServiceImpl) Create(ctx context.Context, request *request
 		return nil, err
 	}
 
-	return category, nil
+	return &pb.GetCategoryResponse{
+		Category: category.ToProtoBuff(),
+	}, nil
 
 }
 
-func (service *CategoryServiceImpl) Update(ctx context.Context, request *request.UpdateCategoryRequest) (*model.Category, error) {
+func (service *CategoryService) Update(ctx context.Context, req *pb.UpdateCategoryRequest) (*pb.GetCategoryResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[CategoryService][Update] problem in db transaction, err: ", err.Error())
@@ -95,7 +107,7 @@ func (service *CategoryServiceImpl) Update(ctx context.Context, request *request
 	}
 	defer util.CommitOrRollback(tx)
 
-	category, err := service.CategoryRepository.FindById(ctx, tx, request.IdCategory)
+	category, err := service.CategoryRepository.FindById(ctx, tx, req.IdCategory)
 	if err != nil {
 		log.Println("[CategoryService][Update][FindById] problem in getting from repository, err: ", err.Error())
 		return nil, err
@@ -106,7 +118,7 @@ func (service *CategoryServiceImpl) Update(ctx context.Context, request *request
 		log.Println("[CategoryService][Update] problem in parsing to time, err: ", err.Error())
 		return nil, err
 	}
-	category.Name = util.UpperWords(request.Name)
+	category.Name = util.UpperWords(req.Name)
 	category.UpdatedAt = timeNow
 
 	_, err = service.CategoryRepository.Update(ctx, tx, category)
@@ -115,28 +127,30 @@ func (service *CategoryServiceImpl) Update(ctx context.Context, request *request
 		return nil, err
 	}
 
-	return category, nil
+	return &pb.GetCategoryResponse{
+		Category: category.ToProtoBuff(),
+	}, nil
 }
 
-func (service *CategoryServiceImpl) Delete(ctx context.Context, id int) error {
+func (service *CategoryService) Delete(ctx context.Context, req *pb.GetCategoryByIdRequest) (*empty.Empty, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[CategoryService][Delete] problem in db transaction, err: ", err.Error())
-		return err
+		return nil, err
 	}
 	defer util.CommitOrRollback(tx)
 
-	category, err := service.CategoryRepository.FindById(ctx, tx, id)
+	category, err := service.CategoryRepository.FindById(ctx, tx, req.Id)
 	if err != nil {
 		log.Println("[CategoryService][Delete][FindById] problem in getting from repository, err: ", err.Error())
-		return err
+		return nil, err
 	}
 
 	err = service.CategoryRepository.Delete(ctx, tx, category.IdCategory)
 	if err != nil {
 		log.Println("[CategoryService][Delete][Delete] problem in getting from repository, err: ", err.Error())
-		return err
+		return nil, err
 	}
 
-	return nil
+	return nil, nil
 }

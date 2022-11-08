@@ -6,35 +6,37 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/arvians-id/apriori/internal/http/presenter/request"
-	"github.com/arvians-id/apriori/internal/model"
-	"github.com/arvians-id/apriori/internal/repository"
-	"github.com/arvians-id/apriori/util"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/auth/pb"
+	pbuser "github.com/arvians-id/go-apriori-microservice/adapter/pkg/user/pb"
+	"github.com/arvians-id/go-apriori-microservice/model"
+	"github.com/arvians-id/go-apriori-microservice/services/password-reset-service/repository"
+	"github.com/arvians-id/go-apriori-microservice/util"
+	"github.com/golang/protobuf/ptypes/empty"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"strconv"
 	"time"
 )
 
-type PasswordResetServiceImpl struct {
+type PasswordResetService struct {
 	PasswordResetRepository repository.PasswordResetRepository
-	UserRepository          repository.UserRepository
+	UserService             pbuser.UserServiceClient
 	DB                      *sql.DB
 }
 
 func NewPasswordResetService(
 	resetRepository *repository.PasswordResetRepository,
-	userRepository *repository.UserRepository,
+	userService pbuser.UserServiceClient,
 	db *sql.DB,
-) PasswordResetService {
-	return &PasswordResetServiceImpl{
+) pb.PasswordResetServiceServer {
+	return &PasswordResetService{
 		PasswordResetRepository: *resetRepository,
-		UserRepository:          *userRepository,
+		UserService:             userService,
 		DB:                      db,
 	}
 }
 
-func (service *PasswordResetServiceImpl) CreateOrUpdateByEmail(ctx context.Context, email string) (*model.PasswordReset, error) {
+func (service *PasswordResetService) CreateOrUpdateByEmail(ctx context.Context, req *pb.GetPasswordResetByEmailRequest) (*pb.GetPasswordResetResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[PasswordResetService][CreateOrUpdateByEmail] problem in db transaction, err: ", err.Error())
@@ -44,23 +46,25 @@ func (service *PasswordResetServiceImpl) CreateOrUpdateByEmail(ctx context.Conte
 
 	timestamp := time.Now().Add(1 * time.Hour).Unix()
 	timestampString := strconv.Itoa(int(timestamp))
-	token := md5.Sum([]byte(email + timestampString))
+	token := md5.Sum([]byte(req.Email + timestampString))
 	tokenString := fmt.Sprintf("%x", token)
 	passwordResetRequest := model.PasswordReset{
-		Email:   email,
+		Email:   req.Email,
 		Token:   tokenString,
 		Expired: timestamp,
 	}
 
 	// Check if email is exists in table users
-	user, err := service.UserRepository.FindByEmail(ctx, tx, email)
+	user, err := service.UserService.FindByEmail(ctx, &pbuser.GetUserByEmailRequest{
+		Email: req.Email,
+	})
 	if err != nil {
 		log.Println("[NotificationService][CreateOrUpdateByEmail][FindByEmail] problem in getting from repository, err: ", err.Error())
 		return nil, err
 	}
 
 	// Check If email is exists in table password_resets
-	_, err = service.PasswordResetRepository.FindByEmail(ctx, tx, user.Email)
+	_, err = service.PasswordResetRepository.FindByEmail(ctx, tx, user.User.Email)
 	if err != nil {
 		// Create new data if not exists
 		passwordReset, err := service.PasswordResetRepository.Create(ctx, tx, &passwordResetRequest)
@@ -69,7 +73,9 @@ func (service *PasswordResetServiceImpl) CreateOrUpdateByEmail(ctx context.Conte
 			return nil, err
 		}
 
-		return passwordReset, nil
+		return &pb.GetPasswordResetResponse{
+			PasswordReset: passwordReset.ToProtoBuff(),
+		}, nil
 	}
 
 	// Update data if exists
@@ -79,27 +85,29 @@ func (service *PasswordResetServiceImpl) CreateOrUpdateByEmail(ctx context.Conte
 		return nil, err
 	}
 
-	return passwordReset, nil
+	return &pb.GetPasswordResetResponse{
+		PasswordReset: passwordReset.ToProtoBuff(),
+	}, nil
 }
 
-func (service *PasswordResetServiceImpl) Verify(ctx context.Context, request *request.UpdateResetPasswordUserRequest) error {
+func (service *PasswordResetService) Verify(ctx context.Context, req *pb.GetVerifyRequest) (*empty.Empty, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[PasswordResetService][Verify] problem in db transaction, err: ", err.Error())
-		return err
+		return nil, err
 	}
 	defer util.CommitOrRollback(tx)
 
 	// Check if email and token is exists in table password_resets
 	passwordResetRequest := model.PasswordReset{
-		Email: request.Email,
-		Token: request.Token,
+		Email: req.Email,
+		Token: req.Token,
 	}
 
 	reset, err := service.PasswordResetRepository.FindByEmailAndToken(ctx, tx, &passwordResetRequest)
 	if err != nil {
 		log.Println("[NotificationService][Verify][FindByEmailAndToken] problem in getting from repository, err: ", err.Error())
-		return err
+		return nil, err
 	}
 
 	// Check token expired
@@ -110,48 +118,44 @@ func (service *PasswordResetServiceImpl) Verify(ctx context.Context, request *re
 		err := service.PasswordResetRepository.Delete(ctx, tx, reset.Email)
 		if err != nil {
 			log.Println("[NotificationService][Verify][Delete] problem in getting from repository, err: ", err.Error())
-			return err
+			return nil, err
 		}
 
-		return errors.New("reset password verification is expired")
+		return nil, errors.New("reset password verification is expired")
 	}
 
 	// if not
 	// Check if email is exists in table users
-	user, err := service.UserRepository.FindByEmail(ctx, tx, reset.Email)
+	user, err := service.UserService.FindByEmail(ctx, &pbuser.GetUserByEmailRequest{
+		Email: req.Email,
+	})
 	if err != nil {
 		log.Println("[NotificationService][Verify][FindByEmail] problem in getting from repository, err: ", err.Error())
-		return err
+		return nil, err
 	}
 
 	// Update the password
-	timeNow, err := time.Parse(util.TimeFormat, now.Format(util.TimeFormat))
-	if err != nil {
-		log.Println("[NotificationService][Verify] problem in parsing to time, err: ", err.Error())
-		return err
-	}
-
-	password, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
+	password, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		log.Println("[NotificationService][Verify] problem in generating password hashed, err: ", err.Error())
-		return err
+		return nil, err
 	}
 
-	user.Password = string(password)
-	user.UpdatedAt = timeNow
-
-	err = service.UserRepository.UpdatePassword(ctx, tx, user)
+	_, err = service.UserService.UpdatePassword(ctx, &pbuser.UpdateUserPasswordRequest{
+		Email:    req.Email,
+		Password: string(password),
+	})
 	if err != nil {
 		log.Println("[NotificationService][Verify][UpdatePassword] problem in getting from repository, err: ", err.Error())
-		return err
+		return nil, err
 	}
 
 	// Delete data from table password_reset
-	err = service.PasswordResetRepository.Delete(ctx, tx, user.Email)
+	err = service.PasswordResetRepository.Delete(ctx, tx, user.User.Email)
 	if err != nil {
 		log.Println("[NotificationService][Verify][Delete] problem in getting from repository, err: ", err.Error())
-		return err
+		return nil, err
 	}
 
-	return nil
+	return nil, nil
 }

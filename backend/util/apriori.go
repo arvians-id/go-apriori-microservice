@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func FindFirstItemSet(transactionsSet []*model.Transaction, minimumSupport float64) ([]*model.GetProductNameTransactionResponse, map[string]float64, []string) {
+func FindFirstItemSet(transactionsSet []*model.Transaction, minimumSupport float32) ([]*model.GetProductNameTransactionResponse, map[string]float32, []string) {
 	// Generate all product
 	var transactions []*model.GetProductNameTransactionResponse
 	for _, transaction := range transactionsSet {
@@ -20,7 +20,7 @@ func FindFirstItemSet(transactionsSet []*model.Transaction, minimumSupport float
 	}
 
 	// Count all every product name
-	var productName = make(map[string]float64)
+	var productName = make(map[string]float32)
 	for _, value := range transactions {
 		for _, product := range value.ProductName {
 			product = strings.ToLower(product)
@@ -31,7 +31,7 @@ func FindFirstItemSet(transactionsSet []*model.Transaction, minimumSupport float
 	// Finding one item set
 	var propertyProduct []string
 	for nameOfProduct, total := range productName {
-		support := total / float64(len(transactionsSet)) * 100
+		support := total / float32(len(transactionsSet)) * 100
 		if support >= minimumSupport {
 			supportValue := fmt.Sprintf("%.2f", support)
 			totalValue := strconv.Itoa(int(total))
@@ -48,10 +48,10 @@ func FindFirstItemSet(transactionsSet []*model.Transaction, minimumSupport float
 
 	return transactions, productName, propertyProduct
 }
-func HandleMapsProblem(propertyProduct []string, minSupport float64) ([]string, []float64, []int, []string, []string) {
+func HandleMapsProblem(propertyProduct []string, minSupport float32) ([]string, []float32, []int32, []string, []string) {
 	var oneSet []string
-	var support []float64
-	var totalTransaction []int
+	var support []float32
+	var totalTransaction []int32
 	var checkEligible []string
 	var cleanSet []string
 
@@ -68,15 +68,15 @@ func HandleMapsProblem(propertyProduct []string, minSupport float64) ([]string, 
 
 		// Convert and insert support
 		number, _ := strconv.ParseFloat(transaction[0], 64)
-		support = append(support, number)
+		support = append(support, float32(number))
 
-		if number >= minSupport {
+		if float32(number) >= minSupport {
 			cleanSet = append(cleanSet, nameOfProduct[0])
 		}
 
 		// Convert and insert total transaction
 		transactionNumber, _ := strconv.Atoi(isEligible[0])
-		totalTransaction = append(totalTransaction, transactionNumber)
+		totalTransaction = append(totalTransaction, int32(transactionNumber))
 
 		// Check Is Eligible
 		checkEligible = append(checkEligible, isEligible[1])
@@ -85,17 +85,17 @@ func HandleMapsProblem(propertyProduct []string, minSupport float64) ([]string, 
 	return oneSet, support, totalTransaction, checkEligible, cleanSet
 }
 
-func FindConfidence(apriori []*model.GenerateApriori, productName map[string]float64, minSupport float64, minConfidence float64) []*model.GenerateApriori {
+func FindConfidence(apriori []*model.GenerateApriori, productName map[string]float32, minSupport float32, minConfidence float32) []*model.GenerateApriori {
 	var confidence []*model.GenerateApriori
 	for _, value := range apriori {
 		if value.Iterate == apriori[len(apriori)-1].Iterate {
-			if val, ok := productName[value.ItemSet[0]]; ok && value.Support >= float32(minSupport) && float64(value.Transaction)/val*100 >= minConfidence {
+			if val, ok := productName[value.ItemSet[0]]; ok && value.Support >= float32(minSupport) && float32(value.Transaction)/val*100 >= minConfidence {
 				confidence = append(confidence, &model.GenerateApriori{
 					ItemSet:     value.ItemSet,
 					Support:     value.Support,
 					Iterate:     value.Iterate,
 					Transaction: value.Transaction,
-					Confidence:  float32(float64(value.Transaction) / val * 100),
+					Confidence:  float32(float32(value.Transaction) / val * 100),
 				})
 			}
 		}
@@ -117,8 +117,8 @@ func IsDuplicate(array []string) bool {
 	return false
 }
 
-func FindCandidate(data []string, transactions []*model.GetProductNameTransactionResponse) int {
-	var counter int
+func FindCandidate(data []string, transactions []*model.GetProductNameTransactionResponse) int32 {
+	var counter int32
 	for _, j := range transactions {
 		results := make([]string, 0) // slice to store the result
 
@@ -139,9 +139,9 @@ func FindCandidate(data []string, transactions []*model.GetProductNameTransactio
 	return counter
 }
 
-func FindDiscount(apriori []*model.GenerateApriori, minDiscount float64, maxDiscount float64) []*model.GenerateApriori {
+func FindDiscount(apriori []*model.GenerateApriori, minDiscount float32, maxDiscount float32) []*model.GenerateApriori {
 	var discounts []*model.GenerateApriori
-	var calculateDiscount = (maxDiscount - minDiscount) / float64(len(apriori))
+	var calculateDiscount = (maxDiscount - minDiscount) / float32(len(apriori))
 
 	// Sorting if the value is greater, then the discount given will be large
 	sort.Slice(apriori, func(i, j int) bool {

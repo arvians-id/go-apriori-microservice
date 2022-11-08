@@ -3,38 +3,41 @@ package usecase
 import (
 	"context"
 	"database/sql"
-	"github.com/arvians-id/apriori/cmd/library/aws"
-	"github.com/arvians-id/apriori/internal/http/presenter/request"
-	"github.com/arvians-id/apriori/internal/model"
-	"github.com/arvians-id/apriori/internal/repository"
-	"github.com/arvians-id/apriori/util"
+	pbapriori "github.com/arvians-id/go-apriori-microservice/adapter/pkg/apriori/pb"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/product/pb"
+	"github.com/arvians-id/go-apriori-microservice/model"
+	"github.com/arvians-id/go-apriori-microservice/services/product-service/repository"
+	"github.com/arvians-id/go-apriori-microservice/third-party/aws"
+	"github.com/arvians-id/go-apriori-microservice/util"
+	"github.com/aws/aws-sdk-go/aws/request"
+	"github.com/golang/protobuf/ptypes/empty"
 	"log"
 	"strings"
 	"time"
 )
 
-type ProductServiceImpl struct {
+type ProductService struct {
 	ProductRepository repository.ProductRepository
-	AprioriRepository repository.AprioriRepository
+	AprioriService    pbapriori.AprioriServiceClient
 	StorageS3         aws.StorageS3
 	DB                *sql.DB
 }
 
 func NewProductService(
 	productRepository *repository.ProductRepository,
-	aprioriRepository *repository.AprioriRepository,
+	aprioriService pbapriori.AprioriServiceClient,
 	storageS3 *aws.StorageS3,
 	db *sql.DB,
-) ProductService {
-	return &ProductServiceImpl{
+) pb.ProductServiceServer {
+	return &ProductService{
 		ProductRepository: *productRepository,
-		AprioriRepository: *aprioriRepository,
+		AprioriService:    aprioriService,
 		StorageS3:         *storageS3,
 		DB:                db,
 	}
 }
 
-func (service *ProductServiceImpl) FindAllByAdmin(ctx context.Context) ([]*model.Product, error) {
+func (service *ProductService) FindAllByAdmin(ctx context.Context, empty *empty.Empty) (*pb.ListProductResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[ProductService][FindAllByAdmin] problem in db transaction, err: ", err.Error())
@@ -51,7 +54,7 @@ func (service *ProductServiceImpl) FindAllByAdmin(ctx context.Context) ([]*model
 	return products, nil
 }
 
-func (service *ProductServiceImpl) FindAll(ctx context.Context, search string, category string) ([]*model.Product, error) {
+func (service *ProductService) FindAll(ctx context.Context, req *pb.GetProductByFiltersRequest) (*pb.ListProductResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[ProductService][FindAll] problem in db transaction, err: ", err.Error())
@@ -68,7 +71,7 @@ func (service *ProductServiceImpl) FindAll(ctx context.Context, search string, c
 	return products, nil
 }
 
-func (service *ProductServiceImpl) FindAllBySimilarCategory(ctx context.Context, code string) ([]*model.Product, error) {
+func (service *ProductService) FindAllBySimilarCategory(ctx context.Context, req *pb.GetProductByProductCodeRequest) (*pb.ListProductResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[ProductService][FindAllBySimilarCategory] problem in db transaction, err: ", err.Error())
@@ -100,7 +103,7 @@ func (service *ProductServiceImpl) FindAllBySimilarCategory(ctx context.Context,
 	return productResponses, nil
 }
 
-func (service *ProductServiceImpl) FindAllRecommendation(ctx context.Context, code string) ([]*model.ProductRecommendation, error) {
+func (service *ProductService) FindAllRecommendation(ctx context.Context, req *pb.GetProductByProductCodeRequest) (*pb.ListProductRecommendationResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[ProductService][FindAllRecommendation] problem in db transaction, err: ", err.Error())
@@ -152,7 +155,7 @@ func (service *ProductServiceImpl) FindAllRecommendation(ctx context.Context, co
 	return productResponses, nil
 }
 
-func (service *ProductServiceImpl) FindByCode(ctx context.Context, code string) (*model.Product, error) {
+func (service *ProductService) FindByCode(ctx context.Context, req *pb.GetProductByProductCodeRequest) (*pb.GetProductResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[ProductService][FindByCode] problem in db transaction, err: ", err.Error())
@@ -169,7 +172,24 @@ func (service *ProductServiceImpl) FindByCode(ctx context.Context, code string) 
 	return productResponse, nil
 }
 
-func (service *ProductServiceImpl) Create(ctx context.Context, request *request.CreateProductRequest) (*model.Product, error) {
+func (service *ProductService) FindByName(ctx context.Context, req *pb.GetProductByProductNameRequest) (*pb.GetProductResponse, error) {
+	tx, err := service.DB.Begin()
+	if err != nil {
+		log.Println("[ProductService][FindByCode] problem in db transaction, err: ", err.Error())
+		return nil, err
+	}
+	defer util.CommitOrRollback(tx)
+
+	productResponse, err := service.ProductRepository.FindByCode(ctx, tx, code)
+	if err != nil {
+		log.Println("[ProductService][FindByCode][FindByCode] problem in getting from repository, err: ", err.Error())
+		return nil, err
+	}
+
+	return productResponse, nil
+}
+
+func (service *ProductService) Create(ctx context.Context, req *pb.CreateProductRequest) (*pb.GetProductResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[ProductService][Create] problem in db transaction, err: ", err.Error())
@@ -208,7 +228,7 @@ func (service *ProductServiceImpl) Create(ctx context.Context, request *request.
 	return productResponse, nil
 }
 
-func (service *ProductServiceImpl) Update(ctx context.Context, request *request.UpdateProductRequest) (*model.Product, error) {
+func (service *ProductService) Update(ctx context.Context, req *pb.UpdateProductRequest) (*pb.GetProductResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[ProductService][Update] problem in db transaction, err: ", err.Error())
@@ -249,7 +269,7 @@ func (service *ProductServiceImpl) Update(ctx context.Context, request *request.
 	return productResponse, nil
 }
 
-func (service *ProductServiceImpl) Delete(ctx context.Context, code string) error {
+func (service *ProductService) Delete(ctx context.Context, req *pb.GetProductByProductCodeRequest) (*empty.Empty, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[ProductService][Delete] problem in db transaction, err: ", err.Error())

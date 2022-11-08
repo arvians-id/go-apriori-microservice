@@ -1,5 +1,7 @@
 package model
 
+import "github.com/arvians-id/go-apriori-microservice/adapter/pkg/payment/pb"
+
 type Payment struct {
 	IdPayload         int64   `json:"id_payload"`
 	UserId            int64   `json:"user_id"`
@@ -22,6 +24,32 @@ type Payment struct {
 	Address           *string `json:"address"`
 	Courier           *string `json:"courier"`
 	CourierService    *string `json:"courier_service"`
+}
+
+func (payment *Payment) ToProtoBuff() *pb.Payment {
+	return &pb.Payment{
+		IdPayload:         payment.IdPayload,
+		UserId:            payment.UserId,
+		OrderId:           payment.OrderId,
+		TransactionTime:   payment.TransactionTime,
+		TransactionStatus: payment.TransactionStatus,
+		TransactionId:     payment.TransactionId,
+		StatusCode:        payment.StatusCode,
+		SignatureKey:      payment.SignatureKey,
+		SettlementTime:    payment.SettlementTime,
+		PaymentType:       payment.PaymentType,
+		MerchantId:        payment.MerchantId,
+		GrossAmount:       payment.GrossAmount,
+		FraudStatus:       payment.FraudStatus,
+		BankType:          payment.BankType,
+		VANumber:          payment.VANumber,
+		BillerCode:        payment.BillerCode,
+		BillKey:           payment.BillKey,
+		ReceiptNumber:     payment.ReceiptNumber,
+		Address:           payment.Address,
+		Courier:           payment.Courier,
+		CourierService:    payment.CourierService,
+	}
 }
 
 type GetPaymentTokenRequest struct {

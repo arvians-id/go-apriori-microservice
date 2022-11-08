@@ -104,7 +104,7 @@ func (repository *CommentRepositoryImpl) FindAllByProductCode(ctx context.Contex
 	return comments, nil
 }
 
-func (repository *CommentRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id int) (*model.Comment, error) {
+func (repository *CommentRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id int64) (*model.Comment, error) {
 	query := `SELECT c.*,u.id_user,u.name 
 			  FROM comments c 
 				LEFT JOIN user_orders uo ON uo.id_order = c.user_order_id 
@@ -139,7 +139,7 @@ func (repository *CommentRepositoryImpl) FindById(ctx context.Context, tx *sql.T
 	return &comment, nil
 }
 
-func (repository *CommentRepositoryImpl) FindByUserOrderId(ctx context.Context, tx *sql.Tx, userOrderId int) (*model.Comment, error) {
+func (repository *CommentRepositoryImpl) FindByUserOrderId(ctx context.Context, tx *sql.Tx, userOrderId int64) (*model.Comment, error) {
 	query := `SELECT c.*,u.id_user,u.name 
 			  FROM comments c 
 				LEFT JOIN user_orders uo ON uo.id_order = c.user_order_id 
@@ -176,7 +176,7 @@ func (repository *CommentRepositoryImpl) FindByUserOrderId(ctx context.Context, 
 }
 
 func (repository *CommentRepositoryImpl) Create(ctx context.Context, tx *sql.Tx, comment *model.Comment) (*model.Comment, error) {
-	id := 0
+	var id int64
 	query := `INSERT INTO comments (user_order_id, product_code, description, tag, rating, created_at) 
 			  VALUES ($1, $2, $3, $4, $5, $6) RETURNING id_comment`
 	row := tx.QueryRowContext(

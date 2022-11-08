@@ -4,11 +4,14 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"github.com/arvians-id/apriori/cmd/config"
-	request2 "github.com/arvians-id/apriori/internal/http/presenter/request"
-	"github.com/arvians-id/apriori/internal/model"
-	"github.com/arvians-id/apriori/internal/repository"
-	"github.com/arvians-id/apriori/util"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/payment/pb"
+	pbtransaction "github.com/arvians-id/go-apriori-microservice/adapter/pkg/transaction/pb"
+	pbuserorder "github.com/arvians-id/go-apriori-microservice/adapter/pkg/user-order/pb"
+	"github.com/arvians-id/go-apriori-microservice/config"
+	"github.com/arvians-id/go-apriori-microservice/model"
+	"github.com/arvians-id/go-apriori-microservice/services/payment-service/repository"
+	"github.com/arvians-id/go-apriori-microservice/util"
+	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/veritrans/go-midtrans"
 	"log"
 	"reflect"
@@ -16,47 +19,47 @@ import (
 	"time"
 )
 
-type PaymentServiceImpl struct {
-	MidClient             midtrans.Client
-	SnapGateway           midtrans.SnapGateway
-	ServerKey             string
-	ClientKey             string
-	PaymentRepository     repository.PaymentRepository
-	UserOrderRepository   repository.UserOrderRepository
-	TransactionRepository repository.TransactionRepository
-	DB                    *sql.DB
+type PaymentService struct {
+	MidClient          midtrans.Client
+	SnapGateway        midtrans.SnapGateway
+	ServerKey          string
+	ClientKey          string
+	PaymentRepository  repository.PaymentRepository
+	UserOrderService   pbuserorder.UserOrderServiceClient
+	TransactionService pbtransaction.TransactionServiceClient
+	DB                 *sql.DB
 }
 
 func NewPaymentService(
 	configuration config.Config,
 	paymentRepository *repository.PaymentRepository,
-	userOrderRepository *repository.UserOrderRepository,
-	transactionRepository *repository.TransactionRepository,
+	userOrderService pbuserorder.UserOrderServiceClient,
+	transactionService pbtransaction.TransactionServiceClient,
 	db *sql.DB,
-) PaymentService {
+) pb.PaymentServiceServer {
 	midClient := midtrans.NewClient()
-	midClient.ServerKey = configuration.Get("MIDTRANS_SERVER_KEY")
-	midClient.ClientKey = configuration.Get("MIDTRANS_CLIENT_KEY")
+	midClient.ServerKey = configuration.MidtransServerKey
+	midClient.ClientKey = configuration.MidtransClientKey
 	midClient.APIEnvType = midtrans.Sandbox
 
-	return &PaymentServiceImpl{
-		MidClient:             midClient,
-		ServerKey:             midClient.ServerKey,
-		ClientKey:             midClient.ClientKey,
-		PaymentRepository:     *paymentRepository,
-		UserOrderRepository:   *userOrderRepository,
-		TransactionRepository: *transactionRepository,
-		DB:                    db,
+	return &PaymentService{
+		MidClient:          midClient,
+		ServerKey:          midClient.ServerKey,
+		ClientKey:          midClient.ClientKey,
+		PaymentRepository:  *paymentRepository,
+		UserOrderService:   userOrderService,
+		TransactionService: transactionService,
+		DB:                 db,
 	}
 }
 
-func (service *PaymentServiceImpl) GetClient() {
+func (service *PaymentService) GetClient() {
 	service.SnapGateway = midtrans.SnapGateway{
 		Client: service.MidClient,
 	}
 }
 
-func (service *PaymentServiceImpl) FindAll(ctx context.Context) ([]*model.Payment, error) {
+func (service *PaymentService) FindAll(ctx context.Context, empty *empty.Empty) (*pb.ListPaymentResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[PaymentService][FindAll] problem in db transaction, err: ", err.Error())
@@ -70,10 +73,17 @@ func (service *PaymentServiceImpl) FindAll(ctx context.Context) ([]*model.Paymen
 		return nil, err
 	}
 
-	return payments, nil
+	var paymentListResponse []*pb.Payment
+	for _, payment := range payments {
+		paymentListResponse = append(paymentListResponse, payment.ToProtoBuff())
+	}
+
+	return &pb.ListPaymentResponse{
+		Payment: paymentListResponse,
+	}, nil
 }
 
-func (service *PaymentServiceImpl) FindAllByUserId(ctx context.Context, userId int) ([]*model.Payment, error) {
+func (service *PaymentService) FindAllByUserId(ctx context.Context, req *pb.GetPaymentByUserIdRequest) (*pb.ListPaymentResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[PaymentService][FindAllByUserId] problem in db transaction, err: ", err.Error())
@@ -81,16 +91,23 @@ func (service *PaymentServiceImpl) FindAllByUserId(ctx context.Context, userId i
 	}
 	defer util.CommitOrRollback(tx)
 
-	payments, err := service.PaymentRepository.FindAllByUserId(ctx, tx, userId)
+	payments, err := service.PaymentRepository.FindAllByUserId(ctx, tx, req.UserId)
 	if err != nil {
 		log.Println("[PaymentService][FindAllByUserId][FindAllByUserId] problem in getting from repository, err: ", err.Error())
 		return nil, err
 	}
 
-	return payments, nil
+	var paymentListResponse []*pb.Payment
+	for _, payment := range payments {
+		paymentListResponse = append(paymentListResponse, payment.ToProtoBuff())
+	}
+
+	return &pb.ListPaymentResponse{
+		Payment: paymentListResponse,
+	}, nil
 }
 
-func (service *PaymentServiceImpl) FindByOrderId(ctx context.Context, orderId string) (*model.Payment, error) {
+func (service *PaymentService) FindByOrderId(ctx context.Context, req *pb.GetPaymentByOrderIdRequest) (*pb.GetPaymentResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[PaymentService][FindByOrderId] problem in db transaction, err: ", err.Error())
@@ -98,22 +115,35 @@ func (service *PaymentServiceImpl) FindByOrderId(ctx context.Context, orderId st
 	}
 	defer util.CommitOrRollback(tx)
 
-	payment, err := service.PaymentRepository.FindByOrderId(ctx, tx, orderId)
+	payment, err := service.PaymentRepository.FindByOrderId(ctx, tx, req.OrderId)
 	if err != nil {
 		log.Println("[PaymentService][FindByOrderId][FindByOrderId] problem in getting from repository, err: ", err.Error())
 		return nil, err
 	}
 
-	return payment, nil
+	return &pb.GetPaymentResponse{
+		Payment: payment.ToProtoBuff(),
+	}, nil
 }
 
-func (service *PaymentServiceImpl) CreateOrUpdate(ctx context.Context, requestPayment map[string]interface{}) (bool, error) {
+func (service *PaymentService) CreateOrUpdate(ctx context.Context, req *pb.CreatePaymentRequest) (*pb.GetCreatePaymentResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[PaymentService][CreateOrUpdate] problem in db transaction, err: ", err.Error())
-		return false, err
+		return &pb.GetCreatePaymentResponse{
+			IsSuccess: false,
+		}, err
 	}
 	defer util.CommitOrRollback(tx)
+
+	requestPayment := make(map[string]interface{})
+	err = json.Unmarshal(req.Payment, &requestPayment)
+	if err != nil {
+		log.Println("[PaymentController][Notification] unable to unmarshal json, err: ", err.Error())
+		return &pb.GetCreatePaymentResponse{
+			IsSuccess: false,
+		}, err
+	}
 
 	var bankType, vaNumber, billerCode, billKey, settlementTime string
 
@@ -150,10 +180,13 @@ func (service *PaymentServiceImpl) CreateOrUpdate(ctx context.Context, requestPa
 	checkTransaction, err := service.PaymentRepository.FindByOrderId(ctx, tx, requestPayment["order_id"].(string))
 	if err != nil {
 		log.Println("[PaymentService][CreateOrUpdate][FindByOrderId] problem in getting from repository, err: ", err.Error())
-		return false, err
+
+		return &pb.GetCreatePaymentResponse{
+			IsSuccess: false,
+		}, err
 	}
 
-	checkTransaction.UserId = util.StrToInt(requestPayment["custom_field1"].(string))
+	checkTransaction.UserId = int64(util.StrToInt(requestPayment["custom_field1"].(string)))
 	checkTransaction.OrderId = &orderID
 	checkTransaction.TransactionTime = &transactionTime
 	checkTransaction.TransactionStatus = &transactionStatus
@@ -174,49 +207,52 @@ func (service *PaymentServiceImpl) CreateOrUpdate(ctx context.Context, requestPa
 		err := service.PaymentRepository.Update(ctx, tx, checkTransaction)
 		if err != nil {
 			log.Println("[PaymentService][CreateOrUpdate][Update] problem in getting from repository, err: ", err.Error())
-			return false, err
+			return &pb.GetCreatePaymentResponse{
+				IsSuccess: false,
+			}, err
 		}
 
 		if requestPayment["transaction_status"].(string) == "settlement" {
-			timeNow, err := time.Parse(util.TimeFormat, time.Now().Format(util.TimeFormat))
-			if err != nil {
-				log.Println("[PaymentService][CreateOrUpdate] problem in parsing to time, err: ", err.Error())
-				return false, err
-			}
-
-			userOrder, err := service.UserOrderRepository.FindAllByPayloadId(ctx, tx, requestPayment["custom_field2"].(string))
+			userOrder, err := service.UserOrderService.FindAllByPayloadId(ctx, &pbuserorder.GetUserOrderByPayloadIdRequest{
+				PayloadId: int64(util.StrToInt(requestPayment["custom_field2"].(string))),
+			})
 			if err != nil {
 				log.Println("[PaymentService][CreateOrUpdate][FindAllByPayloadId] problem in getting from repository, err: ", err.Error())
-				return false, err
+				return &pb.GetCreatePaymentResponse{
+					IsSuccess: false,
+				}, err
 			}
 
 			var productName []string
-			for _, item := range userOrder {
+			for _, item := range userOrder.UserOrder {
 				productName = append(productName, *item.Name)
 			}
 
-			transaction := model.Transaction{
+			orderId := requestPayment["order_id"].(string)
+			_, err = service.TransactionService.Create(ctx, &pbtransaction.CreateTransactionRequest{
 				ProductName:   strings.ToLower(strings.Join(productName, ", ")),
 				CustomerName:  requestPayment["custom_field3"].(string),
-				NoTransaction: requestPayment["order_id"].(string),
-				CreatedAt:     timeNow,
-				UpdatedAt:     timeNow,
-			}
-
-			_, err = service.TransactionRepository.Create(ctx, tx, &transaction)
+				NoTransaction: &orderId,
+			})
 			if err != nil {
 				log.Println("[PaymentService][CreateOrUpdate][TransactionCreate] problem in getting from repository, err: ", err.Error())
-				return false, err
+				return &pb.GetCreatePaymentResponse{
+					IsSuccess: false,
+				}, err
 			}
 
-			return true, nil
+			return &pb.GetCreatePaymentResponse{
+				IsSuccess: true,
+			}, nil
 		}
 	}
 
-	return false, nil
+	return &pb.GetCreatePaymentResponse{
+		IsSuccess: false,
+	}, nil
 }
 
-func (service *PaymentServiceImpl) UpdateReceiptNumber(ctx context.Context, request *request2.AddReceiptNumberRequest) (*model.Payment, error) {
+func (service *PaymentService) UpdateReceiptNumber(ctx context.Context, req *pb.UpdateReceiptNumberRequest) (*pb.GetPaymentResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[PaymentService][UpdateReceiptNumber] problem in db transaction, err: ", err.Error())
@@ -224,13 +260,13 @@ func (service *PaymentServiceImpl) UpdateReceiptNumber(ctx context.Context, requ
 	}
 	defer util.CommitOrRollback(tx)
 
-	payment, err := service.PaymentRepository.FindByOrderId(ctx, tx, request.OrderId)
+	payment, err := service.PaymentRepository.FindByOrderId(ctx, tx, req.OrderId)
 	if err != nil {
 		log.Println("[PaymentService][UpdateReceiptNumber][FindByOrderId] problem in getting from repository, err: ", err.Error())
 		return nil, err
 	}
 
-	payment.ReceiptNumber = &request.ReceiptNumber
+	payment.ReceiptNumber = &req.ReceiptNumber
 
 	err = service.PaymentRepository.UpdateReceiptNumber(ctx, tx, payment)
 	if err != nil {
@@ -238,36 +274,43 @@ func (service *PaymentServiceImpl) UpdateReceiptNumber(ctx context.Context, requ
 		return nil, err
 	}
 
-	return payment, nil
+	return &pb.GetPaymentResponse{
+		Payment: payment.ToProtoBuff(),
+	}, nil
 }
 
-func (service *PaymentServiceImpl) Delete(ctx context.Context, orderId string) error {
+func (service *PaymentService) Delete(ctx context.Context, req *pb.GetPaymentByOrderIdRequest) (*empty.Empty, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[PaymentService][Delete] problem in db transaction, err: ", err.Error())
-		return err
+		return nil, err
 	}
 	defer util.CommitOrRollback(tx)
 
-	payment, err := service.PaymentRepository.FindByOrderId(ctx, tx, orderId)
+	payment, err := service.PaymentRepository.FindByOrderId(ctx, tx, req.OrderId)
 	if err != nil {
 		log.Println("[PaymentService][Delete][FindByOrderId] problem in getting from repository, err: ", err.Error())
-		return err
+		return nil, err
 	}
 
 	err = service.PaymentRepository.Delete(ctx, tx, payment.OrderId)
 	if err != nil {
 		log.Println("[PaymentService][Delete][FindByOrderId] problem in getting from repository, err: ", err.Error())
-		return err
+		return nil, err
 	}
 
-	return nil
+	return nil, nil
 }
-func (service *PaymentServiceImpl) GetToken(ctx context.Context, request *request2.GetPaymentTokenRequest) (map[string]interface{}, error) {
-	service.GetClient()
+func (service *PaymentService) GetToken(ctx context.Context, req *pb.GetPaymentTokenRequest) (*pb.GetPaymentTokenResponse, error) {
+	var getClient = func() {
+		service.SnapGateway = midtrans.SnapGateway{
+			Client: service.MidClient,
+		}
+	}
+	getClient()
 
 	var items []map[string]interface{}
-	for _, item := range request.Items {
+	for _, item := range req.Items {
 		err := json.Unmarshal([]byte(item), &items)
 		if err != nil {
 			log.Println("[PaymentService][GetToken] unable to unmarshal json, err: ", err.Error())
@@ -296,19 +339,19 @@ func (service *PaymentServiceImpl) GetToken(ctx context.Context, request *reques
 	itemDetails = append(itemDetails, midtrans.ItemDetail{
 		ID:    itemDetails[len(itemDetails)-1].ID,
 		Name:  "Ongkos Kirim",
-		Price: request.ShippingCost,
+		Price: req.ShippingCost,
 		Qty:   1,
 	})
 
 	orderID := util.RandomString(20)
 	var snapRequest midtrans.SnapReq
 	snapRequest.TransactionDetails.OrderID = orderID
-	snapRequest.TransactionDetails.GrossAmt = request.GrossAmount
+	snapRequest.TransactionDetails.GrossAmt = req.GrossAmount
 	snapRequest.Items = &itemDetails
 	snapRequest.CustomerDetail = &midtrans.CustDetail{
-		FName: request.CustomerName,
+		FName: req.CustomerName,
 	}
-	snapRequest.CustomField1 = util.IntToStr(request.UserId)
+	snapRequest.CustomField1 = util.IntToStr(int(req.UserId))
 
 	// Save to database
 	tx, err := service.DB.Begin()
@@ -321,13 +364,13 @@ func (service *PaymentServiceImpl) GetToken(ctx context.Context, request *reques
 	canceled := "canceled"
 	timeNow := time.Now().Format("2006-01-02 15:04:05")
 	paymentRequest := model.Payment{
-		UserId:            request.UserId,
+		UserId:            req.UserId,
 		OrderId:           &orderID,
 		TransactionStatus: &canceled,
 		TransactionTime:   &timeNow,
-		Address:           &request.Address,
-		Courier:           &request.Courier,
-		CourierService:    &request.CourierService,
+		Address:           &req.Address,
+		Courier:           &req.Courier,
+		CourierService:    &req.CourierService,
 	}
 	payment, err := service.PaymentRepository.Create(ctx, tx, &paymentRequest)
 	if err != nil {
@@ -335,8 +378,8 @@ func (service *PaymentServiceImpl) GetToken(ctx context.Context, request *reques
 		return nil, err
 	}
 	// Send id payload
-	snapRequest.CustomField2 = util.IntToStr(payment.IdPayload)
-	snapRequest.CustomField3 = request.CustomerName
+	snapRequest.CustomField2 = util.IntToStr(int(payment.IdPayload))
+	snapRequest.CustomField3 = req.CustomerName
 
 	token, err := service.SnapGateway.GetToken(&snapRequest)
 	if err != nil {
@@ -344,18 +387,18 @@ func (service *PaymentServiceImpl) GetToken(ctx context.Context, request *reques
 		return nil, err
 	}
 
-	var tokenResponse = make(map[string]interface{})
+	var tokenResponse map[string]string
 	tokenResponse["clientKey"] = service.ClientKey
 	tokenResponse["token"] = token.Token
 
 	for _, item := range items {
 		code := CheckCode(item)
 		price := int64(item["price"].(float64))
-		quantity := int(item["quantity"].(float64))
+		quantity := int32(item["quantity"].(float64))
 		totalPriceItem := int64(item["totalPricePerItem"].(float64))
 		name := item["name"].(string)
 		image := item["image"].(string)
-		userOrder := model.UserOrder{
+		_, err := service.UserOrderService.Create(ctx, &pbuserorder.CreateUserOrderRequest{
 			PayloadId:      payment.IdPayload,
 			Code:           &code,
 			Name:           &name,
@@ -363,15 +406,16 @@ func (service *PaymentServiceImpl) GetToken(ctx context.Context, request *reques
 			Image:          &image,
 			Quantity:       &quantity,
 			TotalPriceItem: &totalPriceItem,
-		}
-		_, err := service.UserOrderRepository.Create(ctx, tx, &userOrder)
+		})
 		if err != nil {
 			log.Println("[PaymentService][GetToken][Create] problem in getting from repository, err: ", err.Error())
 			return nil, err
 		}
 	}
 
-	return tokenResponse, nil
+	return &pb.GetPaymentTokenResponse{
+		Payment: tokenResponse,
+	}, nil
 }
 
 func CheckCode(value map[string]interface{}) string {
