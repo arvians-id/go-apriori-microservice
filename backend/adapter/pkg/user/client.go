@@ -3,7 +3,7 @@ package user
 import (
 	"errors"
 	"github.com/arvians-id/go-apriori-microservice/adapter/middleware"
-	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/user/pb"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pb"
 	"github.com/arvians-id/go-apriori-microservice/adapter/response"
 	"github.com/arvians-id/go-apriori-microservice/config"
 	"github.com/arvians-id/go-apriori-microservice/util"
@@ -53,7 +53,7 @@ func (client *ServiceClient) Profile(c *gin.Context) {
 		return
 	}
 
-	user, err := client.UserService.FindById(c.Request.Context(), &pb.FindByIdRequest{
+	user, err := client.UserService.FindById(c.Request.Context(), &pb.GetUserByIdRequest{
 		Id: int64(id.(float64)),
 	})
 	if err != nil {
@@ -78,7 +78,7 @@ func (client *ServiceClient) UpdateProfile(c *gin.Context) {
 		return
 	}
 
-	user, err := client.UserService.Update(c.Request.Context(), &pb.UpdateRequest{
+	user, err := client.UserService.Update(c.Request.Context(), &pb.UpdateUserRequest{
 		IdUser:   int64(id.(float64)),
 		Role:     requestUpdate.Role,
 		Name:     requestUpdate.Name,
@@ -116,7 +116,7 @@ func (client *ServiceClient) FindById(c *gin.Context) {
 		return
 	}
 
-	user, err := client.UserService.FindById(c.Request.Context(), &pb.FindByIdRequest{
+	user, err := client.UserService.FindById(c.Request.Context(), &pb.GetUserByIdRequest{
 		Id: idParam,
 	})
 	if err != nil {
@@ -139,7 +139,7 @@ func (client *ServiceClient) Create(c *gin.Context) {
 		return
 	}
 
-	user, err := client.UserService.Create(c.Request.Context(), &pb.CreateRequest{
+	user, err := client.UserService.Create(c.Request.Context(), &pb.CreateUserRequest{
 		Name:     requestCreate.Name,
 		Email:    requestCreate.Email,
 		Address:  requestCreate.Address,
@@ -168,7 +168,7 @@ func (client *ServiceClient) Update(c *gin.Context) {
 		return
 	}
 
-	user, err := client.UserService.Update(c.Request.Context(), &pb.UpdateRequest{
+	user, err := client.UserService.Update(c.Request.Context(), &pb.UpdateUserRequest{
 		IdUser:   idParam,
 		Role:     requestUpdate.Role,
 		Name:     requestUpdate.Name,
@@ -196,7 +196,7 @@ func (client *ServiceClient) Delete(c *gin.Context) {
 		return
 	}
 
-	_, err = client.UserService.Delete(c.Request.Context(), &pb.FindByIdRequest{
+	_, err = client.UserService.Delete(c.Request.Context(), &pb.GetUserByIdRequest{
 		Id: idParam,
 	})
 	if err != nil {

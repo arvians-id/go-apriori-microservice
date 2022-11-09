@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/product/pb"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
 )

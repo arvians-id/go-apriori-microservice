@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "./adapter/pb";
+
+import "google/protobuf/Empty.proto";
+import "adapter/proto/entity.proto";
+import "adapter/proto/product.proto";
+
+service AprioriService {
+  rpc FindAll(google.protobuf.Empty) returns (ListAprioriResponse);
+  rpc FindAllByActive(google.protobuf.Empty) returns (ListAprioriResponse);
+  rpc FindAllByCode(GetAprioriByCodeRequest) returns (ListAprioriResponse);
+  rpc FindByCodeAndId(GetAprioriByCodeAndIdRequest) returns (GetAprioriByCodeAndIdResponse);
+  rpc Create(CreateAprioriRequest) returns (google.protobuf.Empty);
+  rpc Update(UpdateAprioriRequest) returns (GetAprioriResponse);
+  rpc UpdateStatus(GetAprioriByCodeRequest) returns (google.protobuf.Empty);
+  rpc Delete(GetAprioriByCodeRequest) returns (google.protobuf.Empty);
+  rpc Generate(GenerateAprioriRequest) returns (GetGenerateAprioriResponse);
+}
+
+message GetGenerateAprioriResponse {
+  repeated AprioriGenerate AprioriGenerate = 1;
+}
+
+message AprioriGenerate {
+  repeated string ItemSet = 1;
+  float Support = 2;
+  int32 Iterate = 3;
+  int32 Transaction = 4;
+  float Confidence = 5;
+  float Discount = 6;
+  string Description = 7;
+  string RangeDate = 8;
+}
+
+message ListAprioriResponse {
+  repeated Apriori apriori = 1;
+}
+
+message GetAprioriResponse {
+  Apriori apriori = 1;
+}
+
+message GetAprioriByCodeRequest {
+  string Code = 1;
+}
+
+message GetAprioriByCodeAndIdRequest {
+  string Code = 1;
+  int64 Id = 2;
+}
+
+message GetAprioriByCodeAndIdResponse {
+  proto.ProductRecommendation productRecommendation = 1;
+}
+
+message CreateAprioriRequest {
+  message Create {
+    string Item = 1;
+    float Discount = 2;
+    float Support = 3;
+    float Confidence = 4;
+    string RangeDate = 5;
+    string CreatedAt = 6;
+  }
+
+  repeated Create CreateAprioriRequest = 1;
+}
+
+message UpdateAprioriRequest {
+  int64  IdApriori = 1;
+  string Code = 2;
+  string Description = 3;
+  string Image = 4;
+}
+
+message GenerateAprioriRequest {
+  float MinimumSupport = 1;
+  float MinimumConfidence = 2;
+  int32 MinimumDiscount = 3;
+  int32 MaximumDiscount = 4;
+  string StartDate = 5;
+  string EndDate = 6;
+}

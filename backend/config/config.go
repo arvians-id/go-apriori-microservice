@@ -10,16 +10,15 @@ type Config struct {
 	XApiKey  string `mapstructure:"X_API_KEY"`
 
 	AprioriSvcUrl       string `mapstructure:"APRIORI_SERVICE_URL"`
-	AuthSvcUrl          string `mapstructure:"AUTH_SERVICE"`
 	CategorySvcUrl      string `mapstructure:"CATEGORY_SERVICE_URL"`
 	CommentSvcUrl       string `mapstructure:"COMMENT_SERVICE_URL"`
 	NotificationSvcUrl  string `mapstructure:"NOTIFICATION_SERVICE_URL"`
 	PasswordResetSvcUrl string `mapstructure:"PASSWORD_RESET_SERVICE_URL"`
 	PaymentSvcUrl       string `mapstructure:"PAYMENT_SERVICE_URL"`
-	ProductSvcUrl       string `mapstructure:"PRODUCT_SERVICE"`
+	ProductSvcUrl       string `mapstructure:"PRODUCT_SERVICE_URL"`
 	TransactionSvcUrl   string `mapstructure:"TRANSACTION_SERVICE_URL"`
 	UserOrderSvcUrl     string `mapstructure:"USER_ORDER_SERVICE_URL"`
-	UserSvcUrl          string `mapstructure:"USER_SERVICE"`
+	UserSvcUrl          string `mapstructure:"USER_SERVICE_URL"`
 	MessageBrokerUrl    string `mapstructure:"MESSAGE_BROKER_URL"`
 
 	DBConnection string `mapstructure:"DB_CONNECTION"`
@@ -69,7 +68,7 @@ func LoadConfig(filenames ...string) (c *Config, err error) {
 	if filenames != nil {
 		viper.AddConfigPath(filenames[0])
 	} else {
-		viper.AddConfigPath("../../config/envs")
+		viper.AddConfigPath("./config/envs")
 	}
 
 	viper.SetConfigName("dev")

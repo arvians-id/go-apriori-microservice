@@ -3,11 +3,9 @@ package payment
 import (
 	"encoding/json"
 	"github.com/arvians-id/go-apriori-microservice/adapter/middleware"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pb"
 	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/notification"
-	pbnotification "github.com/arvians-id/go-apriori-microservice/adapter/pkg/notification/pb"
-	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/payment/pb"
 	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/user"
-	pbuser "github.com/arvians-id/go-apriori-microservice/adapter/pkg/user/pb"
 	"github.com/arvians-id/go-apriori-microservice/adapter/response"
 	"github.com/arvians-id/go-apriori-microservice/config"
 	"github.com/arvians-id/go-apriori-microservice/model"
@@ -22,8 +20,8 @@ import (
 
 type ServiceClient struct {
 	PaymentService      pb.PaymentServiceClient
-	UserService         pbuser.UserServiceClient
-	NotificationService pbnotification.NotificationServiceClient
+	UserService         pb.UserServiceClient
+	NotificationService pb.NotificationServiceClient
 	Producer            *messaging.Producer
 }
 
@@ -111,7 +109,7 @@ func (client *ServiceClient) UpdateReceiptNumber(c *gin.Context) {
 	}
 
 	// Send Notification
-	notificationResponse, err := client.NotificationService.Create(c.Request.Context(), &pbnotification.CreateNotificationRequest{
+	notificationResponse, err := client.NotificationService.Create(c.Request.Context(), &pb.CreateNotificationRequest{
 		UserId:      payment.Payment.UserId,
 		Title:       "Receipt number arrived",
 		Description: "Your receipt number had been entered by admin",
@@ -122,7 +120,7 @@ func (client *ServiceClient) UpdateReceiptNumber(c *gin.Context) {
 		return
 	}
 
-	userResponse, err := client.UserService.FindById(c.Request.Context(), &pbuser.GetUserByIdRequest{
+	userResponse, err := client.UserService.FindById(c.Request.Context(), &pb.GetUserByIdRequest{
 		Id: payment.Payment.UserId,
 	})
 	if err != nil {
@@ -205,7 +203,7 @@ func (client *ServiceClient) Notification(c *gin.Context) {
 	if isSettlement.IsSuccess {
 		idUser := util.StrToInt(resArray["custom_field1"].(string))
 		// Send Notification
-		notificationResponse, err := client.NotificationService.Create(c.Request.Context(), &pbnotification.CreateNotificationRequest{
+		notificationResponse, err := client.NotificationService.Create(c.Request.Context(), &pb.CreateNotificationRequest{
 			UserId:      int64(idUser),
 			Title:       "Transaction Successfully",
 			Description: "You have successfully made a payment. Thank you for shopping at Ryzy Shop",
@@ -216,7 +214,7 @@ func (client *ServiceClient) Notification(c *gin.Context) {
 			return
 		}
 
-		userResponse, err := client.UserService.FindById(c.Request.Context(), &pbuser.GetUserByIdRequest{
+		userResponse, err := client.UserService.FindById(c.Request.Context(), &pb.GetUserByIdRequest{
 			Id: int64(idUser),
 		})
 		if err != nil {

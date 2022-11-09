@@ -135,7 +135,7 @@ func (repository *TransactionRepositoryImpl) CreateByCsv(ctx context.Context, tx
 }
 
 func (repository *TransactionRepositoryImpl) Create(ctx context.Context, tx *sql.Tx, transaction *model.Transaction) (*model.Transaction, error) {
-	id := 0
+	var id int64
 	query := "INSERT INTO transactions(product_name,customer_name,no_transaction,created_at,updated_at) VALUES($1,$2,$3,$4,$5) RETURNING id_transaction"
 	row := tx.QueryRowContext(
 		ctx,

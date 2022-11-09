@@ -2,7 +2,7 @@ package comment
 
 import (
 	"github.com/arvians-id/go-apriori-microservice/adapter/middleware"
-	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/comment/pb"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pb"
 	"github.com/arvians-id/go-apriori-microservice/adapter/response"
 	"github.com/arvians-id/go-apriori-microservice/config"
 	"github.com/arvians-id/go-apriori-microservice/util"

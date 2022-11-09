@@ -1,24 +1,25 @@
 package model
 
 import (
-	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/apriori/pb"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
 )
 
 type Apriori struct {
-	IdApriori   int64     `json:"id_apriori"`
-	Code        string    `json:"code"`
-	Item        string    `json:"item"`
-	Discount    float32   `json:"discount"`
-	Support     float32   `json:"support"`
-	Confidence  float32   `json:"confidence"`
-	RangeDate   string    `json:"range_date"`
-	IsActive    bool      `json:"is_active"`
-	Description *string   `json:"description"`
-	Mass        int32     `json:"mass"`
-	Image       *string   `json:"image"`
-	CreatedAt   time.Time `json:"created_at"`
+	IdApriori   int64      `json:"id_apriori"`
+	Code        string     `json:"code"`
+	Item        string     `json:"item"`
+	Discount    float32    `json:"discount"`
+	Support     float32    `json:"support"`
+	Confidence  float32    `json:"confidence"`
+	RangeDate   string     `json:"range_date"`
+	IsActive    bool       `json:"is_active"`
+	Description *string    `json:"description"`
+	Mass        int32      `json:"mass"`
+	Image       *string    `json:"image"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UserOrder   *UserOrder `json:"user_order"`
 }
 
 func (apriori *Apriori) ToProtoBuff() *pb.Apriori {
@@ -35,6 +36,7 @@ func (apriori *Apriori) ToProtoBuff() *pb.Apriori {
 		Mass:        apriori.Mass,
 		Image:       apriori.Image,
 		CreatedAt:   timestamppb.New(apriori.CreatedAt),
+		UserOrder:   apriori.UserOrder.ToProtoBuff(),
 	}
 }
 

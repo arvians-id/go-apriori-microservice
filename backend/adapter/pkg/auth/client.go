@@ -4,9 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/arvians-id/go-apriori-microservice/adapter/middleware"
-	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/auth/pb"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pb"
 	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/user"
-	pbuser "github.com/arvians-id/go-apriori-microservice/adapter/pkg/user/pb"
 	"github.com/arvians-id/go-apriori-microservice/adapter/response"
 	"github.com/arvians-id/go-apriori-microservice/config"
 	"github.com/arvians-id/go-apriori-microservice/model"
@@ -25,13 +24,13 @@ import (
 
 type ServiceClient struct {
 	PasswordResetService pb.PasswordResetServiceClient
-	UserService          pbuser.UserServiceClient
+	UserService          pb.UserServiceClient
 	Jwt                  *jwt.JsonWebToken
 	Producer             *messaging.Producer
 }
 
 func NewAuthServiceClient(configuration *config.Config) pb.PasswordResetServiceClient {
-	connection, err := grpc.Dial(configuration.AuthSvcUrl, grpc.WithInsecure())
+	connection, err := grpc.Dial(configuration.PasswordResetSvcUrl, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -47,12 +46,12 @@ func RegisterRoutes(router *gin.Engine, configuration *config.Config, jwt *jwt.J
 		Producer:             producer,
 	}
 
-	authorized := router.Group("/api/jwt", middleware.AuthJwtMiddleware())
+	authorized := router.Group("/api/auth", middleware.AuthJwtMiddleware())
 	{
 		authorized.GET("/token", serviceClient.Token)
 	}
 
-	unauthorized := router.Group("/api/jwt")
+	unauthorized := router.Group("/api/auth")
 	{
 		unauthorized.POST("/login", serviceClient.Login)
 		unauthorized.POST("/refresh", serviceClient.Refresh)
@@ -73,7 +72,7 @@ func (client *ServiceClient) Login(c *gin.Context) {
 		return
 	}
 
-	userResponse, err := client.UserService.FindByEmail(c.Request.Context(), &pbuser.FindByEmailRequest{
+	userResponse, err := client.UserService.FindByEmail(c.Request.Context(), &pb.GetUserByEmailRequest{
 		Email:    requestCredential.Email,
 		Password: requestCredential.Password,
 	})
@@ -164,7 +163,7 @@ func (client *ServiceClient) Register(c *gin.Context) {
 		return
 	}
 
-	userResponse, err := client.UserService.Create(c.Request.Context(), &pbuser.CreateRequest{
+	userResponse, err := client.UserService.Create(c.Request.Context(), &pb.CreateUserRequest{
 		Name:     requestCreate.Name,
 		Email:    requestCreate.Email,
 		Password: requestCreate.Password,
@@ -204,7 +203,7 @@ func (client *ServiceClient) ForgotPassword(c *gin.Context) {
 	emailService := model.EmailService{
 		ToEmail: result.PasswordReset.Email,
 		Subject: "Forgot Password",
-		Message: message,
+		Message: &message,
 	}
 	err = client.Producer.Publish("mail_topic", emailService)
 	if err != nil {
@@ -225,7 +224,7 @@ func (client *ServiceClient) VerifyResetPassword(c *gin.Context) {
 		return
 	}
 
-	_, err = client.PasswordResetService.Verify(c.Request.Context(), &pb.PasswordReset{
+	_, err = client.PasswordResetService.Verify(c.Request.Context(), &pb.GetVerifyRequest{
 		Email: requestUpdate.Email,
 		Token: c.Query("signature"),
 	})

@@ -1,6 +1,6 @@
 package model
 
-import "github.com/arvians-id/go-apriori-microservice/adapter/pkg/auth/pb"
+import "github.com/arvians-id/go-apriori-microservice/adapter/pb"
 
 type PasswordReset struct {
 	Email   string `json:"email"`

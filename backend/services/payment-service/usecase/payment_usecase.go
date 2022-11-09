@@ -4,9 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/payment/pb"
-	pbtransaction "github.com/arvians-id/go-apriori-microservice/adapter/pkg/transaction/pb"
-	pbuserorder "github.com/arvians-id/go-apriori-microservice/adapter/pkg/user-order/pb"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pb"
 	"github.com/arvians-id/go-apriori-microservice/config"
 	"github.com/arvians-id/go-apriori-microservice/model"
 	"github.com/arvians-id/go-apriori-microservice/services/payment-service/client"
@@ -229,7 +227,7 @@ func (service *PaymentService) CreateOrUpdate(ctx context.Context, req *pb.Creat
 			}
 
 			orderId := requestPayment["order_id"].(string)
-			_, err = service.TransactionService.Create(ctx, &pbtransaction.CreateTransactionRequest{
+			_, err = service.TransactionService.Create(ctx, &pb.CreateTransactionRequest{
 				ProductName:   strings.ToLower(strings.Join(productName, ", ")),
 				CustomerName:  requestPayment["custom_field3"].(string),
 				NoTransaction: &orderId,
@@ -398,7 +396,7 @@ func (service *PaymentService) GetToken(ctx context.Context, req *pb.GetPaymentT
 		totalPriceItem := int64(item["totalPricePerItem"].(float64))
 		name := item["name"].(string)
 		image := item["image"].(string)
-		_, err := service.UserOrderService.Create(ctx, &pbuserorder.CreateUserOrderRequest{
+		_, err := service.UserOrderService.Create(ctx, &pb.CreateUserOrderRequest{
 			PayloadId:      payment.IdPayload,
 			Code:           &code,
 			Name:           &name,

@@ -1,0 +1,132 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "./adapter/pb";
+
+import "google/protobuf/Timestamp.proto";
+
+message Category {
+  int64 IdCategory = 1;
+  string Name = 2;
+  google.protobuf.Timestamp CreatedAt = 3;
+  google.protobuf.Timestamp UpdatedAt = 4;
+}
+
+message PasswordReset {
+  string Email = 1;
+  string Token = 2;
+  int64 Expired = 3;
+}
+
+message Comment {
+  int64 IdComment = 1;
+  int64 UserOrderId = 2;
+  string ProductCode = 3;
+  optional string Description = 4;
+  optional string Tag = 5;
+  int32 Rating = 6;
+  google.protobuf.Timestamp CreatedAt = 7;
+  UserOrder UserOrder = 8;
+}
+
+message Notification {
+  int64 IdNotification = 1;
+  int64 UserId = 2;
+  string Title = 3;
+  optional string Description = 4;
+  optional string URL = 5;
+  bool IsRead = 6;
+  google.protobuf.Timestamp CreatedAt = 7;
+  User User = 8;
+}
+
+message Transaction {
+  int64 IdTransaction = 1;
+  string ProductName = 2;
+  string CustomerName = 3;
+  string NoTransaction = 4;
+  google.protobuf.Timestamp CreatedAt = 5;
+  google.protobuf.Timestamp UpdatedAt = 6;
+}
+
+message Payment {
+  int64 IdPayload = 1;
+  int64 UserId = 2;
+  optional string OrderId = 3;
+  optional string TransactionTime = 4;
+  optional string TransactionStatus = 5;
+  optional string TransactionId = 6;
+  optional string StatusCode = 7;
+  optional string SignatureKey = 8;
+  optional string SettlementTime = 9;
+  optional string PaymentType = 10;
+  optional string MerchantId = 11;
+  optional string GrossAmount = 12;
+  optional string FraudStatus = 13;
+  optional string BankType = 14;
+  optional string VANumber = 15;
+  optional string BillerCode = 16;
+  optional string BillKey = 17;
+  optional string ReceiptNumber = 18;
+  optional string Address = 19;
+  optional string Courier = 20;
+  optional string CourierService = 21;
+  User User = 22;
+  repeated UserOrder UserOrder = 23;
+}
+
+message Product {
+  int64 IdProduct = 1;
+  string Code = 2;
+  string Name = 3;
+  optional string Description = 4;
+  int32 Price = 5;
+  string Category = 6;
+  bool IsEmpty = 7;
+  int32 Mass = 8;
+  optional string Image = 9;
+  google.protobuf.Timestamp CreatedAt = 10;
+  google.protobuf.Timestamp UpdatedAt = 11;
+}
+message User {
+  int64 IdUser = 1;
+  int32 Role = 2;
+  string Name = 3;
+  string Email = 4;
+  string Address = 5;
+  string Phone = 6;
+  string Password = 7;
+  google.protobuf.Timestamp CreatedAt = 8;
+  google.protobuf.Timestamp UpdatedAt = 9;
+  repeated Notification Notification = 10;
+  repeated Payment Payment = 11;
+}
+
+message Apriori {
+  int64 IdApriori = 1;
+  string Code = 2;
+  string Item = 3;
+  float Discount = 4;
+  float Support = 5;
+  float Confidence = 6;
+  string RangeDate = 7;
+  bool IsActive = 8;
+  optional string Description = 9;
+  int32 Mass = 10;
+  optional string Image = 11;
+  google.protobuf.Timestamp CreatedAt = 12;
+  UserOrder UserOrder = 13;
+}
+
+message UserOrder {
+  int64 IdOrder = 1;
+  int64 PayloadId = 2;
+  optional string Code = 3;
+  optional string Name = 4;
+  optional int64 Price = 5;
+  optional string Image = 6;
+  optional int32 Quantity = 7;
+  optional int64 TotalPriceItem = 8;
+  Payment Payment = 9;
+}

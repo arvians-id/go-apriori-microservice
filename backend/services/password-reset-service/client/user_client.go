@@ -2,7 +2,7 @@ package client
 
 import (
 	"context"
-	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/user/pb"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pb"
 	"github.com/arvians-id/go-apriori-microservice/config"
 	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"

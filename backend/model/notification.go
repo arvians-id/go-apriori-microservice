@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/notification/pb"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
 )
@@ -14,6 +14,7 @@ type Notification struct {
 	URL            *string   `json:"url"`
 	IsRead         bool      `json:"is_read"`
 	CreatedAt      time.Time `json:"created_at"`
+	User           *User     `json:"user"`
 }
 
 func (notification *Notification) ToProtoBuff() *pb.Notification {
@@ -25,5 +26,6 @@ func (notification *Notification) ToProtoBuff() *pb.Notification {
 		URL:            notification.URL,
 		IsRead:         notification.IsRead,
 		CreatedAt:      timestamppb.New(notification.CreatedAt),
+		User:           notification.User.ToProtoBuff(),
 	}
 }

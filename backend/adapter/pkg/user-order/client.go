@@ -3,9 +3,8 @@ package user_order
 import (
 	"errors"
 	"github.com/arvians-id/go-apriori-microservice/adapter/middleware"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pb"
 	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/payment"
-	pbpayment "github.com/arvians-id/go-apriori-microservice/adapter/pkg/payment/pb"
-	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/user-order/pb"
 	"github.com/arvians-id/go-apriori-microservice/adapter/response"
 	"github.com/arvians-id/go-apriori-microservice/config"
 	"github.com/arvians-id/go-apriori-microservice/third-party/aws"
@@ -18,7 +17,7 @@ import (
 
 type ServiceClient struct {
 	UserOrderService pb.UserOrderServiceClient
-	PaymentService   pbpayment.PaymentServiceClient
+	PaymentService   pb.PaymentServiceClient
 	StorageS3        aws.StorageS3
 }
 
@@ -55,7 +54,7 @@ func (client *ServiceClient) FindAll(c *gin.Context) {
 		return
 	}
 
-	payments, err := client.PaymentService.FindAllByUserId(c.Request.Context(), &pbpayment.GetPaymentByUserIdRequest{
+	payments, err := client.PaymentService.FindAllByUserId(c.Request.Context(), &pb.GetPaymentByUserIdRequest{
 		UserId: int64(id.(float64)),
 	})
 	if err != nil {
@@ -86,7 +85,7 @@ func (client *ServiceClient) FindAllByUserId(c *gin.Context) {
 
 func (client *ServiceClient) FindAllById(c *gin.Context) {
 	orderIdParam := c.Param("order_id")
-	paymentResponse, err := client.PaymentService.FindByOrderId(c.Request.Context(), &pbpayment.GetPaymentByOrderIdRequest{
+	paymentResponse, err := client.PaymentService.FindByOrderId(c.Request.Context(), &pb.GetPaymentByOrderIdRequest{
 		OrderId: orderIdParam,
 	})
 	if err != nil {

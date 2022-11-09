@@ -1,19 +1,20 @@
 package model
 
 import (
-	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/comment/pb"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
 )
 
 type Comment struct {
-	IdComment   int64     `json:"id_comment"`
-	UserOrderId int64     `json:"user_order_id"`
-	ProductCode string    `json:"product_code"`
-	Description *string   `json:"description"`
-	Tag         *string   `json:"tag"`
-	Rating      int32     `json:"rating"`
-	CreatedAt   time.Time `json:"created_at"`
+	IdComment   int64      `json:"id_comment"`
+	UserOrderId int64      `json:"user_order_id"`
+	ProductCode string     `json:"product_code"`
+	Description *string    `json:"description"`
+	Tag         *string    `json:"tag"`
+	Rating      int32      `json:"rating"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UserOrder   *UserOrder `json:"user_order"`
 }
 
 func (comment *Comment) ToProtoBuff() *pb.Comment {
@@ -25,6 +26,7 @@ func (comment *Comment) ToProtoBuff() *pb.Comment {
 		Tag:         comment.Tag,
 		Rating:      comment.Rating,
 		CreatedAt:   timestamppb.New(comment.CreatedAt),
+		UserOrder:   comment.UserOrder.ToProtoBuff(),
 	}
 }
 

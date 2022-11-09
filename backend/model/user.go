@@ -1,21 +1,23 @@
 package model
 
 import (
-	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/user/pb"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
 )
 
 type User struct {
-	IdUser    int64     `json:"id_user"`
-	Role      int32     `json:"role"`
-	Name      string    `json:"name"`
-	Email     string    `json:"email"`
-	Address   string    `json:"address"`
-	Phone     string    `json:"phone"`
-	Password  string    `json:"password"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	IdUser       int64           `json:"id_user"`
+	Role         int32           `json:"role"`
+	Name         string          `json:"name"`
+	Email        string          `json:"email"`
+	Address      string          `json:"address"`
+	Phone        string          `json:"phone"`
+	Password     string          `json:"password"`
+	CreatedAt    time.Time       `json:"created_at"`
+	UpdatedAt    time.Time       `json:"updated_at"`
+	Notification []*Notification `json:"notification"`
+	Payment      []*Payment      `json:"payment"`
 }
 
 func (user *User) ToProtoBuff() *pb.User {

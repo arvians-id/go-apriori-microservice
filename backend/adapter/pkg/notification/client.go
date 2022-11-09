@@ -3,7 +3,7 @@ package notification
 import (
 	"errors"
 	"github.com/arvians-id/go-apriori-microservice/adapter/middleware"
-	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/notification/pb"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pb"
 	"github.com/arvians-id/go-apriori-microservice/adapter/response"
 	"github.com/arvians-id/go-apriori-microservice/config"
 	"github.com/gin-gonic/gin"

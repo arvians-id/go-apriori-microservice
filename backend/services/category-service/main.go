@@ -3,7 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/category/pb"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pb"
 	"github.com/arvians-id/go-apriori-microservice/config"
 	"github.com/arvians-id/go-apriori-microservice/services/category-service/repository"
 	"github.com/arvians-id/go-apriori-microservice/services/category-service/usecase"

@@ -4,8 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/apriori/pb"
-	pbproduct "github.com/arvians-id/go-apriori-microservice/adapter/pkg/product/pb"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pb"
 	"github.com/arvians-id/go-apriori-microservice/model"
 	"github.com/arvians-id/go-apriori-microservice/services/apriori-service/client"
 	"github.com/arvians-id/go-apriori-microservice/services/apriori-service/repository"
@@ -138,7 +137,7 @@ func (service *AprioriService) FindByCodeAndId(ctx context.Context, req *pb.GetA
 	}
 
 	return &pb.GetAprioriByCodeAndIdResponse{
-		ProductRecommendation: &pbproduct.ProductRecommendation{
+		ProductRecommendation: &pb.ProductRecommendation{
 			AprioriId:          apriori.IdApriori,
 			AprioriCode:        apriori.Code,
 			AprioriItem:        apriori.Item,

@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/user/pb"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pb"
 	"github.com/arvians-id/go-apriori-microservice/model"
 	"github.com/arvians-id/go-apriori-microservice/services/user-service/repository"
 	"github.com/arvians-id/go-apriori-microservice/util"

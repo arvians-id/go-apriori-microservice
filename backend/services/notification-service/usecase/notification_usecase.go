@@ -3,7 +3,7 @@ package usecase
 import (
 	"context"
 	"database/sql"
-	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/notification/pb"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pb"
 	"github.com/arvians-id/go-apriori-microservice/model"
 	"github.com/arvians-id/go-apriori-microservice/services/notification-service/repository"
 	"github.com/arvians-id/go-apriori-microservice/util"

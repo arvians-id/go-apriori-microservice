@@ -6,8 +6,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/auth/pb"
-	pbuser "github.com/arvians-id/go-apriori-microservice/adapter/pkg/user/pb"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pb"
 	"github.com/arvians-id/go-apriori-microservice/model"
 	"github.com/arvians-id/go-apriori-microservice/services/password-reset-service/client"
 	"github.com/arvians-id/go-apriori-microservice/services/password-reset-service/repository"
@@ -138,7 +137,7 @@ func (service *PasswordResetService) Verify(ctx context.Context, req *pb.GetVeri
 		return nil, err
 	}
 
-	_, err = service.UserService.UpdatePassword(ctx, &pbuser.UpdateUserPasswordRequest{
+	_, err = service.UserService.UpdatePassword(ctx, &pb.UpdateUserPasswordRequest{
 		Email:    req.Email,
 		Password: string(password),
 	})

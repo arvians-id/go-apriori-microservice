@@ -3,7 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/auth/pb"
+	"github.com/arvians-id/go-apriori-microservice/adapter/pb"
 	"github.com/arvians-id/go-apriori-microservice/config"
 	"github.com/arvians-id/go-apriori-microservice/services/password-reset-service/client"
 	"github.com/arvians-id/go-apriori-microservice/services/password-reset-service/repository"
