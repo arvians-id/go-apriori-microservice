@@ -50,12 +50,8 @@ message CreateTransactionRequest {
   optional string NoTransaction = 3;
 }
 
-message CSVRequest {
-  repeated string CSV = 1;
-}
-
 message CreateTransactionByCSVRequest {
-  repeated CSVRequest request = 1;
+  string FilePath = 1;
 }
 
 message UpdateTransactionRequest {

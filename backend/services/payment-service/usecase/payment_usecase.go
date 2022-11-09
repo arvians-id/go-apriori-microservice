@@ -9,6 +9,7 @@ import (
 	pbuserorder "github.com/arvians-id/go-apriori-microservice/adapter/pkg/user-order/pb"
 	"github.com/arvians-id/go-apriori-microservice/config"
 	"github.com/arvians-id/go-apriori-microservice/model"
+	"github.com/arvians-id/go-apriori-microservice/services/payment-service/client"
 	"github.com/arvians-id/go-apriori-microservice/services/payment-service/repository"
 	"github.com/arvians-id/go-apriori-microservice/util"
 	"github.com/golang/protobuf/ptypes/empty"
@@ -25,16 +26,16 @@ type PaymentService struct {
 	ServerKey          string
 	ClientKey          string
 	PaymentRepository  repository.PaymentRepository
-	UserOrderService   pbuserorder.UserOrderServiceClient
-	TransactionService pbtransaction.TransactionServiceClient
+	UserOrderService   client.UserOrderServiceClient
+	TransactionService client.TransactionServiceClient
 	DB                 *sql.DB
 }
 
 func NewPaymentService(
-	configuration config.Config,
-	paymentRepository *repository.PaymentRepository,
-	userOrderService pbuserorder.UserOrderServiceClient,
-	transactionService pbtransaction.TransactionServiceClient,
+	configuration *config.Config,
+	paymentRepository repository.PaymentRepository,
+	userOrderService client.UserOrderServiceClient,
+	transactionService client.TransactionServiceClient,
 	db *sql.DB,
 ) pb.PaymentServiceServer {
 	midClient := midtrans.NewClient()
@@ -46,7 +47,7 @@ func NewPaymentService(
 		MidClient:          midClient,
 		ServerKey:          midClient.ServerKey,
 		ClientKey:          midClient.ClientKey,
-		PaymentRepository:  *paymentRepository,
+		PaymentRepository:  paymentRepository,
 		UserOrderService:   userOrderService,
 		TransactionService: transactionService,
 		DB:                 db,
@@ -213,9 +214,8 @@ func (service *PaymentService) CreateOrUpdate(ctx context.Context, req *pb.Creat
 		}
 
 		if requestPayment["transaction_status"].(string) == "settlement" {
-			userOrder, err := service.UserOrderService.FindAllByPayloadId(ctx, &pbuserorder.GetUserOrderByPayloadIdRequest{
-				PayloadId: int64(util.StrToInt(requestPayment["custom_field2"].(string))),
-			})
+			payloadId := int64(util.StrToInt(requestPayment["custom_field2"].(string)))
+			userOrder, err := service.UserOrderService.FindAllByPayloadId(ctx, payloadId)
 			if err != nil {
 				log.Println("[PaymentService][CreateOrUpdate][FindAllByPayloadId] problem in getting from repository, err: ", err.Error())
 				return &pb.GetCreatePaymentResponse{

@@ -17,9 +17,9 @@ type CategoryService struct {
 	DB                 *sql.DB
 }
 
-func NewCategoryService(categoryRepository *repository.CategoryRepository, db *sql.DB) pb.CategoryServiceServer {
+func NewCategoryService(categoryRepository repository.CategoryRepository, db *sql.DB) pb.CategoryServiceServer {
 	return &CategoryService{
-		CategoryRepository: *categoryRepository,
+		CategoryRepository: categoryRepository,
 		DB:                 db,
 	}
 }

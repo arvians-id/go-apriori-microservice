@@ -1,5 +1,7 @@
 package model
 
+import "github.com/arvians-id/go-apriori-microservice/adapter/pkg/user-order/pb"
+
 type UserOrder struct {
 	IdOrder        int64   `json:"id_order"`
 	PayloadId      int64   `json:"payload_id"`
@@ -9,4 +11,17 @@ type UserOrder struct {
 	Image          *string `json:"image"`
 	Quantity       *int32  `json:"quantity"`
 	TotalPriceItem *int64  `json:"total_price_item"`
+}
+
+func (userOrder *UserOrder) ToProtoBuff() *pb.UserOrder {
+	return &pb.UserOrder{
+		IdOrder:        userOrder.IdOrder,
+		PayloadId:      userOrder.PayloadId,
+		Code:           userOrder.Code,
+		Name:           userOrder.Name,
+		Price:          userOrder.Price,
+		Image:          userOrder.Image,
+		Quantity:       userOrder.Quantity,
+		TotalPriceItem: userOrder.TotalPriceItem,
+	}
 }

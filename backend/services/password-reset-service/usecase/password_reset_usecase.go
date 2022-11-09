@@ -9,6 +9,7 @@ import (
 	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/auth/pb"
 	pbuser "github.com/arvians-id/go-apriori-microservice/adapter/pkg/user/pb"
 	"github.com/arvians-id/go-apriori-microservice/model"
+	"github.com/arvians-id/go-apriori-microservice/services/password-reset-service/client"
 	"github.com/arvians-id/go-apriori-microservice/services/password-reset-service/repository"
 	"github.com/arvians-id/go-apriori-microservice/util"
 	"github.com/golang/protobuf/ptypes/empty"
@@ -20,17 +21,17 @@ import (
 
 type PasswordResetService struct {
 	PasswordResetRepository repository.PasswordResetRepository
-	UserService             pbuser.UserServiceClient
+	UserService             client.UserServiceClient
 	DB                      *sql.DB
 }
 
 func NewPasswordResetService(
-	resetRepository *repository.PasswordResetRepository,
-	userService pbuser.UserServiceClient,
+	resetRepository repository.PasswordResetRepository,
+	userService client.UserServiceClient,
 	db *sql.DB,
 ) pb.PasswordResetServiceServer {
 	return &PasswordResetService{
-		PasswordResetRepository: *resetRepository,
+		PasswordResetRepository: resetRepository,
 		UserService:             userService,
 		DB:                      db,
 	}
@@ -55,9 +56,7 @@ func (service *PasswordResetService) CreateOrUpdateByEmail(ctx context.Context, 
 	}
 
 	// Check if email is exists in table users
-	user, err := service.UserService.FindByEmail(ctx, &pbuser.GetUserByEmailRequest{
-		Email: req.Email,
-	})
+	user, err := service.UserService.FindByEmail(ctx, req.Email)
 	if err != nil {
 		log.Println("[NotificationService][CreateOrUpdateByEmail][FindByEmail] problem in getting from repository, err: ", err.Error())
 		return nil, err
@@ -126,9 +125,7 @@ func (service *PasswordResetService) Verify(ctx context.Context, req *pb.GetVeri
 
 	// if not
 	// Check if email is exists in table users
-	user, err := service.UserService.FindByEmail(ctx, &pbuser.GetUserByEmailRequest{
-		Email: req.Email,
-	})
+	user, err := service.UserService.FindByEmail(ctx, req.Email)
 	if err != nil {
 		log.Println("[NotificationService][Verify][FindByEmail] problem in getting from repository, err: ", err.Error())
 		return nil, err

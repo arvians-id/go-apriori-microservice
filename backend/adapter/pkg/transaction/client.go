@@ -108,14 +108,8 @@ func (client *ServiceClient) CreateByCSV(c *gin.Context) {
 		return
 	}
 
-	data, err := util.OpenCsvFile(filePath)
-	if err != nil {
-		response.ReturnErrorInternalServerError(c, err, nil)
-		return
-	}
-
 	_, err = client.TransactionService.CreateByCSV(c.Request.Context(), &pb.CreateTransactionByCSVRequest{
-		Request: data,
+		FilePath: filePath,
 	})
 	if err != nil {
 		response.ReturnErrorInternalServerError(c, err, nil)

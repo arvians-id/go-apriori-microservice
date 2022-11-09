@@ -12,13 +12,15 @@ type ProductServiceClient struct {
 	Client pb.ProductServiceClient
 }
 
-func NewProductServiceClient(configuration *config.Config) pb.ProductServiceClient {
+func NewProductServiceClient(configuration *config.Config) ProductServiceClient {
 	connection, err := grpc.Dial(configuration.ProductSvcUrl, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalln("Could not connect:", err)
 	}
 
-	return pb.NewProductServiceClient(connection)
+	return ProductServiceClient{
+		Client: pb.NewProductServiceClient(connection),
+	}
 }
 
 func (client *ProductServiceClient) FindByName(ctx context.Context, name string) (*pb.GetProductResponse, error) {

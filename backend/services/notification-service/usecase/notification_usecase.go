@@ -19,11 +19,11 @@ type NotificationService struct {
 }
 
 func NewNotificationService(
-	notificationRepository *repository.NotificationRepository,
+	notificationRepository repository.NotificationRepository,
 	db *sql.DB,
 ) pb.NotificationServiceServer {
 	return &NotificationService{
-		NotificationRepository: *notificationRepository,
+		NotificationRepository: notificationRepository,
 		DB:                     db,
 	}
 }

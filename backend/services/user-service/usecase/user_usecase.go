@@ -10,6 +10,7 @@ import (
 	"github.com/arvians-id/go-apriori-microservice/util"
 	"github.com/golang/protobuf/ptypes/empty"
 	"golang.org/x/crypto/bcrypt"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"log"
 	"time"
 )
@@ -19,9 +20,9 @@ type UserService struct {
 	DB             *sql.DB
 }
 
-func NewUserService(userRepository *repository.UserRepository, db *sql.DB) pb.UserServiceServer {
+func NewUserService(userRepository repository.UserRepository, db *sql.DB) pb.UserServiceServer {
 	return &UserService{
-		UserRepository: *userRepository,
+		UserRepository: userRepository,
 		DB:             db,
 	}
 }
@@ -44,7 +45,14 @@ func (service *UserService) FindAll(ctx context.Context, empty *empty.Empty) (*p
 		return nil, err
 	}
 
-	return users, nil
+	var userListResponse []*pb.User
+	for _, user := range users {
+		userListResponse = append(userListResponse, user.ToProtoBuff())
+	}
+
+	return &pb.ListUserResponse{
+		User: userListResponse,
+	}, nil
 }
 
 func (service *UserService) FindById(ctx context.Context, req *pb.GetUserByIdRequest) (*pb.GetUserResponse, error) {
@@ -59,13 +67,15 @@ func (service *UserService) FindById(ctx context.Context, req *pb.GetUserByIdReq
 	}
 	defer util.CommitOrRollback(tx)
 
-	user, err := service.UserRepository.FindById(ctx, tx, id)
+	user, err := service.UserRepository.FindById(ctx, tx, req.Id)
 	if err != nil {
 		log.Println("[UserService][FindById][FindById] problem in getting from repository, err: ", err.Error())
 		return nil, err
 	}
 
-	return user, nil
+	return &pb.GetUserResponse{
+		User: user.ToProtoBuff(),
+	}, nil
 }
 
 func (service *UserService) FindByEmail(ctx context.Context, req *pb.GetUserByEmailRequest) (*pb.GetUserResponse, error) {
@@ -80,19 +90,20 @@ func (service *UserService) FindByEmail(ctx context.Context, req *pb.GetUserByEm
 	}
 	defer util.CommitOrRollback(tx)
 
-	user, err := service.UserRepository.FindByEmail(ctx, tx, request.Email)
+	user, err := service.UserRepository.FindByEmail(ctx, tx, req.Email)
 	if err != nil {
 		log.Println("[UserService][FindByEmail][FindByEmail] problem in getting from repository, err: ", err.Error())
 		return nil, err
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
 	if err != nil {
 		log.Println("[UserService][FindByEmail] problem in comparing password, err: ", err.Error())
 		return nil, errors.New("wrong password")
 	}
-
-	return user, nil
+	return &pb.GetUserResponse{
+		User: user.ToProtoBuff(),
+	}, nil
 }
 
 func (service *UserService) Create(ctx context.Context, req *pb.CreateUserRequest) (*pb.GetUserResponse, error) {
@@ -107,7 +118,7 @@ func (service *UserService) Create(ctx context.Context, req *pb.CreateUserReques
 	}
 	defer util.CommitOrRollback(tx)
 
-	password, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
+	password, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		log.Println("[UserService][Create] problem in generating password hashed, err: ", err.Error())
 		return nil, err
@@ -121,10 +132,10 @@ func (service *UserService) Create(ctx context.Context, req *pb.CreateUserReques
 
 	userRequest := model.User{
 		Role:      2,
-		Name:      request.Name,
-		Email:     request.Email,
-		Address:   request.Address,
-		Phone:     request.Phone,
+		Name:      req.Name,
+		Email:     req.Email,
+		Address:   req.Address,
+		Phone:     req.Phone,
 		Password:  string(password),
 		CreatedAt: timeNow,
 		UpdatedAt: timeNow,
@@ -135,7 +146,9 @@ func (service *UserService) Create(ctx context.Context, req *pb.CreateUserReques
 		return nil, err
 	}
 
-	return user, nil
+	return &pb.GetUserResponse{
+		User: user.ToProtoBuff(),
+	}, nil
 }
 
 func (service *UserService) Update(ctx context.Context, req *pb.UpdateUserRequest) (*pb.GetUserResponse, error) {
@@ -150,15 +163,15 @@ func (service *UserService) Update(ctx context.Context, req *pb.UpdateUserReques
 	}
 	defer util.CommitOrRollback(tx)
 
-	user, err := service.UserRepository.FindById(ctx, tx, request.IdUser)
+	user, err := service.UserRepository.FindById(ctx, tx, req.IdUser)
 	if err != nil {
 		log.Println("[UserService][Update][FindById] problem in getting from repository, err: ", err.Error())
 		return nil, err
 	}
 
 	newPassword := user.Password
-	if request.Password != "" {
-		password, _ := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
+	if req.Password != "" {
+		password, _ := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 		if err != nil {
 			log.Println("[UserService][Update] problem in generating password hashed, err: ", err.Error())
 			return nil, err
@@ -173,10 +186,10 @@ func (service *UserService) Update(ctx context.Context, req *pb.UpdateUserReques
 		return nil, err
 	}
 
-	user.Name = request.Name
-	user.Email = request.Email
-	user.Address = request.Address
-	user.Phone = request.Phone
+	user.Name = req.Name
+	user.Email = req.Email
+	user.Address = req.Address
+	user.Phone = req.Phone
 	user.Password = newPassword
 	user.UpdatedAt = timeNow
 
@@ -186,7 +199,40 @@ func (service *UserService) Update(ctx context.Context, req *pb.UpdateUserReques
 		return nil, err
 	}
 
-	return user, nil
+	return &pb.GetUserResponse{
+		User: user.ToProtoBuff(),
+	}, nil
+}
+
+func (service *UserService) UpdatePassword(ctx context.Context, req *pb.UpdateUserPasswordRequest) (*emptypb.Empty, error) {
+	var tx *sql.Tx
+	if service.DB != nil {
+		transaction, err := service.DB.Begin()
+		if err != nil {
+			log.Println("[UserService][Update] problem in db transaction, err: ", err.Error())
+			return nil, err
+		}
+		tx = transaction
+	}
+	defer util.CommitOrRollback(tx)
+
+	timeNow, err := time.Parse(util.TimeFormat, time.Now().Format(util.TimeFormat))
+	if err != nil {
+		log.Println("[UserService][Update] problem in parsing to time, err: ", err.Error())
+		return nil, err
+	}
+
+	err = service.UserRepository.UpdatePassword(ctx, tx, &model.User{
+		Password:  req.Password,
+		Email:     req.Email,
+		UpdatedAt: timeNow,
+	})
+	if err != nil {
+		log.Println("[UserService][UpdatePassword] problem in getting from repository, err: ", err.Error())
+		return nil, err
+	}
+
+	return nil, nil
 }
 
 func (service *UserService) Delete(ctx context.Context, req *pb.GetUserByIdRequest) (*empty.Empty, error) {
@@ -195,23 +241,23 @@ func (service *UserService) Delete(ctx context.Context, req *pb.GetUserByIdReque
 		transaction, err := service.DB.Begin()
 		if err != nil {
 			log.Println("[UserService][Delete] problem in db transaction, err: ", err.Error())
-			return err
+			return nil, err
 		}
 		tx = transaction
 	}
 	defer util.CommitOrRollback(tx)
 
-	user, err := service.UserRepository.FindById(ctx, tx, id)
+	user, err := service.UserRepository.FindById(ctx, tx, req.Id)
 	if err != nil {
 		log.Println("[UserService][Delete][FindById] problem in getting from repository, err: ", err.Error())
-		return err
+		return nil, err
 	}
 
 	err = service.UserRepository.Delete(ctx, tx, user.IdUser)
 	if err != nil {
 		log.Println("[UserService][Delete][Delete] problem in getting from repository, err: ", err.Error())
-		return err
+		return nil, err
 	}
 
-	return nil
+	return nil, nil
 }

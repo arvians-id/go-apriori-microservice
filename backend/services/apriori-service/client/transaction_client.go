@@ -12,13 +12,15 @@ type TransactionServiceClient struct {
 	Client pb.TransactionServiceClient
 }
 
-func NewTransactionServiceClient(configuration *config.Config) pb.TransactionServiceClient {
+func NewTransactionServiceClient(configuration *config.Config) TransactionServiceClient {
 	connection, err := grpc.Dial(configuration.TransactionSvcUrl, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalln("Could not connect:", err)
 	}
 
-	return pb.NewTransactionServiceClient(connection)
+	return TransactionServiceClient{
+		Client: pb.NewTransactionServiceClient(connection),
+	}
 }
 
 func (client *TransactionServiceClient) FindAllItemSet(ctx context.Context, startDate string, endDate string) (*pb.ListTransactionsResponse, error) {

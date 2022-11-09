@@ -1,11 +1,11 @@
-package service
+package usecase
 
 import (
 	"context"
 	"database/sql"
-	pbpayment "github.com/arvians-id/go-apriori-microservice/adapter/pkg/payment/pb"
 	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/user-order/pb"
-	pbuser "github.com/arvians-id/go-apriori-microservice/adapter/pkg/user/pb"
+	"github.com/arvians-id/go-apriori-microservice/model"
+	"github.com/arvians-id/go-apriori-microservice/services/user-order-service/client"
 	"github.com/arvians-id/go-apriori-microservice/services/user-order-service/repository"
 	"github.com/arvians-id/go-apriori-microservice/util"
 	"log"
@@ -13,20 +13,17 @@ import (
 
 type UserOrderService struct {
 	UserOrderRepository repository.UserOrderRepository
-	PaymentService      pbpayment.PaymentServiceClient
-	UserService         pbuser.UserServiceClient
+	UserService         client.UserServiceClient
 	DB                  *sql.DB
 }
 
 func NewUserOrderService(
-	userOrderRepository *repository.UserOrderRepository,
-	PpaymentService pbpayment.PaymentServiceClient,
-	userService pbuser.UserServiceClient,
+	userOrderRepository repository.UserOrderRepository,
+	userService client.UserServiceClient,
 	db *sql.DB,
 ) pb.UserOrderServiceServer {
 	return &UserOrderService{
-		UserOrderRepository: *userOrderRepository,
-		PaymentService:      PpaymentService,
+		UserOrderRepository: userOrderRepository,
 		UserService:         userService,
 		DB:                  db,
 	}
@@ -40,13 +37,20 @@ func (service *UserOrderService) FindAllByPayloadId(ctx context.Context, req *pb
 	}
 	defer util.CommitOrRollback(tx)
 
-	userOrders, err := service.UserOrderRepository.FindAllByPayloadId(ctx, tx, util.IntToStr(payloadId))
+	userOrders, err := service.UserOrderRepository.FindAllByPayloadId(ctx, tx, req.PayloadId)
 	if err != nil {
 		log.Println("[UserOrderService][FindAllByPayloadId][FindAllByPayloadId] problem in getting from repository, err: ", err.Error())
 		return nil, err
 	}
 
-	return userOrders, nil
+	var userOrderListResponse []*pb.UserOrder
+	for _, userOrder := range userOrders {
+		userOrderListResponse = append(userOrderListResponse, userOrder.ToProtoBuff())
+	}
+
+	return &pb.ListUserOrderResponse{
+		UserOrder: userOrderListResponse,
+	}, nil
 }
 
 func (service *UserOrderService) FindAllByUserId(ctx context.Context, req *pb.GetUserOrderByUserIdRequest) (*pb.ListUserOrderResponse, error) {
@@ -57,19 +61,26 @@ func (service *UserOrderService) FindAllByUserId(ctx context.Context, req *pb.Ge
 	}
 	defer util.CommitOrRollback(tx)
 
-	_, err = service.UserRepository.FindById(ctx, tx, userId)
+	user, err := service.UserService.FindById(ctx, req.UserId)
 	if err != nil {
 		log.Println("[UserOrderService][FindAllByUserId][FindById] problem in getting from repository, err: ", err.Error())
 		return nil, err
 	}
 
-	userOrders, err := service.UserOrderRepository.FindAllByUserId(ctx, tx, userId)
+	userOrders, err := service.UserOrderRepository.FindAllByUserId(ctx, tx, user.User.IdUser)
 	if err != nil {
 		log.Println("[UserOrderService][FindAllByUserId][FindAllByUserId] problem in getting from repository, err: ", err.Error())
 		return nil, err
 	}
 
-	return userOrders, nil
+	var userOrderListResponse []*pb.UserOrder
+	for _, userOrder := range userOrders {
+		userOrderListResponse = append(userOrderListResponse, userOrder.ToProtoBuff())
+	}
+
+	return &pb.ListUserOrderResponse{
+		UserOrder: userOrderListResponse,
+	}, nil
 }
 
 func (service *UserOrderService) FindById(ctx context.Context, req *pb.GetUserOrderByIdRequest) (*pb.GetUserOrderResponse, error) {
@@ -80,13 +91,15 @@ func (service *UserOrderService) FindById(ctx context.Context, req *pb.GetUserOr
 	}
 	defer util.CommitOrRollback(tx)
 
-	userOrder, err := service.UserOrderRepository.FindById(ctx, tx, id)
+	userOrder, err := service.UserOrderRepository.FindById(ctx, tx, req.Id)
 	if err != nil {
 		log.Println("[UserOrderService][FindById][FindById] problem in getting from repository, err: ", err.Error())
 		return nil, err
 	}
 
-	return userOrder, nil
+	return &pb.GetUserOrderResponse{
+		UserOrder: userOrder.ToProtoBuff(),
+	}, nil
 }
 
 func (service *UserOrderService) Create(ctx context.Context, req *pb.CreateUserOrderRequest) (*pb.GetUserOrderResponse, error) {
@@ -97,11 +110,21 @@ func (service *UserOrderService) Create(ctx context.Context, req *pb.CreateUserO
 	}
 	defer util.CommitOrRollback(tx)
 
-	userOrder, err := service.UserOrderRepository.Create(ctx, tx, req)
+	userOrder, err := service.UserOrderRepository.Create(ctx, tx, &model.UserOrder{
+		PayloadId:      req.PayloadId,
+		Code:           req.Code,
+		Name:           req.Name,
+		Price:          req.Price,
+		Image:          req.Image,
+		Quantity:       req.Quantity,
+		TotalPriceItem: req.TotalPriceItem,
+	})
 	if err != nil {
 		log.Println("[UserOrderService][Create][Create] problem in getting from repository, err: ", err.Error())
 		return nil, err
 	}
 
-	return userOrder, nil
+	return &pb.GetUserOrderResponse{
+		UserOrder: userOrder.ToProtoBuff(),
+	}, nil
 }

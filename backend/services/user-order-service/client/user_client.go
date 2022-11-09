@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/user/pb"
 	"github.com/arvians-id/go-apriori-microservice/config"
-	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
 	"log"
 )
@@ -24,22 +23,12 @@ func NewUserServiceClient(configuration *config.Config) UserServiceClient {
 	}
 }
 
-func (client *UserServiceClient) FindByEmail(ctx context.Context, email string) (*pb.GetUserResponse, error) {
-	request := &pb.GetUserByEmailRequest{
-		Email: email,
+func (client *UserServiceClient) FindById(ctx context.Context, id int64) (*pb.GetUserResponse, error) {
+	request := &pb.GetUserByIdRequest{
+		Id: id,
 	}
 
-	response, err := client.Client.FindByEmail(ctx, request)
-	if err != nil {
-		log.Println("[TransactionServiceClient][FindAllItemSet] problem calling transaction service, err: ", err.Error())
-		return nil, err
-	}
-
-	return response, nil
-}
-
-func (client *UserServiceClient) UpdatePassword(ctx context.Context, req *pb.UpdateUserPasswordRequest) (*empty.Empty, error) {
-	response, err := client.Client.UpdatePassword(ctx, req)
+	response, err := client.Client.FindById(ctx, request)
 	if err != nil {
 		log.Println("[TransactionServiceClient][FindAllItemSet] problem calling transaction service, err: ", err.Error())
 		return nil, err

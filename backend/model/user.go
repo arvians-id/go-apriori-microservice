@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/user/pb"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"time"
+)
 
 type User struct {
 	IdUser    int64     `json:"id_user"`
@@ -12,6 +16,20 @@ type User struct {
 	Password  string    `json:"password"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+}
+
+func (user *User) ToProtoBuff() *pb.User {
+	return &pb.User{
+		IdUser:    user.IdUser,
+		Role:      user.Role,
+		Name:      user.Name,
+		Email:     user.Email,
+		Address:   user.Address,
+		Phone:     user.Phone,
+		Password:  user.Password,
+		CreatedAt: timestamppb.New(user.CreatedAt),
+		UpdatedAt: timestamppb.New(user.UpdatedAt),
+	}
 }
 
 type TokenJwt struct {

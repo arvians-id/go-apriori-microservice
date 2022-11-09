@@ -3,7 +3,6 @@ package usecase
 import (
 	"context"
 	"database/sql"
-	pbproduct "github.com/arvians-id/go-apriori-microservice/adapter/pkg/product/pb"
 	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/transaction/pb"
 	"github.com/arvians-id/go-apriori-microservice/model"
 	"github.com/arvians-id/go-apriori-microservice/services/transaction-service/repository"
@@ -17,18 +16,15 @@ import (
 
 type TransactionService struct {
 	TransactionRepository repository.TransactionRepository
-	ProductService        pbproduct.ProductServiceClient
 	DB                    *sql.DB
 }
 
 func NewTransactionService(
-	transactionRepository *repository.TransactionRepository,
-	productService pbproduct.ProductServiceClient,
+	transactionRepository repository.TransactionRepository,
 	db *sql.DB,
-) pb.TransactionServiceClient {
+) pb.TransactionServiceServer {
 	return &TransactionService{
-		TransactionRepository: *transactionRepository,
-		ProductService:        productService,
+		TransactionRepository: transactionRepository,
 		DB:                    db,
 	}
 }
@@ -47,7 +43,14 @@ func (service *TransactionService) FindAll(ctx context.Context, empty *empty.Emp
 		return nil, err
 	}
 
-	return transactions, nil
+	var transactionListResponse []*pb.Transaction
+	for _, transaction := range transactions {
+		transactionListResponse = append(transactionListResponse, transaction.ToProtoBuff())
+	}
+
+	return &pb.ListTransactionsResponse{
+		Transaction: transactionListResponse,
+	}, nil
 }
 
 func (service *TransactionService) FindAllItemSet(ctx context.Context, req *pb.GetAllItemSetTransactionRequest) (*pb.ListTransactionsResponse, error) {
@@ -64,7 +67,14 @@ func (service *TransactionService) FindAllItemSet(ctx context.Context, req *pb.G
 		return nil, err
 	}
 
-	return transactions, nil
+	var transactionListResponse []*pb.Transaction
+	for _, transaction := range transactions {
+		transactionListResponse = append(transactionListResponse, transaction.ToProtoBuff())
+	}
+
+	return &pb.ListTransactionsResponse{
+		Transaction: transactionListResponse,
+	}, nil
 }
 
 func (service *TransactionService) FindByNoTransaction(ctx context.Context, req *pb.GetTransactionByNoTransactionRequest) (*pb.GetTransactionResponse, error) {
@@ -75,13 +85,15 @@ func (service *TransactionService) FindByNoTransaction(ctx context.Context, req 
 	}
 	defer util.CommitOrRollback(tx)
 
-	transaction, err := service.TransactionRepository.FindByNoTransaction(ctx, tx, noTransaction)
+	transaction, err := service.TransactionRepository.FindByNoTransaction(ctx, tx, req.NoTransaction)
 	if err != nil {
 		log.Println("[TransactionService][FindByNoTransaction][FindByNoTransaction] problem in getting from repository, err: ", err.Error())
 		return nil, err
 	}
 
-	return transaction, nil
+	return &pb.GetTransactionResponse{
+		Transaction: transaction.ToProtoBuff(),
+	}, nil
 }
 
 func (service *TransactionService) Create(ctx context.Context, req *pb.CreateTransactionRequest) (*pb.GetTransactionResponse, error) {
@@ -104,8 +116,8 @@ func (service *TransactionService) Create(ctx context.Context, req *pb.CreateTra
 	}
 
 	transactionRequest := model.Transaction{
-		ProductName:   strings.ToLower(request.ProductName),
-		CustomerName:  request.CustomerName,
+		ProductName:   strings.ToLower(req.ProductName),
+		CustomerName:  req.CustomerName,
 		NoTransaction: noTransaction,
 		CreatedAt:     timeNow,
 		UpdatedAt:     timeNow,
@@ -117,16 +129,24 @@ func (service *TransactionService) Create(ctx context.Context, req *pb.CreateTra
 		return nil, err
 	}
 
-	return transaction, nil
+	return &pb.GetTransactionResponse{
+		Transaction: transaction.ToProtoBuff(),
+	}, nil
 }
 
 func (service *TransactionService) CreateByCSV(ctx context.Context, req *pb.CreateTransactionByCSVRequest) (*empty.Empty, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[TransactionService][CreateByCsv] problem in db transaction, err: ", err.Error())
-		return err
+		return nil, err
 	}
 	defer util.CommitOrRollback(tx)
+
+	data, err := util.OpenCsvFile(req.FilePath)
+	if err != nil {
+		log.Println("[TransactionService][CreateByCsv] problem in db transaction, err: ", err.Error())
+		return nil, err
+	}
 
 	var transactions []*model.Transaction
 	for _, transaction := range data {
@@ -143,10 +163,10 @@ func (service *TransactionService) CreateByCSV(ctx context.Context, req *pb.Crea
 	err = service.TransactionRepository.CreateByCsv(ctx, tx, transactions)
 	if err != nil {
 		log.Println("[TransactionService][CreateByCsv][CreateByCsv] problem in getting from repository, err: ", err.Error())
-		return err
+		return nil, err
 	}
 
-	return nil
+	return nil, nil
 }
 
 func (service *TransactionService) Update(ctx context.Context, req *pb.UpdateTransactionRequest) (*pb.GetTransactionResponse, error) {
@@ -158,7 +178,7 @@ func (service *TransactionService) Update(ctx context.Context, req *pb.UpdateTra
 	defer util.CommitOrRollback(tx)
 
 	// Find Transaction by number transaction
-	transaction, err := service.TransactionRepository.FindByNoTransaction(ctx, tx, request.NoTransaction)
+	transaction, err := service.TransactionRepository.FindByNoTransaction(ctx, tx, req.NoTransaction)
 	if err != nil {
 		log.Println("[TransactionService][Update][FindByNoTransaction] problem in getting from repository, err: ", err.Error())
 		return nil, err
@@ -170,9 +190,9 @@ func (service *TransactionService) Update(ctx context.Context, req *pb.UpdateTra
 		return nil, err
 	}
 
-	transaction.ProductName = strings.ToLower(request.ProductName)
-	transaction.CustomerName = request.CustomerName
-	transaction.NoTransaction = request.NoTransaction
+	transaction.ProductName = strings.ToLower(req.ProductName)
+	transaction.CustomerName = req.CustomerName
+	transaction.NoTransaction = req.NoTransaction
 	transaction.UpdatedAt = timeNow
 
 	_, err = service.TransactionRepository.Update(ctx, tx, transaction)
@@ -181,45 +201,47 @@ func (service *TransactionService) Update(ctx context.Context, req *pb.UpdateTra
 		return nil, err
 	}
 
-	return transaction, nil
+	return &pb.GetTransactionResponse{
+		Transaction: transaction.ToProtoBuff(),
+	}, nil
 }
 
 func (service *TransactionService) Delete(ctx context.Context, req *pb.GetTransactionByNoTransactionRequest) (*emptypb.Empty, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[TransactionService][Delete] problem in db transaction, err: ", err.Error())
-		return err
+		return nil, err
 	}
 	defer util.CommitOrRollback(tx)
 
-	transaction, err := service.TransactionRepository.FindByNoTransaction(ctx, tx, noTransaction)
+	transaction, err := service.TransactionRepository.FindByNoTransaction(ctx, tx, req.NoTransaction)
 	if err != nil {
 		log.Println("[TransactionService][Delete][FindByNoTransaction] problem in getting from repository, err: ", err.Error())
-		return err
+		return nil, err
 	}
 
 	err = service.TransactionRepository.Delete(ctx, tx, transaction.NoTransaction)
 	if err != nil {
 		log.Println("[TransactionService][Delete][Delete] problem in getting from repository, err: ", err.Error())
-		return err
+		return nil, err
 	}
 
-	return nil
+	return nil, nil
 }
 
 func (service *TransactionService) Truncate(ctx context.Context, empty *empty.Empty) (*emptypb.Empty, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[TransactionService][Truncate] problem in db transaction, err: ", err.Error())
-		return err
+		return nil, err
 	}
 	defer util.CommitOrRollback(tx)
 
 	err = service.TransactionRepository.Truncate(ctx, tx)
 	if err != nil {
 		log.Println("[TransactionService][Truncate][Truncate] problem in getting from repository, err: ", err.Error())
-		return err
+		return nil, err
 	}
 
-	return nil
+	return nil, nil
 }

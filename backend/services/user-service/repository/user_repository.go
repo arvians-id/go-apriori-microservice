@@ -54,7 +54,7 @@ func (repository *UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) (
 	return users, nil
 }
 
-func (repository *UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id int) (*model.User, error) {
+func (repository *UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id int64) (*model.User, error) {
 	query := "SELECT * FROM users WHERE id_user = $1"
 	row := tx.QueryRowContext(ctx, query, id)
 
@@ -160,7 +160,7 @@ func (repository *UserRepositoryImpl) UpdatePassword(ctx context.Context, tx *sq
 	return nil
 }
 
-func (repository *UserRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, id int) error {
+func (repository *UserRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, id int64) error {
 	query := "DELETE FROM users WHERE id_user = $1"
 	_, err := tx.ExecContext(ctx, query, id)
 	if err != nil {

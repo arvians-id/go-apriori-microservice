@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/comment/pb"
-	pbproduct "github.com/arvians-id/go-apriori-microservice/adapter/pkg/product/pb"
 	"github.com/arvians-id/go-apriori-microservice/model"
+	"github.com/arvians-id/go-apriori-microservice/services/comment-service/client"
 	"github.com/arvians-id/go-apriori-microservice/services/comment-service/repository"
 	"github.com/arvians-id/go-apriori-microservice/util"
 	"log"
@@ -15,17 +15,17 @@ import (
 
 type CommentService struct {
 	CommentRepository repository.CommentRepository
-	ProductService    pbproduct.ProductServiceClient
+	ProductService    client.ProductServiceClient
 	DB                *sql.DB
 }
 
 func NewCommentService(
-	commentRepository *repository.CommentRepository,
-	productService pbproduct.ProductServiceClient,
+	commentRepository repository.CommentRepository,
+	productService client.ProductServiceClient,
 	db *sql.DB,
 ) pb.CommentServiceServer {
 	return &CommentService{
-		CommentRepository: *commentRepository,
+		CommentRepository: commentRepository,
 		ProductService:    productService,
 		DB:                db,
 	}
@@ -39,9 +39,7 @@ func (service *CommentService) FindAllRatingByProductCode(ctx context.Context, r
 	}
 	defer util.CommitOrRollback(tx)
 
-	product, err := service.ProductService.FindByCode(ctx, &pbproduct.GetProductByProductCodeRequest{
-		Code: req.ProductCode,
-	})
+	product, err := service.ProductService.FindByCode(ctx, req.ProductCode)
 	if err != nil {
 		log.Println("[CategoryService][FindAllRatingByProductCode][FindByCode] problem in getting from repository, err: ", err.Error())
 		return nil, err
@@ -71,9 +69,7 @@ func (service *CommentService) FindAllByProductCode(ctx context.Context, req *pb
 	}
 	defer util.CommitOrRollback(tx)
 
-	product, err := service.ProductService.FindByCode(ctx, &pbproduct.GetProductByProductCodeRequest{
-		Code: req.ProductCode,
-	})
+	product, err := service.ProductService.FindByCode(ctx, req.ProductCode)
 	if err != nil {
 		log.Println("[CategoryService][FindAllByProductCode][FindByCode] problem in getting from repository, err: ", err.Error())
 		return nil, err

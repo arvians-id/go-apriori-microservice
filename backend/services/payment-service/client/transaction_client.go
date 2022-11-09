@@ -12,23 +12,19 @@ type TransactionServiceClient struct {
 	Client pb.TransactionServiceClient
 }
 
-func NewTransactionServiceClient(configuration *config.Config) pb.TransactionServiceClient {
+func NewTransactionServiceClient(configuration *config.Config) TransactionServiceClient {
 	connection, err := grpc.Dial(configuration.TransactionSvcUrl, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalln("Could not connect:", err)
 	}
 
-	return pb.NewTransactionServiceClient(connection)
+	return TransactionServiceClient{
+		Client: pb.NewTransactionServiceClient(connection),
+	}
 }
 
-func (client *TransactionServiceClient) Create(ctx context.Context, productName string, customerName string, noTransaction *string) (*pb.GetTransactionResponse, error) {
-	request := &pb.CreateTransactionRequest{
-		ProductName:   productName,
-		CustomerName:  customerName,
-		NoTransaction: noTransaction,
-	}
-
-	response, err := client.Client.Create(ctx, request)
+func (client *TransactionServiceClient) Create(ctx context.Context, req *pb.CreateTransactionRequest) (*pb.GetTransactionResponse, error) {
+	response, err := client.Client.Create(ctx, req)
 	if err != nil {
 		log.Println("[TransactionServiceClient][FindAllItemSet] problem calling transaction service, err: ", err.Error())
 		return nil, err

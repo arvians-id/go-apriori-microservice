@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/apriori/pb"
 	pbproduct "github.com/arvians-id/go-apriori-microservice/adapter/pkg/product/pb"
-	pbtransaction "github.com/arvians-id/go-apriori-microservice/adapter/pkg/transaction/pb"
 	"github.com/arvians-id/go-apriori-microservice/model"
+	"github.com/arvians-id/go-apriori-microservice/services/apriori-service/client"
 	"github.com/arvians-id/go-apriori-microservice/services/apriori-service/repository"
 	"github.com/arvians-id/go-apriori-microservice/third-party/aws"
 	"github.com/arvians-id/go-apriori-microservice/util"
@@ -21,21 +21,21 @@ import (
 
 type AprioriService struct {
 	AprioriRepository  repository.AprioriRepository
-	ProductService     pbproduct.ProductServiceClient
-	TransactionService pbtransaction.TransactionServiceClient
+	ProductService     client.ProductServiceClient
+	TransactionService client.TransactionServiceClient
 	StorageS3          aws.StorageS3
 	DB                 *sql.DB
 }
 
 func NewAprioriService(
-	aprioriRepository *repository.AprioriRepository,
+	aprioriRepository repository.AprioriRepository,
 	storageS3 *aws.StorageS3,
 	db *sql.DB,
-	productService pbproduct.ProductServiceClient,
-	transactionService pbtransaction.TransactionServiceClient,
+	productService client.ProductServiceClient,
+	transactionService client.TransactionServiceClient,
 ) pb.AprioriServiceServer {
 	return &AprioriService{
-		AprioriRepository:  *aprioriRepository,
+		AprioriRepository:  aprioriRepository,
 		StorageS3:          *storageS3,
 		DB:                 db,
 		ProductService:     productService,
@@ -132,9 +132,7 @@ func (service *AprioriService) FindByCodeAndId(ctx context.Context, req *pb.GetA
 	var totalPrice, mass int32
 	productNames := strings.Split(apriori.Item, ",")
 	for _, productName := range productNames {
-		product, _ := service.ProductService.FindByName(ctx, &pbproduct.GetProductByProductNameRequest{
-			Name: util.UpperWords(productName),
-		})
+		product, _ := service.ProductService.FindByName(ctx, util.UpperWords(productName))
 		totalPrice += product.Product.Price
 		mass += product.Product.Mass
 	}
@@ -299,10 +297,7 @@ func (service *AprioriService) Generate(ctx context.Context, req *pb.GenerateApr
 
 	var apriori []*model.GenerateApriori
 	// Get all transaction from database
-	transactionsSet, err := service.TransactionService.FindAllItemSet(ctx, &pbtransaction.GetAllItemSetTransactionRequest{
-		StartDate: req.StartDate,
-		EndDate:   req.EndDate,
-	})
+	transactionsSet, err := service.TransactionService.FindAllItemSet(ctx, req.StartDate, req.EndDate)
 	if err != nil {
 		log.Println("[AprioriService][Generate][FindAllItemSet] problem in getting from repository, err: ", err.Error())
 		return nil, err

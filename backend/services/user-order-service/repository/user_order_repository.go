@@ -14,7 +14,7 @@ func NewUserOrderRepository() UserOrderRepository {
 	return &UserOrderRepositoryImpl{}
 }
 
-func (repository *UserOrderRepositoryImpl) FindAllByPayloadId(ctx context.Context, tx *sql.Tx, payloadId string) ([]*model.UserOrder, error) {
+func (repository *UserOrderRepositoryImpl) FindAllByPayloadId(ctx context.Context, tx *sql.Tx, payloadId int64) ([]*model.UserOrder, error) {
 	query := "SELECT * FROM user_orders WHERE payload_id = $1"
 	rows, err := tx.QueryContext(ctx, query, payloadId)
 	if err != nil {
@@ -53,7 +53,7 @@ func (repository *UserOrderRepositoryImpl) FindAllByPayloadId(ctx context.Contex
 	return userOrders, nil
 }
 
-func (repository *UserOrderRepositoryImpl) FindAllByUserId(ctx context.Context, tx *sql.Tx, userId int) ([]*model.UserOrder, error) {
+func (repository *UserOrderRepositoryImpl) FindAllByUserId(ctx context.Context, tx *sql.Tx, userId int64) ([]*model.UserOrder, error) {
 	query := `SELECT 
 				id_order,
 			    payload_id,
@@ -110,7 +110,7 @@ func (repository *UserOrderRepositoryImpl) FindAllByUserId(ctx context.Context, 
 	return userOrders, nil
 }
 
-func (repository *UserOrderRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id int) (*model.UserOrder, error) {
+func (repository *UserOrderRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id int64) (*model.UserOrder, error) {
 	query := `SELECT * FROM user_orders WHERE id_order = $1`
 	row := tx.QueryRowContext(ctx, query, id)
 
@@ -134,7 +134,7 @@ func (repository *UserOrderRepositoryImpl) FindById(ctx context.Context, tx *sql
 }
 
 func (repository *UserOrderRepositoryImpl) Create(ctx context.Context, tx *sql.Tx, userOrder *model.UserOrder) (*model.UserOrder, error) {
-	id := 0
+	var id int64
 	query := `INSERT INTO user_orders(payload_id,code,name,price,image,quantity,total_price_item) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING id_order`
 	row := tx.QueryRowContext(
 		ctx,

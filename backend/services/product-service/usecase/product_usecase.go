@@ -3,13 +3,12 @@ package usecase
 import (
 	"context"
 	"database/sql"
-	pbapriori "github.com/arvians-id/go-apriori-microservice/adapter/pkg/apriori/pb"
 	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/product/pb"
 	"github.com/arvians-id/go-apriori-microservice/model"
+	"github.com/arvians-id/go-apriori-microservice/services/product-service/client"
 	"github.com/arvians-id/go-apriori-microservice/services/product-service/repository"
 	"github.com/arvians-id/go-apriori-microservice/third-party/aws"
 	"github.com/arvians-id/go-apriori-microservice/util"
-	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/golang/protobuf/ptypes/empty"
 	"log"
 	"strings"
@@ -18,19 +17,19 @@ import (
 
 type ProductService struct {
 	ProductRepository repository.ProductRepository
-	AprioriService    pbapriori.AprioriServiceClient
+	AprioriService    client.AprioriServiceClient
 	StorageS3         aws.StorageS3
 	DB                *sql.DB
 }
 
 func NewProductService(
-	productRepository *repository.ProductRepository,
-	aprioriService pbapriori.AprioriServiceClient,
+	productRepository repository.ProductRepository,
+	aprioriService client.AprioriServiceClient,
 	storageS3 *aws.StorageS3,
 	db *sql.DB,
 ) pb.ProductServiceServer {
 	return &ProductService{
-		ProductRepository: *productRepository,
+		ProductRepository: productRepository,
 		AprioriService:    aprioriService,
 		StorageS3:         *storageS3,
 		DB:                db,
@@ -51,7 +50,14 @@ func (service *ProductService) FindAllByAdmin(ctx context.Context, empty *empty.
 		return nil, err
 	}
 
-	return products, nil
+	var productListResponse []*pb.Product
+	for _, product := range products {
+		productListResponse = append(productListResponse, product.ToProtoBuff())
+	}
+
+	return &pb.ListProductResponse{
+		Product: productListResponse,
+	}, nil
 }
 
 func (service *ProductService) FindAll(ctx context.Context, req *pb.GetProductByFiltersRequest) (*pb.ListProductResponse, error) {
@@ -62,13 +68,20 @@ func (service *ProductService) FindAll(ctx context.Context, req *pb.GetProductBy
 	}
 	defer util.CommitOrRollback(tx)
 
-	products, err := service.ProductRepository.FindAll(ctx, tx, search, category)
+	products, err := service.ProductRepository.FindAll(ctx, tx, req.Search, req.Category)
 	if err != nil {
 		log.Println("[ProductService][FindAll][FindAll] problem in getting from repository, err: ", err.Error())
 		return nil, err
 	}
 
-	return products, nil
+	var productListResponse []*pb.Product
+	for _, product := range products {
+		productListResponse = append(productListResponse, product.ToProtoBuff())
+	}
+
+	return &pb.ListProductResponse{
+		Product: productListResponse,
+	}, nil
 }
 
 func (service *ProductService) FindAllBySimilarCategory(ctx context.Context, req *pb.GetProductByProductCodeRequest) (*pb.ListProductResponse, error) {
@@ -79,7 +92,7 @@ func (service *ProductService) FindAllBySimilarCategory(ctx context.Context, req
 	}
 	defer util.CommitOrRollback(tx)
 
-	product, err := service.ProductRepository.FindByCode(ctx, tx, code)
+	product, err := service.ProductRepository.FindByCode(ctx, tx, req.Code)
 	if err != nil {
 		log.Println("[ProductService][FindAllBySimilarCategory][FindByCode] problem in getting from repository, err: ", err.Error())
 		return nil, err
@@ -93,14 +106,16 @@ func (service *ProductService) FindAllBySimilarCategory(ctx context.Context, req
 		return nil, err
 	}
 
-	var productResponses []*model.Product
+	var productListResponse []*pb.Product
 	for _, productCategory := range productCategories {
-		if productCategory.Code != code {
-			productResponses = append(productResponses, productCategory)
+		if productCategory.Code != req.Code {
+			productListResponse = append(productListResponse, productCategory.ToProtoBuff())
 		}
 	}
 
-	return productResponses, nil
+	return &pb.ListProductResponse{
+		Product: productListResponse,
+	}, nil
 }
 
 func (service *ProductService) FindAllRecommendation(ctx context.Context, req *pb.GetProductByProductCodeRequest) (*pb.ListProductRecommendationResponse, error) {
@@ -111,20 +126,20 @@ func (service *ProductService) FindAllRecommendation(ctx context.Context, req *p
 	}
 	defer util.CommitOrRollback(tx)
 
-	product, err := service.ProductRepository.FindByCode(ctx, tx, code)
+	product, err := service.ProductRepository.FindByCode(ctx, tx, req.Code)
 	if err != nil {
 		log.Println("[ProductService][FindAllRecommendation][FindByCode] problem in getting from repository, err: ", err.Error())
 		return nil, err
 	}
 
-	apriories, err := service.AprioriRepository.FindAllByActive(ctx, tx)
+	apriories, err := service.AprioriService.FindAllByActive(ctx)
 	if err != nil {
 		log.Println("[ProductService][FindAllRecommendation][FindAllByActive] problem in getting from repository, err: ", err.Error())
 		return nil, err
 	}
 
-	var productResponses []*model.ProductRecommendation
-	for _, apriori := range apriories {
+	var productResponses []*pb.ProductRecommendation
+	for _, apriori := range apriories.Apriori {
 		productNames := strings.Split(apriori.Item, ",")
 		var exists bool
 		for _, productName := range productNames {
@@ -133,26 +148,28 @@ func (service *ProductService) FindAllRecommendation(ctx context.Context, req *p
 			}
 		}
 
-		var totalPrice int
+		var totalPrice int32
 		if exists {
 			for _, productName := range productNames {
 				productByName, _ := service.ProductRepository.FindByName(ctx, tx, util.UpperWords(productName))
 				totalPrice += productByName.Price
 			}
 
-			productResponses = append(productResponses, &model.ProductRecommendation{
+			productResponses = append(productResponses, &pb.ProductRecommendation{
 				AprioriId:         apriori.IdApriori,
 				AprioriCode:       apriori.Code,
 				AprioriItem:       apriori.Item,
 				AprioriDiscount:   apriori.Discount,
 				ProductTotalPrice: totalPrice,
-				PriceDiscount:     totalPrice - (totalPrice * int(apriori.Discount) / 100),
+				PriceDiscount:     totalPrice - (totalPrice * int32(apriori.Discount) / 100),
 				AprioriImage:      apriori.Image,
 			})
 		}
 	}
 
-	return productResponses, nil
+	return &pb.ListProductRecommendationResponse{
+		ProductRecommendation: productResponses,
+	}, nil
 }
 
 func (service *ProductService) FindByCode(ctx context.Context, req *pb.GetProductByProductCodeRequest) (*pb.GetProductResponse, error) {
@@ -163,13 +180,15 @@ func (service *ProductService) FindByCode(ctx context.Context, req *pb.GetProduc
 	}
 	defer util.CommitOrRollback(tx)
 
-	productResponse, err := service.ProductRepository.FindByCode(ctx, tx, code)
+	productResponse, err := service.ProductRepository.FindByCode(ctx, tx, req.Code)
 	if err != nil {
 		log.Println("[ProductService][FindByCode][FindByCode] problem in getting from repository, err: ", err.Error())
 		return nil, err
 	}
 
-	return productResponse, nil
+	return &pb.GetProductResponse{
+		Product: productResponse.ToProtoBuff(),
+	}, nil
 }
 
 func (service *ProductService) FindByName(ctx context.Context, req *pb.GetProductByProductNameRequest) (*pb.GetProductResponse, error) {
@@ -180,13 +199,15 @@ func (service *ProductService) FindByName(ctx context.Context, req *pb.GetProduc
 	}
 	defer util.CommitOrRollback(tx)
 
-	productResponse, err := service.ProductRepository.FindByCode(ctx, tx, code)
+	productResponse, err := service.ProductRepository.FindByName(ctx, tx, req.Name)
 	if err != nil {
 		log.Println("[ProductService][FindByCode][FindByCode] problem in getting from repository, err: ", err.Error())
 		return nil, err
 	}
 
-	return productResponse, nil
+	return &pb.GetProductResponse{
+		Product: productResponse.ToProtoBuff(),
+	}, nil
 }
 
 func (service *ProductService) Create(ctx context.Context, req *pb.CreateProductRequest) (*pb.GetProductResponse, error) {
@@ -202,19 +223,19 @@ func (service *ProductService) Create(ctx context.Context, req *pb.CreateProduct
 		log.Println("[ProductService][Create] problem in parsing to time, err: ", err.Error())
 		return nil, err
 	}
-	if request.Image == "" {
-		request.Image = "no-image.png"
+	if req.Image == "" {
+		req.Image = "no-image.png"
 	}
 
 	productRequest := model.Product{
-		Code:        request.Code,
-		Name:        util.UpperWords(request.Name),
-		Description: &request.Description,
-		Price:       request.Price,
-		Image:       &request.Image,
-		Category:    util.UpperWords(request.Category),
+		Code:        req.Code,
+		Name:        util.UpperWords(req.Name),
+		Description: &req.Description,
+		Price:       req.Price,
+		Image:       &req.Image,
+		Category:    util.UpperWords(req.Category),
 		IsEmpty:     false,
-		Mass:        request.Mass,
+		Mass:        req.Mass,
 		CreatedAt:   timeNow,
 		UpdatedAt:   timeNow,
 	}
@@ -225,7 +246,9 @@ func (service *ProductService) Create(ctx context.Context, req *pb.CreateProduct
 		return nil, err
 	}
 
-	return productResponse, nil
+	return &pb.GetProductResponse{
+		Product: productResponse.ToProtoBuff(),
+	}, nil
 }
 
 func (service *ProductService) Update(ctx context.Context, req *pb.UpdateProductRequest) (*pb.GetProductResponse, error) {
@@ -236,7 +259,7 @@ func (service *ProductService) Update(ctx context.Context, req *pb.UpdateProduct
 	}
 	defer util.CommitOrRollback(tx)
 
-	product, err := service.ProductRepository.FindByCode(ctx, tx, request.Code)
+	product, err := service.ProductRepository.FindByCode(ctx, tx, req.Code)
 	if err != nil {
 		log.Println("[ProductService][Update][FindByCode] problem in getting from repository, err: ", err.Error())
 		return nil, err
@@ -248,16 +271,16 @@ func (service *ProductService) Update(ctx context.Context, req *pb.UpdateProduct
 		return nil, err
 	}
 
-	product.Name = util.UpperWords(request.Name)
-	product.Description = &request.Description
-	product.Price = request.Price
-	product.Category = util.UpperWords(request.Category)
-	product.IsEmpty = request.IsEmpty
-	product.Mass = request.Mass
+	product.Name = util.UpperWords(req.Name)
+	product.Description = &req.Description
+	product.Price = req.Price
+	product.Category = util.UpperWords(req.Category)
+	product.IsEmpty = req.IsEmpty
+	product.Mass = req.Mass
 	product.UpdatedAt = timeNow
-	if request.Image != "" {
+	if req.Image != "" {
 		_ = service.StorageS3.DeleteFromAWS(*product.Image)
-		product.Image = &request.Image
+		product.Image = &req.Image
 	}
 
 	productResponse, err := service.ProductRepository.Update(ctx, tx, product)
@@ -266,30 +289,32 @@ func (service *ProductService) Update(ctx context.Context, req *pb.UpdateProduct
 		return nil, err
 	}
 
-	return productResponse, nil
+	return &pb.GetProductResponse{
+		Product: productResponse.ToProtoBuff(),
+	}, nil
 }
 
 func (service *ProductService) Delete(ctx context.Context, req *pb.GetProductByProductCodeRequest) (*empty.Empty, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[ProductService][Delete] problem in db transaction, err: ", err.Error())
-		return err
+		return nil, err
 	}
 	defer util.CommitOrRollback(tx)
 
-	product, err := service.ProductRepository.FindByCode(ctx, tx, code)
+	product, err := service.ProductRepository.FindByCode(ctx, tx, req.Code)
 	if err != nil {
 		log.Println("[ProductService][Delete][FindByCode] problem in getting from repository, err: ", err.Error())
-		return err
+		return nil, err
 	}
 
 	err = service.ProductRepository.Delete(ctx, tx, product.Code)
 	if err != nil {
 		log.Println("[ProductService][Delete][FindByCode] problem in getting from repository, err: ", err.Error())
-		return err
+		return nil, err
 	}
 
 	_ = service.StorageS3.DeleteFromAWS(*product.Image)
 
-	return nil
+	return nil, nil
 }
