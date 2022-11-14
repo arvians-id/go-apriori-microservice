@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"github.com/arvians-id/go-apriori-microservice/adapter/response"
+	"github.com/arvians-id/go-apriori-microservice/config"
 	jwtlib "github.com/arvians-id/go-apriori-microservice/third-party/jwt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
@@ -9,7 +10,7 @@ import (
 	"strings"
 )
 
-func AuthJwtMiddleware() gin.HandlerFunc {
+func AuthJwtMiddleware(configuration *config.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authorizationHeader := c.GetHeader("Authorization")
 		if !strings.Contains(authorizationHeader, "Bearer") {
@@ -24,7 +25,7 @@ func AuthJwtMiddleware() gin.HandlerFunc {
 
 		tokenString := strings.Replace(authorizationHeader, "Bearer ", "", -1)
 
-		jwtLibrary := jwtlib.NewJsonWebToken()
+		jwtLibrary := jwtlib.NewJsonWebToken(configuration)
 		token, err := jwtLibrary.ValidateToken(tokenString)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, response.WebResponse{

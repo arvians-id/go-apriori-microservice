@@ -32,7 +32,7 @@ func RegisterRoutes(router *gin.Engine, configuration *config.Config) *ServiceCl
 		UserService: NewUserServiceClient(configuration),
 	}
 
-	authorized := router.Group("/api", middleware.AuthJwtMiddleware())
+	authorized := router.Group("/api", middleware.AuthJwtMiddleware(configuration))
 	{
 		authorized.GET("/users", serviceClient.FindAll)
 		authorized.GET("/users/:id", serviceClient.FindById)
@@ -61,7 +61,7 @@ func (client *ServiceClient) Profile(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", user)
+	response.ReturnSuccessOK(c, "OK", user.GetUser())
 }
 
 func (client *ServiceClient) UpdateProfile(c *gin.Context) {
@@ -96,7 +96,7 @@ func (client *ServiceClient) UpdateProfile(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "updated", user)
+	response.ReturnSuccessOK(c, "updated", user.GetUser())
 }
 
 func (client *ServiceClient) FindAll(c *gin.Context) {
@@ -106,7 +106,7 @@ func (client *ServiceClient) FindAll(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", users)
+	response.ReturnSuccessOK(c, "OK", users.GetUser())
 }
 
 func (client *ServiceClient) FindById(c *gin.Context) {
@@ -128,7 +128,7 @@ func (client *ServiceClient) FindById(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", user)
+	response.ReturnSuccessOK(c, "OK", user.GetUser())
 }
 
 func (client *ServiceClient) Create(c *gin.Context) {
@@ -151,7 +151,7 @@ func (client *ServiceClient) Create(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "created", user)
+	response.ReturnSuccessOK(c, "created", user.GetUser())
 }
 
 func (client *ServiceClient) Update(c *gin.Context) {
@@ -186,7 +186,7 @@ func (client *ServiceClient) Update(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "updated", user)
+	response.ReturnSuccessOK(c, "updated", user.GetUser())
 }
 
 func (client *ServiceClient) Delete(c *gin.Context) {

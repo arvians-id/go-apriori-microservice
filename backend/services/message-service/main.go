@@ -1,8 +1,9 @@
 package main
 
 import (
+	"github.com/arvians-id/go-apriori-microservice/services/message-service/config"
 	"github.com/arvians-id/go-apriori-microservice/services/message-service/handler"
-	messaging "github.com/arvians-id/go-apriori-microservice/third-party/message-queue"
+	"github.com/arvians-id/go-apriori-microservice/services/message-service/messaging"
 	"log"
 	"os"
 	"os/signal"
@@ -12,13 +13,15 @@ import (
 const (
 	channelMail = "mail_channel"
 	topicMail   = "mail_topic"
-
-	channelStorage = "storage_channel"
-	topicStorage   = "storage_topic"
 )
 
 func main() {
-	mailHandler := handler.NewMailService()
+	configuration, err := config.LoadConfig()
+	if err != nil {
+		log.Fatalln("Failed at config", err)
+	}
+
+	mailHandler := handler.NewMailService(configuration)
 	mailConsumer := messaging.ConsumerConfig{
 		Topic:         topicMail,
 		Channel:       channelMail,
@@ -30,19 +33,6 @@ func main() {
 
 	mail := messaging.NewConsumer(mailConsumer)
 	mail.Run()
-
-	storageHandler := handler.NewStorageService()
-	storageConsumer := messaging.ConsumerConfig{
-		Topic:         topicStorage,
-		Channel:       channelStorage,
-		LookupAddress: "nsqlookupd:4161",
-		MaxAttempts:   10,
-		MaxInFlight:   100,
-		Handler:       storageHandler.UploadToAWS,
-	}
-
-	storage := messaging.NewConsumer(storageConsumer)
-	storage.Run()
 
 	// keep app alive until terminated
 	term := make(chan os.Signal, 1)

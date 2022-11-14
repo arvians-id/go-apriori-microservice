@@ -33,7 +33,7 @@ func RegisterRoutes(router *gin.Engine, configuration *config.Config, storageS3 
 		StorageS3:          storageS3,
 	}
 
-	authorized := router.Group("/api", middleware.AuthJwtMiddleware())
+	authorized := router.Group("/api", middleware.AuthJwtMiddleware(configuration))
 	{
 		authorized.GET("/transactions", serviceClient.FindAll)
 		authorized.GET("/transactions/:number_transaction", serviceClient.FindByNoTransaction)
@@ -54,7 +54,7 @@ func (client *ServiceClient) FindAll(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", transaction)
+	response.ReturnSuccessOK(c, "OK", transaction.GetTransaction())
 }
 
 func (client *ServiceClient) FindByNoTransaction(c *gin.Context) {
@@ -71,7 +71,7 @@ func (client *ServiceClient) FindByNoTransaction(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", transactions)
+	response.ReturnSuccessOK(c, "OK", transactions.GetTransaction())
 }
 
 func (client *ServiceClient) Create(c *gin.Context) {
@@ -91,7 +91,7 @@ func (client *ServiceClient) Create(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "created", transaction)
+	response.ReturnSuccessOK(c, "created", transaction.GetTransaction())
 }
 
 func (client *ServiceClient) CreateByCSV(c *gin.Context) {
@@ -116,9 +116,9 @@ func (client *ServiceClient) CreateByCSV(c *gin.Context) {
 		return
 	}
 
-	defer func(StorageS3 *aws.StorageS3, filePath string) {
+	defer func(StorageS3 *aws.StorageS3, filePath *string) {
 		_ = StorageS3.DeleteFromAWS(filePath)
-	}(client.StorageS3, filePath)
+	}(client.StorageS3, &filePath)
 
 	response.ReturnSuccessOK(c, "created", nil)
 }
@@ -147,7 +147,7 @@ func (client *ServiceClient) Update(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "updated", transaction)
+	response.ReturnSuccessOK(c, "updated", transaction.GetTransaction())
 }
 
 func (client *ServiceClient) Delete(c *gin.Context) {

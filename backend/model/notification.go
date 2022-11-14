@@ -26,6 +26,6 @@ func (notification *Notification) ToProtoBuff() *pb.Notification {
 		URL:            notification.URL,
 		IsRead:         notification.IsRead,
 		CreatedAt:      timestamppb.New(notification.CreatedAt),
-		User:           notification.User.ToProtoBuff(),
+		//User:           notification.User.ToProtoBuff(),
 	}
 }

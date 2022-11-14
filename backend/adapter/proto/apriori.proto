@@ -6,7 +6,6 @@ option go_package = "./adapter/pb";
 
 import "google/protobuf/Empty.proto";
 import "adapter/proto/entity.proto";
-import "adapter/proto/product.proto";
 
 service AprioriService {
   rpc FindAll(google.protobuf.Empty) returns (ListAprioriResponse);
@@ -21,18 +20,7 @@ service AprioriService {
 }
 
 message GetGenerateAprioriResponse {
-  repeated AprioriGenerate AprioriGenerate = 1;
-}
-
-message AprioriGenerate {
-  repeated string ItemSet = 1;
-  float Support = 2;
-  int32 Iterate = 3;
-  int32 Transaction = 4;
-  float Confidence = 5;
-  float Discount = 6;
-  string Description = 7;
-  string RangeDate = 8;
+  repeated GenerateApriori generateApriori = 1;
 }
 
 message ListAprioriResponse {

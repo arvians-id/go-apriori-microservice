@@ -35,7 +35,7 @@ func RegisterRoutes(router *gin.Engine, configuration *config.Config) *ServiceCl
 		AprioriService: NewAprioriServiceClient(configuration),
 	}
 
-	authorized := router.Group("/api", middleware.AuthJwtMiddleware())
+	authorized := router.Group("/api", middleware.AuthJwtMiddleware(configuration))
 	{
 		authorized.PATCH("/apriori/:code", serviceClient.UpdateStatus)
 		authorized.POST("/apriori", serviceClient.Create)
@@ -62,7 +62,7 @@ func (client *ServiceClient) FindAll(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", apriories)
+	response.ReturnSuccessOK(c, "OK", apriories.GetApriori())
 }
 
 func (client *ServiceClient) FindAllByActive(c *gin.Context) {
@@ -76,7 +76,7 @@ func (client *ServiceClient) FindAllByActive(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", apriories)
+	response.ReturnSuccessOK(c, "OK", apriories.GetApriori())
 }
 
 func (client *ServiceClient) FindAllByCode(c *gin.Context) {
@@ -93,7 +93,7 @@ func (client *ServiceClient) FindAllByCode(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", apriories)
+	response.ReturnSuccessOK(c, "OK", apriories.GetApriori())
 }
 
 func (client *ServiceClient) FindByCodeAndId(c *gin.Context) {
@@ -157,7 +157,7 @@ func (client *ServiceClient) Update(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", apriories)
+	response.ReturnSuccessOK(c, "OK", apriories.GetApriori())
 }
 
 func (client *ServiceClient) UpdateStatus(c *gin.Context) {

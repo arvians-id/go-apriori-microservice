@@ -34,7 +34,7 @@ func RegisterRoutes(router *gin.Engine, configuration *config.Config, storageS3 
 		StorageS3:      storageS3,
 	}
 
-	authorized := router.Group("/api", middleware.AuthJwtMiddleware())
+	authorized := router.Group("/api", middleware.AuthJwtMiddleware(configuration))
 	{
 		authorized.GET("/products-admin", serviceClient.FindAllByAdmin)
 		authorized.POST("/products", serviceClient.Create)
@@ -60,7 +60,7 @@ func (client *ServiceClient) FindAllByAdmin(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", products)
+	response.ReturnSuccessOK(c, "OK", products.GetProduct())
 }
 
 func (client *ServiceClient) FindAllSimilarCategory(c *gin.Context) {
@@ -77,7 +77,7 @@ func (client *ServiceClient) FindAllSimilarCategory(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", products)
+	response.ReturnSuccessOK(c, "OK", products.GetProduct())
 }
 
 func (client *ServiceClient) FindAllByUser(c *gin.Context) {
@@ -92,7 +92,7 @@ func (client *ServiceClient) FindAllByUser(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", products)
+	response.ReturnSuccessOK(c, "OK", products.GetProduct())
 }
 
 func (client *ServiceClient) FindAllRecommendation(c *gin.Context) {
@@ -109,7 +109,7 @@ func (client *ServiceClient) FindAllRecommendation(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", products)
+	response.ReturnSuccessOK(c, "OK", products.GetProductRecommendation())
 }
 
 func (client *ServiceClient) FindByCode(c *gin.Context) {
@@ -126,7 +126,7 @@ func (client *ServiceClient) FindByCode(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", product)
+	response.ReturnSuccessOK(c, "OK", product.GetProduct())
 }
 
 func (client *ServiceClient) Create(c *gin.Context) {
@@ -150,7 +150,7 @@ func (client *ServiceClient) Create(c *gin.Context) {
 		return
 	}
 
-	_, err = client.ProductService.Create(c.Request.Context(), &pb.CreateProductRequest{
+	product, err := client.ProductService.Create(c.Request.Context(), &pb.CreateProductRequest{
 		Code:        requestCreate.Code,
 		Name:        requestCreate.Name,
 		Description: requestCreate.Description,
@@ -164,7 +164,7 @@ func (client *ServiceClient) Create(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "created", nil)
+	response.ReturnSuccessOK(c, "created", product.GetProduct())
 }
 
 func (client *ServiceClient) Update(c *gin.Context) {
@@ -207,7 +207,7 @@ func (client *ServiceClient) Update(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "updated", product)
+	response.ReturnSuccessOK(c, "updated", product.GetProduct())
 }
 
 func (client *ServiceClient) Delete(c *gin.Context) {

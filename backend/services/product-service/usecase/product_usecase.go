@@ -279,7 +279,7 @@ func (service *ProductService) Update(ctx context.Context, req *pb.UpdateProduct
 	product.Mass = req.Mass
 	product.UpdatedAt = timeNow
 	if req.Image != "" {
-		_ = service.StorageS3.DeleteFromAWS(*product.Image)
+		_ = service.StorageS3.DeleteFromAWS(product.Image)
 		product.Image = &req.Image
 	}
 
@@ -298,23 +298,23 @@ func (service *ProductService) Delete(ctx context.Context, req *pb.GetProductByP
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[ProductService][Delete] problem in db transaction, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 	defer util.CommitOrRollback(tx)
 
 	product, err := service.ProductRepository.FindByCode(ctx, tx, req.Code)
 	if err != nil {
 		log.Println("[ProductService][Delete][FindByCode] problem in getting from repository, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 
 	err = service.ProductRepository.Delete(ctx, tx, product.Code)
 	if err != nil {
 		log.Println("[ProductService][Delete][FindByCode] problem in getting from repository, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 
-	_ = service.StorageS3.DeleteFromAWS(*product.Image)
+	_ = service.StorageS3.DeleteFromAWS(product.Image)
 
-	return nil, nil
+	return new(empty.Empty), nil
 }

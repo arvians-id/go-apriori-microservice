@@ -17,7 +17,7 @@ type ServiceClient struct {
 }
 
 func NewCommentServiceClient(configuration *config.Config) pb.CommentServiceClient {
-	connection, err := grpc.Dial(configuration.CategorySvcUrl, grpc.WithInsecure())
+	connection, err := grpc.Dial(configuration.CommentSvcUrl, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -30,7 +30,7 @@ func RegisterRoutes(router *gin.Engine, configuration *config.Config) *ServiceCl
 		CommentService: NewCommentServiceClient(configuration),
 	}
 
-	authorized := router.Group("/api", middleware.AuthJwtMiddleware())
+	authorized := router.Group("/api", middleware.AuthJwtMiddleware(configuration))
 	{
 		authorized.POST("/comments", serviceClient.Create)
 	}
@@ -64,7 +64,7 @@ func (client *ServiceClient) FindAllByProductCode(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", comments)
+	response.ReturnSuccessOK(c, "OK", comments.GetComment())
 }
 
 func (client *ServiceClient) FindById(c *gin.Context) {
@@ -86,7 +86,7 @@ func (client *ServiceClient) FindById(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", comment)
+	response.ReturnSuccessOK(c, "OK", comment.GetComment())
 }
 
 func (client *ServiceClient) FindAllRatingByProductCode(c *gin.Context) {
@@ -103,7 +103,7 @@ func (client *ServiceClient) FindAllRatingByProductCode(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", comments)
+	response.ReturnSuccessOK(c, "OK", comments.GetRatingFromComments())
 }
 
 func (client *ServiceClient) FindByUserOrderId(c *gin.Context) {
@@ -125,7 +125,7 @@ func (client *ServiceClient) FindByUserOrderId(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", comment)
+	response.ReturnSuccessOK(c, "OK", comment.GetComment())
 }
 
 func (client *ServiceClient) Create(c *gin.Context) {
@@ -147,5 +147,5 @@ func (client *ServiceClient) Create(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", comment)
+	response.ReturnSuccessOK(c, "OK", comment.GetComment())
 }

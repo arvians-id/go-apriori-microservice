@@ -31,7 +31,7 @@ func RegisterRoutes(router *gin.Engine, configuration *config.Config) *ServiceCl
 		CategoryService: NewCategoryServiceClient(configuration),
 	}
 
-	authorized := router.Group("/api", middleware.AuthJwtMiddleware())
+	authorized := router.Group("/api", middleware.AuthJwtMiddleware(configuration))
 	{
 		authorized.GET("/categories/:id", serviceClient.FindById)
 		authorized.POST("/categories", serviceClient.Create)
@@ -54,7 +54,7 @@ func (client *ServiceClient) FindAll(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", categories)
+	response.ReturnSuccessOK(c, "OK", categories.GetCategories())
 }
 
 func (client *ServiceClient) FindById(c *gin.Context) {
@@ -77,7 +77,7 @@ func (client *ServiceClient) FindById(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", category)
+	response.ReturnSuccessOK(c, "OK", category.GetCategory())
 }
 
 func (client *ServiceClient) Create(c *gin.Context) {
@@ -95,7 +95,7 @@ func (client *ServiceClient) Create(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", category)
+	response.ReturnSuccessOK(c, "OK", category.GetCategory())
 }
 
 func (client *ServiceClient) Update(c *gin.Context) {
@@ -125,7 +125,7 @@ func (client *ServiceClient) Update(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", category)
+	response.ReturnSuccessOK(c, "OK", category.GetCategory())
 }
 
 func (client *ServiceClient) Delete(c *gin.Context) {

@@ -1,8 +1,8 @@
 package middleware
 
 import (
+	"github.com/arvians-id/go-apriori-microservice/config"
 	"github.com/gin-gonic/gin"
-	"os"
 )
 
 func SetupCorsMiddleware() gin.HandlerFunc {
@@ -21,10 +21,10 @@ func SetupCorsMiddleware() gin.HandlerFunc {
 	}
 }
 
-func SetupXApiKeyMiddleware() gin.HandlerFunc {
+func SetupXApiKeyMiddleware(configuration *config.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		apiKey := c.GetHeader("X-API-KEY")
-		if apiKey != os.Getenv("X_API_KEY") {
+		if apiKey != configuration.XApiKey {
 			c.JSON(401, gin.H{"error": "Unauthorized"})
 			c.AbortWithStatus(401)
 			return

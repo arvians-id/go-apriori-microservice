@@ -96,6 +96,29 @@ func (service *UserService) FindByEmail(ctx context.Context, req *pb.GetUserByEm
 		return nil, err
 	}
 
+	return &pb.GetUserResponse{
+		User: user.ToProtoBuff(),
+	}, nil
+}
+
+func (service *UserService) VerifyCredential(ctx context.Context, req *pb.GetVerifyCredentialRequest) (*pb.GetUserResponse, error) {
+	var tx *sql.Tx
+	if service.DB != nil {
+		transaction, err := service.DB.Begin()
+		if err != nil {
+			log.Println("[UserService][FindByEmail] problem in db transaction, err: ", err.Error())
+			return nil, err
+		}
+		tx = transaction
+	}
+	defer util.CommitOrRollback(tx)
+
+	user, err := service.UserRepository.FindByEmail(ctx, tx, req.Email)
+	if err != nil {
+		log.Println("[UserService][FindByEmail][FindByEmail] problem in getting from repository, err: ", err.Error())
+		return nil, err
+	}
+
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
 	if err != nil {
 		log.Println("[UserService][FindByEmail] problem in comparing password, err: ", err.Error())
@@ -210,7 +233,7 @@ func (service *UserService) UpdatePassword(ctx context.Context, req *pb.UpdateUs
 		transaction, err := service.DB.Begin()
 		if err != nil {
 			log.Println("[UserService][Update] problem in db transaction, err: ", err.Error())
-			return nil, err
+			return new(empty.Empty), err
 		}
 		tx = transaction
 	}
@@ -219,7 +242,7 @@ func (service *UserService) UpdatePassword(ctx context.Context, req *pb.UpdateUs
 	timeNow, err := time.Parse(util.TimeFormat, time.Now().Format(util.TimeFormat))
 	if err != nil {
 		log.Println("[UserService][Update] problem in parsing to time, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 
 	err = service.UserRepository.UpdatePassword(ctx, tx, &model.User{
@@ -229,19 +252,19 @@ func (service *UserService) UpdatePassword(ctx context.Context, req *pb.UpdateUs
 	})
 	if err != nil {
 		log.Println("[UserService][UpdatePassword] problem in getting from repository, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 
-	return nil, nil
+	return new(empty.Empty), nil
 }
 
-func (service *UserService) Delete(ctx context.Context, req *pb.GetUserByIdRequest) (*empty.Empty, error) {
+func (service *UserService) Delete(ctx context.Context, req *pb.GetUserByIdRequest) (*emptypb.Empty, error) {
 	var tx *sql.Tx
 	if service.DB != nil {
 		transaction, err := service.DB.Begin()
 		if err != nil {
 			log.Println("[UserService][Delete] problem in db transaction, err: ", err.Error())
-			return nil, err
+			return new(empty.Empty), err
 		}
 		tx = transaction
 	}
@@ -250,14 +273,14 @@ func (service *UserService) Delete(ctx context.Context, req *pb.GetUserByIdReque
 	user, err := service.UserRepository.FindById(ctx, tx, req.Id)
 	if err != nil {
 		log.Println("[UserService][Delete][FindById] problem in getting from repository, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 
 	err = service.UserRepository.Delete(ctx, tx, user.IdUser)
 	if err != nil {
 		log.Println("[UserService][Delete][Delete] problem in getting from repository, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 
-	return nil, nil
+	return new(empty.Empty), nil
 }

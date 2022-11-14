@@ -24,6 +24,22 @@ func (userOrder *UserOrder) ToProtoBuff() *pb.UserOrder {
 		Image:          userOrder.Image,
 		Quantity:       userOrder.Quantity,
 		TotalPriceItem: userOrder.TotalPriceItem,
-		Payment:        userOrder.Payment.ToProtoBuff(),
+		//Payment:        userOrder.Payment.ToProtoBuff(),
+	}
+}
+
+func (userOrder *UserOrder) ToListProtoBuff() []*pb.UserOrder {
+	return []*pb.UserOrder{
+		{
+			IdOrder:        userOrder.IdOrder,
+			PayloadId:      userOrder.PayloadId,
+			Code:           userOrder.Code,
+			Name:           userOrder.Name,
+			Price:          userOrder.Price,
+			Image:          userOrder.Image,
+			Quantity:       userOrder.Quantity,
+			TotalPriceItem: userOrder.TotalPriceItem,
+			//Payment:        userOrder.Payment.ToProtoBuff(),
+		},
 	}
 }

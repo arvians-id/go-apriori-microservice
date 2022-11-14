@@ -8,6 +8,7 @@ import (
 	"github.com/arvians-id/go-apriori-microservice/services/category-service/repository"
 	"github.com/arvians-id/go-apriori-microservice/util"
 	"github.com/golang/protobuf/ptypes/empty"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"log"
 	"time"
 )
@@ -132,25 +133,25 @@ func (service *CategoryService) Update(ctx context.Context, req *pb.UpdateCatego
 	}, nil
 }
 
-func (service *CategoryService) Delete(ctx context.Context, req *pb.GetCategoryByIdRequest) (*empty.Empty, error) {
+func (service *CategoryService) Delete(ctx context.Context, req *pb.GetCategoryByIdRequest) (*emptypb.Empty, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[CategoryService][Delete] problem in db transaction, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 	defer util.CommitOrRollback(tx)
 
 	category, err := service.CategoryRepository.FindById(ctx, tx, req.Id)
 	if err != nil {
 		log.Println("[CategoryService][Delete][FindById] problem in getting from repository, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 
 	err = service.CategoryRepository.Delete(ctx, tx, category.IdCategory)
 	if err != nil {
 		log.Println("[CategoryService][Delete][Delete] problem in getting from repository, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 
-	return nil, nil
+	return new(empty.Empty), nil
 }

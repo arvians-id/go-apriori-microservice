@@ -26,7 +26,7 @@ func (comment *Comment) ToProtoBuff() *pb.Comment {
 		Tag:         comment.Tag,
 		Rating:      comment.Rating,
 		CreatedAt:   timestamppb.New(comment.CreatedAt),
-		UserOrder:   comment.UserOrder.ToProtoBuff(),
+		//UserOrder:   comment.UserOrder.ToProtoBuff(),
 	}
 }
 
@@ -36,8 +36,8 @@ type RatingFromComment struct {
 	ResultComment int32 `json:"result_comment"`
 }
 
-func (ratingFromComment *RatingFromComment) ToProtoBuff() *pb.ListRatingFromCommentResponse_RatingFromComment {
-	return &pb.ListRatingFromCommentResponse_RatingFromComment{
+func (ratingFromComment *RatingFromComment) ToProtoBuff() *pb.RatingFromComment {
+	return &pb.RatingFromComment{
 		Rating:        ratingFromComment.Rating,
 		ResultRating:  ratingFromComment.ResultRating,
 		ResultComment: ratingFromComment.ResultComment,

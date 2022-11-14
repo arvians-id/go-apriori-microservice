@@ -21,6 +21,7 @@ services:
       - "6379:6379"
     networks:
       - thesis
+    restart: always
   nsqlookupd:
     image: nsqio/nsq
     ports:
@@ -29,6 +30,7 @@ services:
     command: /nsqlookupd
     networks:
       - thesis
+    restart: always
   nsqd:
     image: nsqio/nsq
     ports:
@@ -39,6 +41,7 @@ services:
     command: /nsqd -lookupd-tcp-address=nsqlookupd:4160 -broadcast-address=nsqd
     networks:
       - thesis
+    restart: always
   nsqadmin:
     image: nsqio/nsq
     ports:
@@ -49,10 +52,9 @@ services:
     command: /nsqadmin -lookupd-http-address=nsqlookupd:4161
     networks:
       - thesis
+    restart: always
   messagebroker:
     build: ./backend/services/message-service
-    env_file:
-      - ./backend/config/envs/dev.env
     ports:
       - "8082:8080"
     restart: always

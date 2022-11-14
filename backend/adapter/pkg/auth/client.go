@@ -17,8 +17,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"os"
-	"strconv"
 	"time"
 )
 
@@ -27,6 +25,8 @@ type ServiceClient struct {
 	UserService          pb.UserServiceClient
 	Jwt                  *jwt.JsonWebToken
 	Producer             *messaging.Producer
+	JwtAccessExpiredTime int
+	AppUrlFE             string
 }
 
 func NewAuthServiceClient(configuration *config.Config) pb.PasswordResetServiceClient {
@@ -44,9 +44,11 @@ func RegisterRoutes(router *gin.Engine, configuration *config.Config, jwt *jwt.J
 		UserService:          user.NewUserServiceClient(configuration),
 		Jwt:                  jwt,
 		Producer:             producer,
+		JwtAccessExpiredTime: configuration.JwtAccessExpiredTime,
+		AppUrlFE:             configuration.AppUrlFE,
 	}
 
-	authorized := router.Group("/api/auth", middleware.AuthJwtMiddleware())
+	authorized := router.Group("/api/auth", middleware.AuthJwtMiddleware(configuration))
 	{
 		authorized.GET("/token", serviceClient.Token)
 	}
@@ -72,7 +74,7 @@ func (client *ServiceClient) Login(c *gin.Context) {
 		return
 	}
 
-	userResponse, err := client.UserService.FindByEmail(c.Request.Context(), &pb.GetUserByEmailRequest{
+	userResponse, err := client.UserService.VerifyCredential(c.Request.Context(), &pb.GetVerifyCredentialRequest{
 		Email:    requestCredential.Email,
 		Password: requestCredential.Password,
 	})
@@ -91,13 +93,7 @@ func (client *ServiceClient) Login(c *gin.Context) {
 		return
 	}
 
-	expiredTimeAccess, err := strconv.Atoi(os.Getenv("JWT_ACCESS_EXPIRED_TIME"))
-	if err != nil {
-		log.Println("[AuthController][Login] problem in conversion string to integer, err: ", err.Error())
-		response.ReturnErrorInternalServerError(c, err, nil)
-		return
-	}
-
+	expiredTimeAccess := client.JwtAccessExpiredTime
 	expirationTime := time.Now().Add(time.Duration(expiredTimeAccess) * 24 * time.Hour)
 	token, err := client.Jwt.GenerateToken(userResponse.User.IdUser, userResponse.User.Role, expirationTime)
 	if err != nil {
@@ -133,13 +129,7 @@ func (client *ServiceClient) Refresh(c *gin.Context) {
 		return
 	}
 
-	expiredTimeAccess, err := strconv.Atoi(os.Getenv("JWT_ACCESS_EXPIRED_TIME"))
-	if err != nil {
-		log.Println("[AuthController][Login] problem in conversion string to integer, err: ", err.Error())
-		response.ReturnErrorInternalServerError(c, err, nil)
-		return
-	}
-
+	expiredTimeAccess := client.JwtAccessExpiredTime
 	expirationTime := time.Now().Add(time.Duration(expiredTimeAccess) * 24 * time.Hour)
 	http.SetCookie(c.Writer, &http.Cookie{
 		Name:     "token",
@@ -175,7 +165,7 @@ func (client *ServiceClient) Register(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "created", userResponse)
+	response.ReturnSuccessOK(c, "created", userResponse.GetUser())
 }
 
 func (client *ServiceClient) ForgotPassword(c *gin.Context) {
@@ -199,7 +189,7 @@ func (client *ServiceClient) ForgotPassword(c *gin.Context) {
 		return
 	}
 
-	message := fmt.Sprintf("%s/jwt/reset-password?signature=%v", os.Getenv("APP_URL_FE"), result.PasswordReset.Token)
+	message := fmt.Sprintf("%s/jwt/reset-password?signature=%v", client.AppUrlFE, result.PasswordReset.Token)
 	emailService := model.EmailService{
 		ToEmail: result.PasswordReset.Email,
 		Subject: "Forgot Password",

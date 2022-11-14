@@ -4,18 +4,21 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/arvians-id/go-apriori-microservice/adapter/response"
+	"github.com/arvians-id/go-apriori-microservice/config"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 )
 
 type ServiceClient struct {
+	RajaOngkirSecretKey string
 }
 
-func RegisterRoutes(router *gin.Engine) *ServiceClient {
-	serviceClient := &ServiceClient{}
+func RegisterRoutes(router *gin.Engine, configuration *config.Config) *ServiceClient {
+	serviceClient := &ServiceClient{
+		RajaOngkirSecretKey: configuration.RajaOngkirSecretKey,
+	}
 
 	router.GET("/api/raja-ongkir/:place", serviceClient.FindAll)
 	router.POST("/api/raja-ongkir/cost", serviceClient.GetCost)
@@ -39,7 +42,7 @@ func (client *ServiceClient) FindAll(c *gin.Context) {
 		return
 	}
 
-	req.Header.Add("key", os.Getenv("RAJA_ONGKIR_SECRET_KEY"))
+	req.Header.Add("key", client.RajaOngkirSecretKey)
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	res, err := http.DefaultClient.Do(req)
@@ -87,7 +90,7 @@ func (client *ServiceClient) GetCost(c *gin.Context) {
 		return
 	}
 
-	req.Header.Add("key", os.Getenv("RAJA_ONGKIR_SECRET_KEY"))
+	req.Header.Add("key", client.RajaOngkirSecretKey)
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	res, err := http.DefaultClient.Do(req)

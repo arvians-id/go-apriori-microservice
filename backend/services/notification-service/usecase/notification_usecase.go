@@ -112,32 +112,32 @@ func (service *NotificationService) MarkAll(ctx context.Context, req *pb.GetNoti
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[NotificationService][MarkAll] problem in db transaction, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 	defer util.CommitOrRollback(tx)
 
 	err = service.NotificationRepository.MarkAll(ctx, tx, req.UserId)
 	if err != nil {
 		log.Println("[NotificationService][Create][MarkAll] problem in getting from repository, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 
-	return nil, nil
+	return new(empty.Empty), nil
 }
 
 func (service *NotificationService) Mark(ctx context.Context, req *pb.GetNotificationByIdRequest) (*empty.Empty, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[NotificationService][Mark] problem in db transaction, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 	defer util.CommitOrRollback(tx)
 
 	err = service.NotificationRepository.Mark(ctx, tx, req.Id)
 	if err != nil {
 		log.Println("[NotificationService][Create][Mark] problem in getting from repository, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 
-	return nil, nil
+	return new(empty.Empty), nil
 }

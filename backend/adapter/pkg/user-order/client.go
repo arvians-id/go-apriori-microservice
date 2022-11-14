@@ -36,7 +36,7 @@ func RegisterRoutes(router *gin.Engine, configuration *config.Config) *ServiceCl
 		PaymentService:   payment.NewCommentServiceClient(configuration),
 	}
 
-	authorized := router.Group("/api", middleware.AuthJwtMiddleware())
+	authorized := router.Group("/api", middleware.AuthJwtMiddleware(configuration))
 	{
 		authorized.GET("/user-order", serviceClient.FindAll)
 		authorized.GET("/user-order/user", serviceClient.FindAllByUserId)
@@ -62,7 +62,7 @@ func (client *ServiceClient) FindAll(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", payments)
+	response.ReturnSuccessOK(c, "OK", payments.GetPayment())
 }
 
 func (client *ServiceClient) FindAllByUserId(c *gin.Context) {
@@ -80,7 +80,7 @@ func (client *ServiceClient) FindAllByUserId(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", userOrders)
+	response.ReturnSuccessOK(c, "OK", userOrders.GetUserOrder())
 }
 
 func (client *ServiceClient) FindAllById(c *gin.Context) {
@@ -105,7 +105,7 @@ func (client *ServiceClient) FindAllById(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", userOrder)
+	response.ReturnSuccessOK(c, "OK", userOrder.GetUserOrder())
 }
 
 func (client *ServiceClient) FindById(c *gin.Context) {
@@ -127,5 +127,5 @@ func (client *ServiceClient) FindById(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", userOrder)
+	response.ReturnSuccessOK(c, "OK", userOrder.GetUserOrder())
 }

@@ -36,7 +36,7 @@ func (apriori *Apriori) ToProtoBuff() *pb.Apriori {
 		Mass:        apriori.Mass,
 		Image:       apriori.Image,
 		CreatedAt:   timestamppb.New(apriori.CreatedAt),
-		UserOrder:   apriori.UserOrder.ToProtoBuff(),
+		//UserOrder:   apriori.UserOrder.ToProtoBuff(),
 	}
 }
 

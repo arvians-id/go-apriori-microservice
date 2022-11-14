@@ -1,6 +1,9 @@
 proto:
 	protoc adapter/proto/*.proto --go_out=plugins=grpc:.
 
+inject:
+	protoc-go-inject-tag -input=./adapter/pb/*.pb.go
+
 main:
 	go run adapter/main.go
 
@@ -33,3 +36,6 @@ order:
 
 user:
 	go run services/user-service/main.go
+
+message:
+	go run services/message-service/main.go

@@ -19,18 +19,6 @@ service ProductService {
   rpc Delete(GetProductByProductCodeRequest) returns (google.protobuf.Empty);
 }
 
-message ProductRecommendation {
-  int64  AprioriId = 1;
-  string AprioriCode = 2;
-  string AprioriItem = 3;
-  float AprioriDiscount = 4;
-  optional string AprioriDescription = 5;
-  optional string AprioriImage = 6;
-  int32 ProductTotalPrice = 7;
-  int32 PriceDiscount = 8;
-  int32 Mass = 9;
-}
-
 message ListProductRecommendationResponse {
   repeated ProductRecommendation ProductRecommendation = 1;
 }

@@ -21,3 +21,12 @@ func (category *Category) ToProtoBuff() *pb.Category {
 		UpdatedAt:  timestamppb.New(category.UpdatedAt),
 	}
 }
+
+func (category *Category) FromProto(categoryPb *pb.Category) *Category {
+	return &Category{
+		IdCategory: categoryPb.IdCategory,
+		Name:       categoryPb.Name,
+		CreatedAt:  categoryPb.CreatedAt.AsTime(),
+		UpdatedAt:  categoryPb.UpdatedAt.AsTime(),
+	}
+}

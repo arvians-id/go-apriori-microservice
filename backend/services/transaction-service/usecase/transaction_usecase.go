@@ -138,14 +138,14 @@ func (service *TransactionService) CreateByCSV(ctx context.Context, req *pb.Crea
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[TransactionService][CreateByCsv] problem in db transaction, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 	defer util.CommitOrRollback(tx)
 
 	data, err := util.OpenCsvFile(req.FilePath)
 	if err != nil {
 		log.Println("[TransactionService][CreateByCsv] problem in db transaction, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 
 	var transactions []*model.Transaction
@@ -163,10 +163,10 @@ func (service *TransactionService) CreateByCSV(ctx context.Context, req *pb.Crea
 	err = service.TransactionRepository.CreateByCsv(ctx, tx, transactions)
 	if err != nil {
 		log.Println("[TransactionService][CreateByCsv][CreateByCsv] problem in getting from repository, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 
-	return nil, nil
+	return new(empty.Empty), nil
 }
 
 func (service *TransactionService) Update(ctx context.Context, req *pb.UpdateTransactionRequest) (*pb.GetTransactionResponse, error) {
@@ -210,38 +210,38 @@ func (service *TransactionService) Delete(ctx context.Context, req *pb.GetTransa
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[TransactionService][Delete] problem in db transaction, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 	defer util.CommitOrRollback(tx)
 
 	transaction, err := service.TransactionRepository.FindByNoTransaction(ctx, tx, req.NoTransaction)
 	if err != nil {
 		log.Println("[TransactionService][Delete][FindByNoTransaction] problem in getting from repository, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 
 	err = service.TransactionRepository.Delete(ctx, tx, transaction.NoTransaction)
 	if err != nil {
 		log.Println("[TransactionService][Delete][Delete] problem in getting from repository, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 
-	return nil, nil
+	return new(empty.Empty), nil
 }
 
-func (service *TransactionService) Truncate(ctx context.Context, empty *empty.Empty) (*emptypb.Empty, error) {
+func (service *TransactionService) Truncate(ctx context.Context, emptys *empty.Empty) (*emptypb.Empty, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[TransactionService][Truncate] problem in db transaction, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 	defer util.CommitOrRollback(tx)
 
 	err = service.TransactionRepository.Truncate(ctx, tx)
 	if err != nil {
 		log.Println("[TransactionService][Truncate][Truncate] problem in getting from repository, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 
-	return nil, nil
+	return new(empty.Empty), nil
 }

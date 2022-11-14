@@ -42,18 +42,18 @@ func RegisterRoutes(router *gin.Engine, configuration *config.Config, producer *
 		Producer:            producer,
 	}
 
-	authorized := router.Group("/api", middleware.AuthJwtMiddleware())
+	authorized := router.Group("/api", middleware.AuthJwtMiddleware(configuration))
 	{
-		authorized.GET("/payments", middleware.SetupXApiKeyMiddleware(), serviceClient.FindAll)
-		authorized.GET("/payments/:order_id", middleware.SetupXApiKeyMiddleware(), serviceClient.FindByOrderId)
-		authorized.PATCH("/payments/:order_id", middleware.SetupXApiKeyMiddleware(), serviceClient.UpdateReceiptNumber)
+		authorized.GET("/payments", middleware.SetupXApiKeyMiddleware(configuration), serviceClient.FindAll)
+		authorized.GET("/payments/:order_id", middleware.SetupXApiKeyMiddleware(configuration), serviceClient.FindByOrderId)
+		authorized.PATCH("/payments/:order_id", middleware.SetupXApiKeyMiddleware(configuration), serviceClient.UpdateReceiptNumber)
 	}
 
 	unauthorized := router.Group("/api")
 	{
-		unauthorized.POST("/payments/pay", middleware.SetupXApiKeyMiddleware(), serviceClient.Pay)
+		unauthorized.POST("/payments/pay", middleware.SetupXApiKeyMiddleware(configuration), serviceClient.Pay)
 		unauthorized.POST("/payments/notification", serviceClient.Notification)
-		unauthorized.DELETE("/payments/:order_id", middleware.SetupXApiKeyMiddleware(), serviceClient.Delete)
+		unauthorized.DELETE("/payments/:order_id", middleware.SetupXApiKeyMiddleware(configuration), serviceClient.Delete)
 	}
 
 	return serviceClient
@@ -66,7 +66,7 @@ func (client *ServiceClient) FindAll(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", payments)
+	response.ReturnSuccessOK(c, "OK", payments.GetPayment())
 }
 
 func (client *ServiceClient) FindByOrderId(c *gin.Context) {
@@ -83,7 +83,7 @@ func (client *ServiceClient) FindByOrderId(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", payment)
+	response.ReturnSuccessOK(c, "OK", payment.GetPayment())
 }
 
 func (client *ServiceClient) UpdateReceiptNumber(c *gin.Context) {
@@ -166,7 +166,7 @@ func (client *ServiceClient) Pay(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", data)
+	response.ReturnSuccessOK(c, "OK", data.GetPayment())
 }
 
 func (client *ServiceClient) Notification(c *gin.Context) {

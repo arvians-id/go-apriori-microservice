@@ -80,8 +80,11 @@ func (storageS3 *StorageS3) UploadToAWS(file multipart.File, fileName string, co
 }
 
 // Deprecated on production
-func (storageS3 *StorageS3) DeleteFromAWS(filePath string) error {
-	headerFilePathName := strings.Split(filePath, "/")
+func (storageS3 *StorageS3) DeleteFromAWS(filePath *string) error {
+	if filePath == nil {
+		return nil
+	}
+	headerFilePathName := strings.Split(*filePath, "/")
 	fileName := headerFilePathName[len(headerFilePathName)-1]
 	if fileName == "no-image.png" {
 		return nil

@@ -31,7 +31,7 @@ func RegisterRoutes(router *gin.Engine, configuration *config.Config) *ServiceCl
 		NotificationService: NewNotificationServiceClient(configuration),
 	}
 
-	authorized := router.Group("/api", middleware.AuthJwtMiddleware())
+	authorized := router.Group("/api", middleware.AuthJwtMiddleware(configuration))
 	{
 		authorized.GET("/notifications", serviceClient.FindAll)
 		authorized.GET("/notifications/user", serviceClient.FindAllByUserId)
@@ -49,7 +49,7 @@ func (client *ServiceClient) FindAll(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", notifications)
+	response.ReturnSuccessOK(c, "OK", notifications.GetNotification())
 }
 
 func (client *ServiceClient) FindAllByUserId(c *gin.Context) {
@@ -67,7 +67,7 @@ func (client *ServiceClient) FindAllByUserId(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", notifications)
+	response.ReturnSuccessOK(c, "OK", notifications.GetNotification())
 }
 
 func (client *ServiceClient) MarkAll(c *gin.Context) {

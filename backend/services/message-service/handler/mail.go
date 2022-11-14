@@ -2,9 +2,9 @@ package handler
 
 import (
 	"encoding/json"
+	"github.com/arvians-id/go-apriori-microservice/services/message-service/config"
 	"gopkg.in/gomail.v2"
 	"log"
-	"os"
 	"strconv"
 
 	"github.com/nsqio/go-nsq"
@@ -17,10 +17,21 @@ type MailValue struct {
 }
 
 type MailService struct {
+	MailFromAdress string
+	MailHost       string
+	MailPort       string
+	MailUsername   string
+	MailPassword   string
 }
 
-func NewMailService() *MailService {
-	return &MailService{}
+func NewMailService(configuration *config.Config) *MailService {
+	return &MailService{
+		MailFromAdress: configuration.MailFromAddress,
+		MailHost:       configuration.MailHost,
+		MailPort:       configuration.MailPort,
+		MailUsername:   configuration.MailUsername,
+		MailPassword:   configuration.MailPassword,
+	}
 }
 
 func (consumer *MailService) SendEmailWithText(message *nsq.Message) error {
@@ -31,21 +42,21 @@ func (consumer *MailService) SendEmailWithText(message *nsq.Message) error {
 	}
 
 	mailer := gomail.NewMessage()
-	mailer.SetHeader("From", os.Getenv("MAIL_FROM_ADDRESS"))
+	mailer.SetHeader("From", consumer.MailFromAdress)
 	mailer.SetHeader("To", mailValue.ToEmail)
 	mailer.SetHeader("Subject", mailValue.Subject)
 	mailer.SetBody("text/html", mailValue.Message)
 
-	port, err := strconv.Atoi(os.Getenv("MAIL_PORT"))
+	port, err := strconv.Atoi(consumer.MailPort)
 	if err != nil {
 		log.Println("[EmailService][SendEmailWithText] problem in conversion string to integer, err: ", err.Error())
 		return err
 	}
 	dialer := gomail.NewDialer(
-		os.Getenv("MAIL_HOST"),
+		consumer.MailHost,
 		port,
-		os.Getenv("MAIL_USERNAME"),
-		os.Getenv("MAIL_PASSWORD"),
+		consumer.MailUsername,
+		consumer.MailPassword,
 	)
 
 	err = dialer.DialAndSend(mailer)

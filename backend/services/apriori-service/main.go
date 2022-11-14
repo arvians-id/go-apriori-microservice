@@ -35,7 +35,7 @@ func NewInitializedServices(configuration *config.Config) (pb.AprioriServiceServ
 	transactionClient := client.NewTransactionServiceClient(configuration)
 
 	aprioriRepository := repository.NewAprioriRepository()
-	aprioriService := usecase.NewAprioriService(aprioriRepository, storageS3, db, productClient, transactionClient)
+	aprioriService := usecase.NewAprioriService(aprioriRepository, storageS3, db, productClient, transactionClient, configuration)
 
 	return aprioriService, nil
 }

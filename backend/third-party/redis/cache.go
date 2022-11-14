@@ -18,7 +18,7 @@ type Redis struct {
 	Expired  int
 }
 
-func NewCacheService(configuration config.Config) *Redis {
+func NewCacheService(configuration *config.Config) *Redis {
 	return &Redis{
 		Addr:     fmt.Sprintf("%s:%s", configuration.RedisHost, configuration.RedisPort),
 		Password: configuration.RedisPassword,

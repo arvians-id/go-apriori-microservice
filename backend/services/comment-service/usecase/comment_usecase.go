@@ -51,7 +51,7 @@ func (service *CommentService) FindAllRatingByProductCode(ctx context.Context, r
 		return nil, err
 	}
 
-	var ratingListResponse []*pb.ListRatingFromCommentResponse_RatingFromComment
+	var ratingListResponse []*pb.RatingFromComment
 	for _, rating := range ratings {
 		ratingListResponse = append(ratingListResponse, rating.ToProtoBuff())
 	}

@@ -3,10 +3,9 @@ package jwt
 import (
 	"errors"
 	"fmt"
+	"github.com/arvians-id/go-apriori-microservice/config"
 	"github.com/golang-jwt/jwt"
 	"log"
-	"os"
-	"strconv"
 	"time"
 )
 
@@ -24,35 +23,27 @@ type TokenDetails struct {
 }
 
 type JsonWebToken struct {
-	accessSecretKey  string
-	refreshSecretKey string
-	jwtSigningMethod jwt.SigningMethod
+	AccessSecretKey    string
+	RefreshSecretKey   string
+	AccessExpiredTime  int
+	RefreshExpiredTime int
+	jwtSigningMethod   jwt.SigningMethod
 }
 
-func NewJsonWebToken() *JsonWebToken {
+func NewJsonWebToken(configuration *config.Config) *JsonWebToken {
 	return &JsonWebToken{
-		accessSecretKey:  getAccessSecretKey(),
-		refreshSecretKey: getRefreshSecretKey(),
-		jwtSigningMethod: jwt.SigningMethodHS256,
+		AccessSecretKey:    configuration.JwtSecretAccessKey,
+		RefreshSecretKey:   configuration.JwtSecretRefreshKey,
+		AccessExpiredTime:  configuration.JwtAccessExpiredTime,
+		RefreshExpiredTime: configuration.JwtRefreshExpiredTime,
+		jwtSigningMethod:   jwt.SigningMethodHS256,
 	}
-}
-
-func getAccessSecretKey() string {
-	return os.Getenv("JWT_SECRET_ACCESS_KEY")
-}
-func getRefreshSecretKey() string {
-	return os.Getenv("JWT_SECRET_REFRESH_KEY")
 }
 
 func (auth *JsonWebToken) GenerateToken(id int64, role int32, expirationTime time.Time) (*TokenDetails, error) {
 	tokens := &TokenDetails{}
 	tokens.AtExpires = expirationTime.Unix()
-	expiredTimeRefresh, err := strconv.Atoi(os.Getenv("JWT_REFRESH_EXPIRED_TIME"))
-	if err != nil {
-		log.Println("[JWTService][GenerateToken] problem in conversion string to integer, err: ", err.Error())
-		return nil, err
-	}
-	tokens.RtExpires = time.Now().Add(time.Duration(expiredTimeRefresh) * 24 * time.Hour).Unix()
+	tokens.RtExpires = time.Now().Add(time.Duration(auth.RefreshExpiredTime) * 24 * time.Hour).Unix()
 
 	// Access token
 	accessToken := jwtCustomClaim{
@@ -64,7 +55,7 @@ func (auth *JsonWebToken) GenerateToken(id int64, role int32, expirationTime tim
 	}
 
 	tokenAt := jwt.NewWithClaims(auth.jwtSigningMethod, accessToken)
-	signedAt, err := tokenAt.SignedString([]byte(auth.accessSecretKey))
+	signedAt, err := tokenAt.SignedString([]byte(auth.AccessSecretKey))
 	if err != nil {
 		log.Println("[JWTService][GenerateToken] problem in first signed string, err: ", err.Error())
 		return nil, err
@@ -81,7 +72,7 @@ func (auth *JsonWebToken) GenerateToken(id int64, role int32, expirationTime tim
 	}
 
 	tokenRt := jwt.NewWithClaims(auth.jwtSigningMethod, refreshToken)
-	signedRt, err := tokenRt.SignedString([]byte(auth.refreshSecretKey))
+	signedRt, err := tokenRt.SignedString([]byte(auth.RefreshSecretKey))
 	if err != nil {
 		log.Println("[JWTService][GenerateToken] problem in second signed string, err: ", err.Error())
 		return nil, err
@@ -103,7 +94,7 @@ func (auth *JsonWebToken) RefreshToken(refreshToken string) (*TokenDetails, erro
 			log.Println("[JWTService][RefreshToken] problem in refresh token, err: ", str)
 			return nil, errors.New(str)
 		}
-		return []byte(auth.refreshSecretKey), nil
+		return []byte(auth.RefreshSecretKey), nil
 	})
 	if err != nil {
 		log.Println("[JWTService][RefreshToken] problem in parsing token, err: ", err.Error())
@@ -125,13 +116,7 @@ func (auth *JsonWebToken) RefreshToken(refreshToken string) (*TokenDetails, erro
 	// --
 
 	// Create new pairs of refresh and access tokens
-	expiredTimeAccess, err := strconv.Atoi(os.Getenv("JWT_ACCESS_EXPIRED_TIME"))
-	if err != nil {
-		log.Println("[JWTService][RefreshToken] problem in conversion string to integer, err: ", err.Error())
-		return nil, err
-	}
-
-	tokens, err := auth.GenerateToken(id, role, time.Now().Add(time.Duration(expiredTimeAccess)*24*time.Hour))
+	tokens, err := auth.GenerateToken(id, role, time.Now().Add(time.Duration(auth.AccessExpiredTime)*24*time.Hour))
 	if err != nil {
 		log.Println("[JWTService][RefreshToken] problem in getting generate token, err: ", err.Error())
 		return nil, err
@@ -155,6 +140,6 @@ func (auth *JsonWebToken) ValidateToken(token string) (*jwt.Token, error) {
 			log.Println("[JWTService][ValidateToken] problem in validating token, err: ", str)
 			return nil, errors.New(str)
 		}
-		return []byte(auth.accessSecretKey), nil
+		return []byte(auth.AccessSecretKey), nil
 	})
 }

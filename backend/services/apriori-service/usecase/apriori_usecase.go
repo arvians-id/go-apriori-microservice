@@ -5,15 +5,16 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/arvians-id/go-apriori-microservice/adapter/pb"
+	"github.com/arvians-id/go-apriori-microservice/config"
 	"github.com/arvians-id/go-apriori-microservice/model"
 	"github.com/arvians-id/go-apriori-microservice/services/apriori-service/client"
 	"github.com/arvians-id/go-apriori-microservice/services/apriori-service/repository"
 	"github.com/arvians-id/go-apriori-microservice/third-party/aws"
 	"github.com/arvians-id/go-apriori-microservice/util"
+	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"log"
 	"math"
-	"os"
 	"strings"
 	"time"
 )
@@ -24,6 +25,8 @@ type AprioriService struct {
 	TransactionService client.TransactionServiceClient
 	StorageS3          aws.StorageS3
 	DB                 *sql.DB
+	AwsRegion          string
+	AwsBucket          string
 }
 
 func NewAprioriService(
@@ -32,6 +35,7 @@ func NewAprioriService(
 	db *sql.DB,
 	productService client.ProductServiceClient,
 	transactionService client.TransactionServiceClient,
+	configuration *config.Config,
 ) pb.AprioriServiceServer {
 	return &AprioriService{
 		AprioriRepository:  aprioriRepository,
@@ -39,6 +43,8 @@ func NewAprioriService(
 		DB:                 db,
 		ProductService:     productService,
 		TransactionService: transactionService,
+		AwsRegion:          configuration.AwsRegion,
+		AwsBucket:          configuration.AwsBucket,
 	}
 }
 
@@ -155,20 +161,20 @@ func (service *AprioriService) Create(ctx context.Context, req *pb.CreateApriori
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[AprioriService][Create] problem in db transaction, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 	defer util.CommitOrRollback(tx)
 
 	timeNow, err := time.Parse(util.TimeFormat, time.Now().Format(util.TimeFormat))
 	if err != nil {
 		log.Println("[AprioriService][Create] problem in parsing to time, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 
 	var aprioriRequests []*model.Apriori
 	code := util.RandomString(10)
 	for _, requestItem := range req.CreateAprioriRequest {
-		image := fmt.Sprintf("https://%s.s3.%s.amazonaws.com/assets/%s", os.Getenv("AWS_BUCKET"), os.Getenv("AWS_REGION"), "no-image.png")
+		image := fmt.Sprintf("https://%s.s3.%s.amazonaws.com/assets/%s", service.AwsBucket, service.AwsRegion, "no-image.png")
 		aprioriRequests = append(aprioriRequests, &model.Apriori{
 			Code:       code,
 			Item:       requestItem.Item,
@@ -185,10 +191,10 @@ func (service *AprioriService) Create(ctx context.Context, req *pb.CreateApriori
 	err = service.AprioriRepository.Create(ctx, tx, aprioriRequests)
 	if err != nil {
 		log.Println("[AprioriService][Create][Create] problem in getting from repository, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 
-	return nil, nil
+	return new(empty.Empty), nil
 }
 
 func (service *AprioriService) Update(ctx context.Context, req *pb.UpdateAprioriRequest) (*pb.GetAprioriResponse, error) {
@@ -207,7 +213,7 @@ func (service *AprioriService) Update(ctx context.Context, req *pb.UpdateApriori
 
 	image := apriori.Image
 	if req.Image != "" {
-		_ = service.StorageS3.DeleteFromAWS(*apriori.Image)
+		_ = service.StorageS3.DeleteFromAWS(apriori.Image)
 		image = &req.Image
 	}
 
@@ -229,20 +235,20 @@ func (service *AprioriService) UpdateStatus(ctx context.Context, req *pb.GetApri
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[AprioriService][UpdateStatus] problem in db transaction, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 	defer util.CommitOrRollback(tx)
 
 	apriories, err := service.AprioriRepository.FindAllByCode(ctx, tx, req.Code)
 	if err != nil {
 		log.Println("[AprioriService][UpdateStatus][FindAllByCode] problem in getting from repository, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 
 	err = service.AprioriRepository.UpdateAllStatus(ctx, tx, false)
 	if err != nil {
 		log.Println("[AprioriService][UpdateStatus][UpdateAllStatus] problem in getting from repository, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 
 	status := true
@@ -253,37 +259,37 @@ func (service *AprioriService) UpdateStatus(ctx context.Context, req *pb.GetApri
 	err = service.AprioriRepository.UpdateStatusByCode(ctx, tx, apriories[0].Code, status)
 	if err != nil {
 		log.Println("[AprioriService][UpdateStatus][UpdateStatusByCode] problem in getting from repository, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 
-	return nil, nil
+	return new(empty.Empty), nil
 }
 
 func (service *AprioriService) Delete(ctx context.Context, req *pb.GetAprioriByCodeRequest) (*emptypb.Empty, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[AprioriService][Delete] problem in db transaction, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 	defer util.CommitOrRollback(tx)
 
 	apriories, err := service.AprioriRepository.FindAllByCode(ctx, tx, req.Code)
 	if err != nil {
 		log.Println("[AprioriService][Delete][FindAllByCode] problem in getting from repository, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 
 	err = service.AprioriRepository.Delete(ctx, tx, apriories[0].Code)
 	if err != nil {
 		log.Println("[AprioriService][Delete][Delete] problem in getting from repository, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 
 	for _, apriori := range apriories {
-		_ = service.StorageS3.DeleteFromAWS(*apriori.Image)
+		_ = service.StorageS3.DeleteFromAWS(apriori.Image)
 	}
 
-	return nil, nil
+	return new(empty.Empty), nil
 }
 
 func (service *AprioriService) Generate(ctx context.Context, req *pb.GenerateAprioriRequest) (*pb.GetGenerateAprioriResponse, error) {
@@ -457,9 +463,9 @@ func (service *AprioriService) Generate(ctx context.Context, req *pb.GenerateApr
 		}
 	}
 
-	var aprioriGenerateResponse []*pb.AprioriGenerate
+	var aprioriGenerateResponse []*pb.GenerateApriori
 	for _, value := range apriori {
-		aprioriGenerateResponse = append(aprioriGenerateResponse, &pb.AprioriGenerate{
+		aprioriGenerateResponse = append(aprioriGenerateResponse, &pb.GenerateApriori{
 			ItemSet:     value.ItemSet,
 			Support:     value.Support,
 			Iterate:     value.Iterate,
@@ -472,6 +478,6 @@ func (service *AprioriService) Generate(ctx context.Context, req *pb.GenerateApr
 	}
 
 	return &pb.GetGenerateAprioriResponse{
-		AprioriGenerate: aprioriGenerateResponse,
+		GenerateApriori: aprioriGenerateResponse,
 	}, nil
 }

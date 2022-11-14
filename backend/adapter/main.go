@@ -36,7 +36,7 @@ func main() {
 	router.Use(middleware.PrometheusMetricsMiddleware())
 
 	// Third Party
-	jwtAuth := jwt.NewJsonWebToken()
+	jwtAuth := jwt.NewJsonWebToken(configuration)
 	storageS3 := aws.NewStorageS3(configuration)
 	messagingProducer := messaging.NewProducer(messaging.ProducerConfig{
 		NsqdAddress: "nsqd:4150",
@@ -51,7 +51,7 @@ func main() {
 	notification.RegisterRoutes(router, configuration)
 	payment.RegisterRoutes(router, configuration, messagingProducer)
 	product.RegisterRoutes(router, configuration, storageS3)
-	raja_ongkir.RegisterRoutes(router)
+	raja_ongkir.RegisterRoutes(router, configuration)
 	transaction.RegisterRoutes(router, configuration, storageS3)
 	user_order.RegisterRoutes(router, configuration)
 
