@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	model2 "github.com/arvians-id/go-apriori-microservice/adapter/model"
 	"github.com/arvians-id/go-apriori-microservice/config"
-	"github.com/arvians-id/go-apriori-microservice/model"
 	paymentRepository "github.com/arvians-id/go-apriori-microservice/services/payment-service/repository"
 	productRepository "github.com/arvians-id/go-apriori-microservice/services/product-service/repository"
 	userOrderRepository "github.com/arvians-id/go-apriori-microservice/services/user-order-service/repository"
@@ -34,8 +34,8 @@ var _ = Describe("User Order API", func() {
 	var database *sql.DB
 	var tokenJWT string
 	var cookie *http.Cookie
-	var order1 *model.UserOrder
-	var payment *model.Payment
+	var order1 *model2.UserOrder
+	var payment *model2.Payment
 	configuration, err := config.LoadConfig("../../config/envs")
 	if err != nil {
 		log.Fatal(err)
@@ -53,7 +53,7 @@ var _ = Describe("User Order API", func() {
 		tx, _ := database.Begin()
 		userRepository := userRepository.NewUserRepository()
 		password, _ := bcrypt.GenerateFromPassword([]byte("Rahasia123"), bcrypt.DefaultCost)
-		user, _ := userRepository.Create(context.Background(), tx, &model.User{
+		user, _ := userRepository.Create(context.Background(), tx, &model2.User{
 			Role:      1,
 			Name:      "Widdy",
 			Email:     "widdy@gmail.com",
@@ -86,7 +86,7 @@ var _ = Describe("User Order API", func() {
 		tx, _ = database.Begin()
 		productRepository := productRepository.NewProductRepository()
 		description := "Test Bang"
-		_, _ = productRepository.Create(context.Background(), tx, &model.Product{
+		_, _ = productRepository.Create(context.Background(), tx, &model2.Product{
 			Code:        "Lfanp",
 			Name:        "Bantal Biasa",
 			Description: &description,
@@ -99,7 +99,7 @@ var _ = Describe("User Order API", func() {
 		// Create payload
 		payloadRepository := paymentRepository.NewPaymentRepository()
 		orderId := "QESXmTNzqowsqTNZYmAD"
-		payload, _ := payloadRepository.Create(context.Background(), tx, &model.Payment{
+		payload, _ := payloadRepository.Create(context.Background(), tx, &model2.Payment{
 			UserId:  user.IdUser,
 			OrderId: &orderId,
 		})
@@ -112,7 +112,7 @@ var _ = Describe("User Order API", func() {
 		image := fmt.Sprintf("https://%s.s3.%s.amazonaws.com/assets/%s", configuration.AwsBucket, configuration.AwsRegion, "no-image.png")
 		var quantity int32 = 1
 		totalPriceItem := int64(20000)
-		userOrder1, _ := userOrderRepository.Create(context.Background(), tx, &model.UserOrder{
+		userOrder1, _ := userOrderRepository.Create(context.Background(), tx, &model2.UserOrder{
 			PayloadId:      payload.IdPayload,
 			Code:           &code,
 			Name:           &name,
@@ -126,7 +126,7 @@ var _ = Describe("User Order API", func() {
 		price = int64(10000)
 		quantity = 2
 		totalPriceItem = int64(20000)
-		_, _ = userOrderRepository.Create(context.Background(), tx, &model.UserOrder{
+		_, _ = userOrderRepository.Create(context.Background(), tx, &model2.UserOrder{
 			PayloadId:      payload.IdPayload,
 			Code:           &code,
 			Name:           &name,

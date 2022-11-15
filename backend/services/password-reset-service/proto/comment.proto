@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "./services/password-reset-service/pb";
+
+import "services/password-reset-service/proto/entity.proto";
+
+service CommentService {
+  rpc FindAllRatingByProductCode(GetCommentByProductCodeRequest) returns (ListRatingFromCommentResponse);
+  rpc FindAllByProductCode(GetCommentByFiltersRequest) returns (ListCommentResponse);
+  rpc FindById(GetCommentByIdRequest) returns (GetCommentResponse);
+  rpc FindByUserOrderId(GetCommentByUserOrderIdRequest) returns (GetCommentResponse);
+  rpc Create(CreateCommentRequest) returns (GetCommentResponse);
+}
+
+message ListRatingFromCommentResponse {
+  repeated RatingFromComment RatingFromComments = 1;
+}
+
+message ListCommentResponse {
+  repeated Comment comment = 1;
+}
+
+message GetCommentResponse {
+  Comment comment = 1;
+}
+
+message GetCommentByProductCodeRequest {
+  string ProductCode = 1;
+}
+
+message GetCommentByFiltersRequest {
+  string ProductCode = 1;
+  string Rating = 2;
+  string Tag = 3;
+}
+
+message GetCommentByIdRequest {
+  int64 Id = 1;
+}
+
+message GetCommentByUserOrderIdRequest {
+  int64 UserOrderId = 1;
+}
+
+message CreateCommentRequest {
+  int64 UserOrderId = 1;
+  string ProductCode = 2;
+  string Description = 3;
+  string Tag = 4;
+  int32 Rating = 5;
+}

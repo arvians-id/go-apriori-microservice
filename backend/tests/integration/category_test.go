@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	model2 "github.com/arvians-id/go-apriori-microservice/adapter/model"
 	"github.com/arvians-id/go-apriori-microservice/config"
-	"github.com/arvians-id/go-apriori-microservice/model"
 	categoryRepository "github.com/arvians-id/go-apriori-microservice/services/category-service/repository"
 	userRepository "github.com/arvians-id/go-apriori-microservice/services/user-service/repository"
 	"github.com/arvians-id/go-apriori-microservice/tests/setup"
@@ -45,7 +45,7 @@ var _ = Describe("Category API", func() {
 		tx, _ := database.Begin()
 		userRepository := userRepository.NewUserRepository()
 		password, _ := bcrypt.GenerateFromPassword([]byte("Rahasia123"), bcrypt.DefaultCost)
-		_, _ = userRepository.Create(context.Background(), tx, &model.User{
+		_, _ = userRepository.Create(context.Background(), tx, &model2.User{
 			Role:      1,
 			Name:      "Widdy",
 			Email:     "widdy@gmail.com",
@@ -139,7 +139,7 @@ var _ = Describe("Category API", func() {
 				// Create Category
 				tx, _ := database.Begin()
 				categoryRepository := categoryRepository.NewCategoryRepository()
-				_, _ = categoryRepository.Create(context.Background(), tx, &model.Category{
+				_, _ = categoryRepository.Create(context.Background(), tx, &model2.Category{
 					Name:      "Produk Kasur",
 					CreatedAt: time.Now(),
 					UpdatedAt: time.Now(),
@@ -193,7 +193,7 @@ var _ = Describe("Category API", func() {
 				// Create Category
 				tx, _ := database.Begin()
 				categoryRepository := categoryRepository.NewCategoryRepository()
-				category, _ := categoryRepository.Create(context.Background(), tx, &model.Category{
+				category, _ := categoryRepository.Create(context.Background(), tx, &model2.Category{
 					Name:      "Produk Kasur",
 					CreatedAt: time.Now(),
 					UpdatedAt: time.Now(),
@@ -248,7 +248,7 @@ var _ = Describe("Category API", func() {
 				// Create Category
 				tx, _ := database.Begin()
 				categoryRepository := categoryRepository.NewCategoryRepository()
-				category, _ := categoryRepository.Create(context.Background(), tx, &model.Category{
+				category, _ := categoryRepository.Create(context.Background(), tx, &model2.Category{
 					Name:      "Produk Kasur",
 					CreatedAt: time.Now(),
 					UpdatedAt: time.Now(),
@@ -313,7 +313,7 @@ var _ = Describe("Category API", func() {
 				// Create Category
 				tx, _ := database.Begin()
 				categoryRepository := categoryRepository.NewCategoryRepository()
-				category, _ := categoryRepository.Create(context.Background(), tx, &model.Category{
+				category, _ := categoryRepository.Create(context.Background(), tx, &model2.Category{
 					Name:      "Produk Kasur",
 					CreatedAt: time.Now(),
 					UpdatedAt: time.Now(),

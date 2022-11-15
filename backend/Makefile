@@ -1,5 +1,5 @@
 proto:
-	protoc adapter/proto/*.proto --go_out=plugins=grpc:.
+	protoc services/*/proto/*.proto --go_out=plugins=grpc:.
 
 inject:
 	protoc-go-inject-tag -input=./adapter/pb/*.pb.go

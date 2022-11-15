@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "./services/product-service/pb";
+
+import "services/product-service/proto/entity.proto";
+
+service UserOrderService {
+  rpc FindAllByPayloadId(GetUserOrderByPayloadIdRequest) returns (ListUserOrderResponse);
+  rpc FindAllByUserId(GetUserOrderByUserIdRequest) returns (ListUserOrderResponse);
+  rpc FindById(GetUserOrderByIdRequest) returns (GetUserOrderResponse);
+  rpc Create(CreateUserOrderRequest) returns (GetUserOrderResponse);
+}
+
+message ListUserOrderResponse {
+  repeated UserOrder UserOrder = 1;
+}
+
+message CreateUserOrderRequest {
+  int64 PayloadId = 1;
+  optional string Code = 2;
+  optional string Name = 3;
+  optional int64 Price = 4;
+  optional string Image = 5;
+  optional int32 Quantity = 6;
+  optional int64 TotalPriceItem = 7;
+}
+
+message GetUserOrderResponse {
+  UserOrder UserOrder = 1;
+}
+
+message GetUserOrderByPayloadIdRequest {
+  int64 PayloadId = 1;
+}
+
+message GetUserOrderByUserIdRequest {
+  int64 UserId = 1;
+}
+
+message GetUserOrderByIdRequest {
+  int64 Id = 1;
+}

@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "./services/transaction-service/pb";
+
+import "google/protobuf/Empty.proto";
+import "services/transaction-service/proto/entity.proto";
+
+service TransactionService {
+  rpc FindAll(google.protobuf.Empty) returns (ListTransactionsResponse);
+  rpc FindAllItemSet(GetAllItemSetTransactionRequest) returns (ListTransactionsResponse);
+  rpc FindByNoTransaction(GetTransactionByNoTransactionRequest) returns (GetTransactionResponse);
+  rpc Create(CreateTransactionRequest) returns (GetTransactionResponse);
+  rpc CreateByCSV(CreateTransactionByCSVRequest) returns (google.protobuf.Empty);
+  rpc Update(UpdateTransactionRequest) returns (GetTransactionResponse);
+  rpc Delete(GetTransactionByNoTransactionRequest) returns (google.protobuf.Empty);
+  rpc Truncate(google.protobuf.Empty) returns (google.protobuf.Empty);
+}
+
+message ListTransactionsResponse {
+  repeated Transaction Transaction = 1;
+}
+
+message GetTransactionResponse {
+  Transaction Transaction = 1;
+}
+
+message GetAllItemSetTransactionRequest {
+  string StartDate = 1;
+  string EndDate = 2;
+}
+
+message GetTransactionByNoTransactionRequest {
+  string NoTransaction = 1;
+}
+
+message CreateTransactionRequest {
+  string ProductName = 1;
+  string CustomerName = 2;
+  optional string NoTransaction = 3;
+}
+
+message CreateTransactionByCSVRequest {
+  string FilePath = 1;
+}
+
+message UpdateTransactionRequest {
+  string ProductName = 1;
+  string CustomerName = 2;
+  string NoTransaction = 3;
+}

@@ -3,9 +3,9 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"github.com/arvians-id/go-apriori-microservice/adapter/pb"
-	"github.com/arvians-id/go-apriori-microservice/config"
 	"github.com/arvians-id/go-apriori-microservice/services/user-order-service/client"
+	"github.com/arvians-id/go-apriori-microservice/services/user-order-service/config"
+	"github.com/arvians-id/go-apriori-microservice/services/user-order-service/pb"
 	"github.com/arvians-id/go-apriori-microservice/services/user-order-service/repository"
 	"github.com/arvians-id/go-apriori-microservice/services/user-order-service/usecase"
 	"google.golang.org/grpc"

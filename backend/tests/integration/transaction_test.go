@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	model2 "github.com/arvians-id/go-apriori-microservice/adapter/model"
 	"github.com/arvians-id/go-apriori-microservice/config"
-	"github.com/arvians-id/go-apriori-microservice/model"
 	transactionRepository "github.com/arvians-id/go-apriori-microservice/services/transaction-service/repository"
 	userRepository "github.com/arvians-id/go-apriori-microservice/services/user-service/repository"
 	"github.com/arvians-id/go-apriori-microservice/tests/setup"
@@ -50,7 +50,7 @@ var _ = Describe("Transaction API", func() {
 		tx, _ := database.Begin()
 		userRepository := userRepository.NewUserRepository()
 		password, _ := bcrypt.GenerateFromPassword([]byte("Rahasia123"), bcrypt.DefaultCost)
-		_, _ = userRepository.Create(context.Background(), tx, &model.User{
+		_, _ = userRepository.Create(context.Background(), tx, &model2.User{
 			Name:      "Widdy",
 			Email:     "widdy@gmail.com",
 			Password:  string(password),
@@ -202,7 +202,7 @@ var _ = Describe("Transaction API", func() {
 					// Create Transaction
 					tx, _ := database.Begin()
 					transactionRepository := transactionRepository.NewTransactionRepository()
-					row, _ := transactionRepository.Create(context.Background(), tx, &model.Transaction{
+					row, _ := transactionRepository.Create(context.Background(), tx, &model2.Transaction{
 						ProductName:   "kasur cinta, bantal memori",
 						CustomerName:  "Wids",
 						NoTransaction: "202320",
@@ -236,7 +236,7 @@ var _ = Describe("Transaction API", func() {
 					// Create Transaction
 					tx, _ := database.Begin()
 					transactionRepository := transactionRepository.NewTransactionRepository()
-					row, _ := transactionRepository.Create(context.Background(), tx, &model.Transaction{
+					row, _ := transactionRepository.Create(context.Background(), tx, &model2.Transaction{
 						ProductName:   "Kasur cinta, Bantal memori",
 						CustomerName:  "Wids",
 						NoTransaction: "202320",
@@ -271,7 +271,7 @@ var _ = Describe("Transaction API", func() {
 				// Create Transaction
 				tx, _ := database.Begin()
 				transactionRepository := transactionRepository.NewTransactionRepository()
-				row, _ := transactionRepository.Create(context.Background(), tx, &model.Transaction{
+				row, _ := transactionRepository.Create(context.Background(), tx, &model2.Transaction{
 					ProductName:   "kasur cinta, bantal memori",
 					CustomerName:  "Wids",
 					NoTransaction: "202320",
@@ -329,7 +329,7 @@ var _ = Describe("Transaction API", func() {
 				// Create Transaction
 				tx, _ := database.Begin()
 				transactionRepository := transactionRepository.NewTransactionRepository()
-				row, _ := transactionRepository.Create(context.Background(), tx, &model.Transaction{
+				row, _ := transactionRepository.Create(context.Background(), tx, &model2.Transaction{
 					ProductName:   "kasur cinta, bantal memori",
 					CustomerName:  "Wids",
 					NoTransaction: "202320",
@@ -385,13 +385,13 @@ var _ = Describe("Transaction API", func() {
 				// Create Transaction
 				tx, _ := database.Begin()
 				transactionRepository := transactionRepository.NewTransactionRepository()
-				transaction1, _ := transactionRepository.Create(context.Background(), tx, &model.Transaction{
+				transaction1, _ := transactionRepository.Create(context.Background(), tx, &model2.Transaction{
 					ProductName:  "kasur cinta, bantal memori",
 					CustomerName: "Wids",
 					CreatedAt:    time.Now(),
 					UpdatedAt:    time.Now(),
 				})
-				transaction2, _ := transactionRepository.Create(context.Background(), tx, &model.Transaction{
+				transaction2, _ := transactionRepository.Create(context.Background(), tx, &model2.Transaction{
 					ProductName:  "guling cinta, guling memori",
 					CustomerName: "Goengs",
 					CreatedAt:    time.Now(),
@@ -451,7 +451,7 @@ var _ = Describe("Transaction API", func() {
 				// Create Transaction
 				tx, _ := database.Begin()
 				transactionRepository := transactionRepository.NewTransactionRepository()
-				row, _ := transactionRepository.Create(context.Background(), tx, &model.Transaction{
+				row, _ := transactionRepository.Create(context.Background(), tx, &model2.Transaction{
 					ProductName:   "kasur cinta, bantal memori",
 					CustomerName:  "Wids",
 					NoTransaction: "202320",
@@ -487,7 +487,7 @@ var _ = Describe("Transaction API", func() {
 				// Create Transaction
 				tx, _ := database.Begin()
 				transactionRepository := transactionRepository.NewTransactionRepository()
-				_, _ = transactionRepository.Create(context.Background(), tx, &model.Transaction{
+				_, _ = transactionRepository.Create(context.Background(), tx, &model2.Transaction{
 					ProductName:   "kasur cinta, bantal memori",
 					CustomerName:  "Wids",
 					NoTransaction: "202320",

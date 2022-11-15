@@ -6,6 +6,4 @@ COPY . .
 
 RUN go build -o message-service
 
-EXPOSE 8080
-
 CMD ./message-service

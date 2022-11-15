@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "./services/password-reset-service/pb";
+
+import "google/protobuf/Empty.proto";
+import "services/password-reset-service/proto/entity.proto";
+
+service NotificationService {
+  rpc FindAll(google.protobuf.Empty) returns (ListNotificationResponse);
+  rpc FindAllByUserId(GetNotificationByUserIdRequest) returns (ListNotificationResponse);
+  rpc Create(CreateNotificationRequest) returns (GetNotificationResponse);
+  rpc MarkAll(GetNotificationByUserIdRequest) returns (google.protobuf.Empty);
+  rpc Mark(GetNotificationByIdRequest) returns (google.protobuf.Empty);
+}
+
+message ListNotificationResponse {
+  repeated Notification notification = 1;
+}
+
+message GetNotificationResponse {
+  Notification notification = 1;
+}
+
+message GetNotificationByIdRequest {
+  int64 Id = 1;
+}
+
+message GetNotificationByUserIdRequest {
+  int64 UserId = 1;
+}
+
+message CreateNotificationRequest {
+  int64 UserId = 1;
+  string Title = 2;
+  string Description = 3;
+  string URL = 4;
+  bool IsRead = 5;
+  string CreatedAt = 6;
+}

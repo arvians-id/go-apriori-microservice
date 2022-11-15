@@ -1,9 +1,9 @@
 package middleware
 
 import (
+	"github.com/arvians-id/go-apriori-microservice/adapter/config"
 	"github.com/arvians-id/go-apriori-microservice/adapter/response"
-	"github.com/arvians-id/go-apriori-microservice/config"
-	jwtlib "github.com/arvians-id/go-apriori-microservice/third-party/jwt"
+	jwtlib "github.com/arvians-id/go-apriori-microservice/adapter/third-party/jwt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"net/http"

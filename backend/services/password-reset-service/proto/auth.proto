@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "./services/password-reset-service/pb";
+
+import "google/protobuf/Empty.proto";
+import "services/password-reset-service/proto/entity.proto";
+
+service PasswordResetService {
+  rpc CreateOrUpdateByEmail(GetPasswordResetByEmailRequest) returns (GetPasswordResetResponse);
+  rpc Verify(GetVerifyRequest) returns (google.protobuf.Empty);
+}
+
+message GetPasswordResetResponse {
+  PasswordReset password_reset = 1;
+}
+
+message GetPasswordResetByEmailRequest {
+  string Email = 1;
+}
+
+message GetVerifyRequest {
+  string Email = 1;
+  string Password = 2;
+  string Token = 3;
+}

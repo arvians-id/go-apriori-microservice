@@ -1,0 +1,162 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "./services/comment-service/pb";
+
+import "google/protobuf/Timestamp.proto";
+
+message Category {
+  int64 IdCategory = 1; // @gotags: json:"id_category"
+  string Name = 2; // @gotags: json:"name"
+  google.protobuf.Timestamp CreatedAt = 3; // @gotags: json:"created_at"
+  google.protobuf.Timestamp UpdatedAt = 4; // @gotags: json:"updated_at"
+}
+
+message PasswordReset {
+  string Email = 1; // @gotags: json:"email"
+  string Token = 2; // @gotags: json:"token"
+  int64 Expired = 3; // @gotags: json:"expired"
+}
+
+message Comment {
+  int64 IdComment = 1; // @gotags: json:"id_comment"
+  int64 UserOrderId = 2; // @gotags: json:"user_order_id"
+  string ProductCode = 3; // @gotags: json:"product_code"
+  optional string Description = 4; // @gotags: json:"description"
+  optional string Tag = 5; // @gotags: json:"tag"
+  int32 Rating = 6; // @gotags: json:"rating"
+  google.protobuf.Timestamp CreatedAt = 7; // @gotags: json:"created_at"
+  UserOrder UserOrder = 8; // @gotags: json:"user_order"
+}
+
+message RatingFromComment {
+  int32 Rating = 1; // @gotags: json:"rating"
+  int32 ResultRating = 2; // @gotags: json:"result_rating"
+  int32 ResultComment = 3; // @gotags: json:"result_comment"
+}
+
+message Notification {
+  int64 IdNotification = 1; // @gotags: json:"id_notification"
+  int64 UserId = 2; // @gotags: json:"user_id"
+  string Title = 3; // @gotags: json:"title"
+  optional string Description = 4; // @gotags: json:"description"
+  optional string URL = 5; // @gotags: json:"url"
+  bool IsRead = 6; // @gotags: json:"is_read"
+  google.protobuf.Timestamp CreatedAt = 7; // @gotags: json:"created_at"
+  User User = 8; // @gotags: json:"user"
+}
+
+message Transaction {
+  int64 IdTransaction = 1; // @gotags: json:"id_transaction"
+  string ProductName = 2; // @gotags: json:"product_name"
+  string CustomerName = 3; // @gotags: json:"customer_name"
+  string NoTransaction = 4; // @gotags: json:"no_transaction"
+  google.protobuf.Timestamp CreatedAt = 5; // @gotags: json:"created_at"
+  google.protobuf.Timestamp UpdatedAt = 6; // @gotags: json:"updated_at"
+}
+
+message Payment {
+  int64 IdPayload = 1; // @gotags: json:"id_payload"
+  int64 UserId = 2; // @gotags: json:"user_id"
+  optional string OrderId = 3; // @gotags: json:"order_id"
+  optional string TransactionTime = 4; // @gotags: json:"transaction_time"
+  optional string TransactionStatus = 5; // @gotags: json:"transaction_status"
+  optional string TransactionId = 6; // @gotags: json:"transaction_id"
+  optional string StatusCode = 7; // @gotags: json:"status_code"
+  optional string SignatureKey = 8; // @gotags: json:"signature_key"
+  optional string SettlementTime = 9; // @gotags: json:"settlement_time"
+  optional string PaymentType = 10; // @gotags: json:"payment_type"
+  optional string MerchantId = 11; // @gotags: json:"merchant_id"
+  optional string GrossAmount = 12; // @gotags: json:"gross_amount"
+  optional string FraudStatus = 13; // @gotags: json:"fraud_status"
+  optional string BankType = 14; // @gotags: json:"bank_type"
+  optional string VANumber = 15; // @gotags: json:"va_number"
+  optional string BillerCode = 16; // @gotags: json:"biller_code"
+  optional string BillKey = 17; // @gotags: json:"bill_key"
+  optional string ReceiptNumber = 18; // @gotags: json:"receipt_number"
+  optional string Address = 19; // @gotags: json:"address"
+  optional string Courier = 20; // @gotags: json:"courier"
+  optional string CourierService = 21; // @gotags: json:"courier_service"
+  User User = 22; // @gotags: json:"user"
+  repeated UserOrder UserOrder = 23; // @gotags: json:"user_order"
+}
+
+message Product {
+  int64 IdProduct = 1; // @gotags: json:"id_product"
+  string Code = 2; // @gotags: json:"code"
+  string Name = 3; // @gotags: json:"name"
+  optional string Description = 4; // @gotags: json:"description"
+  int32 Price = 5; // @gotags: json:"price"
+  string Category = 6; // @gotags: json:"category"
+  bool IsEmpty = 7; // @gotags: json:"is_empty"
+  int32 Mass = 8; // @gotags: json:"mass"
+  optional string Image = 9; // @gotags: json:"image"
+  google.protobuf.Timestamp CreatedAt = 10; // @gotags: json:"created_at"
+  google.protobuf.Timestamp UpdatedAt = 11; // @gotags: json:"updated_at"
+}
+
+message ProductRecommendation {
+  int64  AprioriId = 1; // @gotags: json:"apriori_id"
+  string AprioriCode = 2; // @gotags: json:"apriori_code"
+  string AprioriItem = 3; // @gotags: json:"apriori_item"
+  float AprioriDiscount = 4; // @gotags: json:"apriori_discount"
+  optional string AprioriDescription = 5; // @gotags: json:"apriori_description"
+  optional string AprioriImage = 6; // @gotags: json:"apriori_image"
+  int32 ProductTotalPrice = 7; // @gotags: json:"product_total_price"
+  int32 PriceDiscount = 8; // @gotags: json:"price_discount"
+  int32 Mass = 9; // @gotags: json:"mass"
+}
+
+message User {
+  int64 IdUser = 1; // @gotags: json:"id_user"
+  int32 Role = 2; // @gotags: json:"role"
+  string Name = 3; // @gotags: json:"name"
+  string Email = 4; // @gotags: json:"email"
+  string Address = 5; // @gotags: json:"address"
+  string Phone = 6; // @gotags: json:"phone"
+  string Password = 7; // @gotags: json:"password"
+  google.protobuf.Timestamp CreatedAt = 8; // @gotags: json:"created_at"
+  google.protobuf.Timestamp UpdatedAt = 9; // @gotags: json:"updated_at"
+  repeated Notification Notification = 10; // @gotags: json:"notification"
+  repeated Payment Payment = 11; // @gotags: json:"payment"
+}
+
+message Apriori {
+  int64 IdApriori = 1; // @gotags: json:"id_apriori"
+  string Code = 2; // @gotags: json:"code"
+  string Item = 3; // @gotags: json:"item"
+  float Discount = 4; // @gotags: json:"discount"
+  float Support = 5; // @gotags: json:"support"
+  float Confidence = 6; // @gotags: json:"confidence"
+  string RangeDate = 7; // @gotags: json:"range_date"
+  bool IsActive = 8; // @gotags: json:"is_active"
+  optional string Description = 9; // @gotags: json:"description"
+  int32 Mass = 10; // @gotags: json:"mass"
+  optional string Image = 11; // @gotags: json:"image"
+  google.protobuf.Timestamp CreatedAt = 12; // @gotags: json:"created_at"
+  UserOrder UserOrder = 13; // @gotags: json:"user_order"
+}
+
+message GenerateApriori {
+  repeated string ItemSet = 1; // @gotags: json:"item_set"
+  float Support = 2; // @gotags: json:"support"
+  int32 Iterate = 3; // @gotags: json:"iterate"
+  int32 Transaction = 4; // @gotags: json:"transaction"
+  float Confidence = 5; // @gotags: json:"confidence"
+  float Discount = 6; // @gotags: json:"discount"
+  string Description = 7; // @gotags: json:"description"
+  string RangeDate = 8; // @gotags: json:"range_date"
+}
+
+message UserOrder {
+  int64 IdOrder = 1; // @gotags: json:"id_order"
+  int64 PayloadId = 2; // @gotags: json:"payload_id"
+  optional string Code = 3; // @gotags: json:"code"
+  optional string Name = 4; // @gotags: json:"name"
+  optional int64 Price = 5; // @gotags: json:"price"
+  optional string Image = 6; // @gotags: json:"image"
+  optional int32 Quantity = 7; // @gotags: json:"quantity"
+  optional int64 TotalPriceItem = 8; // @gotags: json:"total_price_item"
+  Payment Payment = 9; // @gotags: json:"payment"
+}

@@ -3,10 +3,10 @@ package usecase
 import (
 	"context"
 	"database/sql"
-	"github.com/arvians-id/go-apriori-microservice/adapter/pb"
-	"github.com/arvians-id/go-apriori-microservice/model"
+	"github.com/arvians-id/go-apriori-microservice/services/category-service/model"
+	"github.com/arvians-id/go-apriori-microservice/services/category-service/pb"
 	"github.com/arvians-id/go-apriori-microservice/services/category-service/repository"
-	"github.com/arvians-id/go-apriori-microservice/util"
+	"github.com/arvians-id/go-apriori-microservice/services/category-service/util"
 	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"log"

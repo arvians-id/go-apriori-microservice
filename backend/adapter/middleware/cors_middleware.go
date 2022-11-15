@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/arvians-id/go-apriori-microservice/config"
+	"github.com/arvians-id/go-apriori-microservice/adapter/config"
 	"github.com/gin-gonic/gin"
 )
 

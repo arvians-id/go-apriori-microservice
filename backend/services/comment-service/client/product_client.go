@@ -2,8 +2,8 @@ package client
 
 import (
 	"context"
-	"github.com/arvians-id/go-apriori-microservice/adapter/pb"
-	"github.com/arvians-id/go-apriori-microservice/config"
+	"github.com/arvians-id/go-apriori-microservice/services/comment-service/config"
+	"github.com/arvians-id/go-apriori-microservice/services/comment-service/pb"
 	"google.golang.org/grpc"
 	"log"
 )

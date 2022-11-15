@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/arvians-id/go-apriori-microservice/adapter/config"
 	"github.com/arvians-id/go-apriori-microservice/adapter/middleware"
 	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/apriori"
 	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/auth"
@@ -13,10 +14,9 @@ import (
 	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/transaction"
 	"github.com/arvians-id/go-apriori-microservice/adapter/pkg/user"
 	user_order "github.com/arvians-id/go-apriori-microservice/adapter/pkg/user-order"
-	"github.com/arvians-id/go-apriori-microservice/config"
-	"github.com/arvians-id/go-apriori-microservice/third-party/aws"
-	"github.com/arvians-id/go-apriori-microservice/third-party/jwt"
-	messaging "github.com/arvians-id/go-apriori-microservice/third-party/message-queue"
+	"github.com/arvians-id/go-apriori-microservice/adapter/third-party/aws"
+	"github.com/arvians-id/go-apriori-microservice/adapter/third-party/jwt"
+	messaging "github.com/arvians-id/go-apriori-microservice/adapter/third-party/message-queue"
 	"github.com/gin-gonic/gin"
 	"log"
 )

@@ -3,8 +3,8 @@ package unittest
 import (
 	"context"
 	"errors"
+	"github.com/arvians-id/go-apriori-microservice/adapter/model"
 	"github.com/arvians-id/go-apriori-microservice/adapter/pb"
-	"github.com/arvians-id/go-apriori-microservice/model"
 	repository "github.com/arvians-id/go-apriori-microservice/services/user-service/mock"
 	"github.com/arvians-id/go-apriori-microservice/services/user-service/usecase"
 	"github.com/arvians-id/go-apriori-microservice/util"

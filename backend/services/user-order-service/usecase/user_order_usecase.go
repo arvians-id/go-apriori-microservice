@@ -3,11 +3,11 @@ package usecase
 import (
 	"context"
 	"database/sql"
-	"github.com/arvians-id/go-apriori-microservice/adapter/pb"
-	"github.com/arvians-id/go-apriori-microservice/model"
 	"github.com/arvians-id/go-apriori-microservice/services/user-order-service/client"
+	"github.com/arvians-id/go-apriori-microservice/services/user-order-service/model"
+	"github.com/arvians-id/go-apriori-microservice/services/user-order-service/pb"
 	"github.com/arvians-id/go-apriori-microservice/services/user-order-service/repository"
-	"github.com/arvians-id/go-apriori-microservice/util"
+	"github.com/arvians-id/go-apriori-microservice/services/user-order-service/util"
 	"log"
 )
 

@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "./services/apriori-service/pb";
+
+import "google/protobuf/Empty.proto";
+import "services/apriori-service/proto/entity.proto";
+
+service PaymentService {
+  rpc FindAll(google.protobuf.Empty) returns (ListPaymentResponse);
+  rpc FindAllByUserId(GetPaymentByUserIdRequest) returns (ListPaymentResponse);
+  rpc FindByOrderId(GetPaymentByOrderIdRequest) returns (GetPaymentResponse);
+  rpc CreateOrUpdate(CreatePaymentRequest) returns (GetCreatePaymentResponse);
+  rpc UpdateReceiptNumber(UpdateReceiptNumberRequest) returns (GetPaymentResponse);
+  rpc Delete(GetPaymentByOrderIdRequest) returns (google.protobuf.Empty);
+  rpc GetToken(GetPaymentTokenRequest) returns (GetPaymentTokenResponse);
+}
+
+message ListPaymentResponse {
+  repeated Payment payment = 1;
+}
+
+message GetPaymentResponse {
+  Payment payment = 1;
+}
+
+message GetPaymentByUserIdRequest {
+  int64 UserId = 1;
+}
+
+message GetPaymentByOrderIdRequest {
+  string OrderId = 1;
+}
+
+message GetCreatePaymentResponse {
+  bool IsSuccess = 1;
+}
+
+message CreatePaymentRequest {
+  bytes payment = 1;
+}
+
+message GetPaymentTokenResponse {
+  map<string, string> payment = 1;
+}
+
+message UpdateReceiptNumberRequest {
+  string OrderId = 1;
+  string ReceiptNumber = 2;
+}
+
+message GetPaymentTokenRequest {
+  int64 GrossAmount = 1;
+  repeated string Items = 2;
+  int64 UserId = 3;
+  string CustomerName = 4;
+  string Address = 5;
+  string Courier = 6;
+  string CourierService = 7;
+  int64 ShippingCost = 8;
+}

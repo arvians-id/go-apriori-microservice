@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"github.com/arvians-id/go-apriori-microservice/model"
-	"github.com/arvians-id/go-apriori-microservice/util"
+	"github.com/arvians-id/go-apriori-microservice/services/apriori-service/model"
+	"github.com/arvians-id/go-apriori-microservice/services/apriori-service/util"
 	"log"
 )
 

@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	model2 "github.com/arvians-id/go-apriori-microservice/adapter/model"
 	"github.com/arvians-id/go-apriori-microservice/config"
-	"github.com/arvians-id/go-apriori-microservice/model"
 	notificationRepository "github.com/arvians-id/go-apriori-microservice/services/notification-service/repository"
 	userRepository "github.com/arvians-id/go-apriori-microservice/services/user-service/repository"
 	"github.com/arvians-id/go-apriori-microservice/tests/setup"
@@ -28,7 +28,7 @@ var _ = Describe("Notification API", func() {
 	var database *sql.DB
 	var tokenJWT string
 	var cookie *http.Cookie
-	var notification1 *model.Notification
+	var notification1 *model2.Notification
 	configuration, err := config.LoadConfig("../../config/envs")
 	if err != nil {
 		log.Fatal(err)
@@ -46,7 +46,7 @@ var _ = Describe("Notification API", func() {
 		tx, _ := database.Begin()
 		userRepository := userRepository.NewUserRepository()
 		password, _ := bcrypt.GenerateFromPassword([]byte("Rahasia123"), bcrypt.DefaultCost)
-		user, _ := userRepository.Create(context.Background(), tx, &model.User{
+		user, _ := userRepository.Create(context.Background(), tx, &model2.User{
 			Role:      1,
 			Name:      "Widdy",
 			Email:     "widdy@gmail.com",
@@ -79,7 +79,7 @@ var _ = Describe("Notification API", func() {
 		notificationRepository := notificationRepository.NewNotificationRepository()
 		description := "This is first notification"
 		url := "https://google.com"
-		notificationOne, _ := notificationRepository.Create(context.Background(), tx, &model.Notification{
+		notificationOne, _ := notificationRepository.Create(context.Background(), tx, &model2.Notification{
 			UserId:      user.IdUser,
 			Title:       "First notification",
 			Description: &description,
@@ -90,7 +90,7 @@ var _ = Describe("Notification API", func() {
 
 		description = "This is second notification"
 		url = "https://facebook.com"
-		_, _ = notificationRepository.Create(context.Background(), tx, &model.Notification{
+		_, _ = notificationRepository.Create(context.Background(), tx, &model2.Notification{
 			UserId:      user.IdUser,
 			Title:       "Second notification",
 			Description: &description,

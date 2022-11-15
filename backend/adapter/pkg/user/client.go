@@ -2,11 +2,11 @@ package user
 
 import (
 	"errors"
+	"github.com/arvians-id/go-apriori-microservice/adapter/config"
 	"github.com/arvians-id/go-apriori-microservice/adapter/middleware"
 	"github.com/arvians-id/go-apriori-microservice/adapter/pb"
 	"github.com/arvians-id/go-apriori-microservice/adapter/response"
-	"github.com/arvians-id/go-apriori-microservice/config"
-	"github.com/arvians-id/go-apriori-microservice/util"
+	"github.com/arvians-id/go-apriori-microservice/adapter/util"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
