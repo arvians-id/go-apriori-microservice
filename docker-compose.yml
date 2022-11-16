@@ -27,8 +27,8 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./backend/third-party/grafana/grafana-data:/var/lib/grafana
-      - ./backend/third-party/grafana/grafana-data:/etc/grafana/provisioning/datasources
+      - ./backend/monitoring/grafana/grafana-data:/var/lib/grafana
+      - ./backend/monitoring/grafana/grafana-data:/etc/grafana/provisioning/datasources
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=Rahasia123
@@ -40,8 +40,8 @@ services:
   prometheus:
     image: prom/prometheus:v2.27.1
     volumes:
-      - ./backend/third-party/prometheus:/etc/prometheus/
-      - ./backend/third-party/prometheus/prometheus-data:/prometheus
+      - ./backend/monitoring/prometheus:/etc/prometheus/
+      - ./backend/monitoring/prometheus/prometheus-data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -94,157 +94,157 @@ services:
       - nsqlookupd
     networks:
       - thesis
-  adapter:
-    build: ./backend/adapter
-    env_file:
-      - ./backend/adapter/config/envs/prod.env
-    ports:
-      - "8086:8080"
-    restart: always
-    depends_on:
-      - nsqlookupd
-    networks:
-      - thesis
-  apriori:
-    build: ./backend/services/apriori-service
-    env_file:
-      - ./backend/services/apriori-service/config/envs/prod.env
-    ports:
-      - "50050:50050"
-    restart: always
-    depends_on:
-      - db
-      - cache
-      - messagebroker
-      - adapter
-    networks:
-      - thesis
-  category:
-    build: ./backend/services/category-service
-    env_file:
-      - ./backend/services/category-service/config/envs/prod.env
-    ports:
-      - "50051:50051"
-    restart: always
-    depends_on:
-      - db
-      - cache
-      - messagebroker
-      - adapter
-    networks:
-      - thesis
-  comment:
-    build: ./backend/services/comment-service
-    env_file:
-      - ./backend/services/comment-service/config/envs/prod.env
-    ports:
-      - "50052:50052"
-    restart: always
-    depends_on:
-      - db
-      - cache
-      - messagebroker
-      - adapter
-    networks:
-      - thesis
-  notification:
-    build: ./backend/services/notification-service
-    env_file:
-      - ./backend/services/notification-service/config/envs/prod.env
-    ports:
-      - "50053:50053"
-    restart: always
-    depends_on:
-      - db
-      - cache
-      - messagebroker
-      - adapter
-    networks:
-      - thesis
-  password:
-    build: ./backend/services/password-reset-service
-    env_file:
-      - ./backend/services/password-reset-service/config/envs/prod.env
-    ports:
-      - "50054:50054"
-    restart: always
-    depends_on:
-      - db
-      - cache
-      - messagebroker
-      - adapter
-    networks:
-      - thesis
-  payment:
-    build: ./backend/services/payment-service
-    env_file:
-      - ./backend/services/payment-service/config/envs/prod.env
-    ports:
-      - "50055:50055"
-    restart: always
-    depends_on:
-      - db
-      - cache
-      - messagebroker
-      - adapter
-    networks:
-      - thesis
-  product:
-    build: ./backend/services/product-service
-    env_file:
-      - ./backend/services/product-service/config/envs/prod.env
-    ports:
-      - "50056:50056"
-    restart: always
-    depends_on:
-      - db
-      - cache
-      - messagebroker
-      - adapter
-    networks:
-      - thesis
-  transaction:
-    build: ./backend/services/transaction-service
-    env_file:
-      - ./backend/services/transaction-service/config/envs/prod.env
-    ports:
-      - "50057:50057"
-    restart: always
-    depends_on:
-      - db
-      - cache
-      - messagebroker
-      - adapter
-    networks:
-      - thesis
-  order:
-    build: ./backend/services/user-order-service
-    env_file:
-      - ./backend/services/user-order-service/config/envs/prod.env
-    ports:
-      - "50058:50058"
-    restart: always
-    depends_on:
-      - db
-      - cache
-      - messagebroker
-      - adapter
-    networks:
-      - thesis
-  user:
-    build: ./backend/services/user-service
-    env_file:
-      - ./backend/services/user-service/config/envs/prod.env
-    ports:
-      - "50059:50059"
-    restart: always
-    depends_on:
-      - db
-      - cache
-      - messagebroker
-      - adapter
-    networks:
-      - thesis
+#  adapter:
+#    build: ./backend/adapter
+#    env_file:
+#      - ./backend/adapter/config/envs/prod.env
+#    ports:
+#      - "8086:8080"
+#    restart: always
+#    depends_on:
+#      - nsqlookupd
+#    networks:
+#      - thesis
+#  apriori:
+#    build: ./backend/services/apriori-service
+#    env_file:
+#      - ./backend/services/apriori-service/config/envs/prod.env
+#    ports:
+#      - "50050:50050"
+#    restart: always
+#    depends_on:
+#      - db
+#      - cache
+#      - messagebroker
+#      - adapter
+#    networks:
+#      - thesis
+#  category:
+#    build: ./backend/services/category-service
+#    env_file:
+#      - ./backend/services/category-service/config/envs/prod.env
+#    ports:
+#      - "50051:50051"
+#    restart: always
+#    depends_on:
+#      - db
+#      - cache
+#      - messagebroker
+#      - adapter
+#    networks:
+#      - thesis
+#  comment:
+#    build: ./backend/services/comment-service
+#    env_file:
+#      - ./backend/services/comment-service/config/envs/prod.env
+#    ports:
+#      - "50052:50052"
+#    restart: always
+#    depends_on:
+#      - db
+#      - cache
+#      - messagebroker
+#      - adapter
+#    networks:
+#      - thesis
+#  notification:
+#    build: ./backend/services/notification-service
+#    env_file:
+#      - ./backend/services/notification-service/config/envs/prod.env
+#    ports:
+#      - "50053:50053"
+#    restart: always
+#    depends_on:
+#      - db
+#      - cache
+#      - messagebroker
+#      - adapter
+#    networks:
+#      - thesis
+#  password:
+#    build: ./backend/services/password-reset-service
+#    env_file:
+#      - ./backend/services/password-reset-service/config/envs/prod.env
+#    ports:
+#      - "50054:50054"
+#    restart: always
+#    depends_on:
+#      - db
+#      - cache
+#      - messagebroker
+#      - adapter
+#    networks:
+#      - thesis
+#  payment:
+#    build: ./backend/services/payment-service
+#    env_file:
+#      - ./backend/services/payment-service/config/envs/prod.env
+#    ports:
+#      - "50055:50055"
+#    restart: always
+#    depends_on:
+#      - db
+#      - cache
+#      - messagebroker
+#      - adapter
+#    networks:
+#      - thesis
+#  product:
+#    build: ./backend/services/product-service
+#    env_file:
+#      - ./backend/services/product-service/config/envs/prod.env
+#    ports:
+#      - "50056:50056"
+#    restart: always
+#    depends_on:
+#      - db
+#      - cache
+#      - messagebroker
+#      - adapter
+#    networks:
+#      - thesis
+#  transaction:
+#    build: ./backend/services/transaction-service
+#    env_file:
+#      - ./backend/services/transaction-service/config/envs/prod.env
+#    ports:
+#      - "50057:50057"
+#    restart: always
+#    depends_on:
+#      - db
+#      - cache
+#      - messagebroker
+#      - adapter
+#    networks:
+#      - thesis
+#  order:
+#    build: ./backend/services/user-order-service
+#    env_file:
+#      - ./backend/services/user-order-service/config/envs/prod.env
+#    ports:
+#      - "50058:50058"
+#    restart: always
+#    depends_on:
+#      - db
+#      - cache
+#      - messagebroker
+#      - adapter
+#    networks:
+#      - thesis
+#  user:
+#    build: ./backend/services/user-service
+#    env_file:
+#      - ./backend/services/user-service/config/envs/prod.env
+#    ports:
+#      - "50059:50059"
+#    restart: always
+#    depends_on:
+#      - db
+#      - cache
+#      - messagebroker
+#      - adapter
+#    networks:
+#      - thesis
 
 networks:
   thesis:

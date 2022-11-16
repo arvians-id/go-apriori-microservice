@@ -182,7 +182,7 @@ func (service *AprioriService) Create(ctx context.Context, req *pb.CreateApriori
 			Support:    requestItem.Support,
 			Confidence: requestItem.Confidence,
 			RangeDate:  requestItem.RangeDate,
-			IsActive:   false,
+			IsActive:   requestItem.IsActive,
 			Image:      &image,
 			CreatedAt:  timeNow,
 		})

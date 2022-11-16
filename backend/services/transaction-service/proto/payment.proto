@@ -12,6 +12,7 @@ service PaymentService {
   rpc FindAllByUserId(GetPaymentByUserIdRequest) returns (ListPaymentResponse);
   rpc FindByOrderId(GetPaymentByOrderIdRequest) returns (GetPaymentResponse);
   rpc CreateOrUpdate(CreatePaymentRequest) returns (GetCreatePaymentResponse);
+  rpc OnlyCreate(OnlyCreatePaymentRequest) returns (GetPaymentResponse);
   rpc UpdateReceiptNumber(UpdateReceiptNumberRequest) returns (GetPaymentResponse);
   rpc Delete(GetPaymentByOrderIdRequest) returns (google.protobuf.Empty);
   rpc GetToken(GetPaymentTokenRequest) returns (GetPaymentTokenResponse);
@@ -35,6 +36,16 @@ message GetPaymentByOrderIdRequest {
 
 message GetCreatePaymentResponse {
   bool IsSuccess = 1;
+}
+
+message OnlyCreatePaymentRequest {
+  int64 UserId = 1;
+  string OrderId = 2;
+  string TransactionStatus = 3;
+  string TransactionTime = 4;
+  string Address = 5;
+  string Courier = 6;
+  string CourierService = 7;
 }
 
 message CreatePaymentRequest {

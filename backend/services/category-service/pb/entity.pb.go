@@ -26,10 +26,10 @@ type Category struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	IdCategory int64                  `protobuf:"varint,1,opt,name=IdCategory,proto3" json:"IdCategory,omitempty"` // @gotags: json:"id_category"
-	Name       string                 `protobuf:"bytes,2,opt,name=Name,proto3" json:"Name,omitempty"`              // @gotags: json:"name"
-	CreatedAt  *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=CreatedAt,proto3" json:"CreatedAt,omitempty"`    // @gotags: json:"created_at"
-	UpdatedAt  *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=UpdatedAt,proto3" json:"UpdatedAt,omitempty"`    // @gotags: json:"updated_at"
+	IdCategory int64                  `protobuf:"varint,1,opt,name=IdCategory,proto3" json:"id_category"` // @gotags: json:"id_category"
+	Name       string                 `protobuf:"bytes,2,opt,name=Name,proto3" json:"name"`              // @gotags: json:"name"
+	CreatedAt  *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=CreatedAt,proto3" json:"created_at"`    // @gotags: json:"created_at"
+	UpdatedAt  *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=UpdatedAt,proto3" json:"updated_at"`    // @gotags: json:"updated_at"
 }
 
 func (x *Category) Reset() {
@@ -97,9 +97,9 @@ type PasswordReset struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Email   string `protobuf:"bytes,1,opt,name=Email,proto3" json:"Email,omitempty"`      // @gotags: json:"email"
-	Token   string `protobuf:"bytes,2,opt,name=Token,proto3" json:"Token,omitempty"`      // @gotags: json:"token"
-	Expired int64  `protobuf:"varint,3,opt,name=Expired,proto3" json:"Expired,omitempty"` // @gotags: json:"expired"
+	Email   string `protobuf:"bytes,1,opt,name=Email,proto3" json:"email"`      // @gotags: json:"email"
+	Token   string `protobuf:"bytes,2,opt,name=Token,proto3" json:"token"`      // @gotags: json:"token"
+	Expired int64  `protobuf:"varint,3,opt,name=Expired,proto3" json:"expired"` // @gotags: json:"expired"
 }
 
 func (x *PasswordReset) Reset() {
@@ -160,14 +160,14 @@ type Comment struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	IdComment   int64                  `protobuf:"varint,1,opt,name=IdComment,proto3" json:"IdComment,omitempty"`          // @gotags: json:"id_comment"
-	UserOrderId int64                  `protobuf:"varint,2,opt,name=UserOrderId,proto3" json:"UserOrderId,omitempty"`      // @gotags: json:"user_order_id"
-	ProductCode string                 `protobuf:"bytes,3,opt,name=ProductCode,proto3" json:"ProductCode,omitempty"`       // @gotags: json:"product_code"
-	Description *string                `protobuf:"bytes,4,opt,name=Description,proto3,oneof" json:"Description,omitempty"` // @gotags: json:"description"
-	Tag         *string                `protobuf:"bytes,5,opt,name=Tag,proto3,oneof" json:"Tag,omitempty"`                 // @gotags: json:"tag"
-	Rating      int32                  `protobuf:"varint,6,opt,name=Rating,proto3" json:"Rating,omitempty"`                // @gotags: json:"rating"
-	CreatedAt   *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=CreatedAt,proto3" json:"CreatedAt,omitempty"`           // @gotags: json:"created_at"
-	UserOrder   *UserOrder             `protobuf:"bytes,8,opt,name=UserOrder,proto3" json:"UserOrder,omitempty"`           // @gotags: json:"user_order"
+	IdComment   int64                  `protobuf:"varint,1,opt,name=IdComment,proto3" json:"id_comment"`          // @gotags: json:"id_comment"
+	UserOrderId int64                  `protobuf:"varint,2,opt,name=UserOrderId,proto3" json:"user_order_id"`      // @gotags: json:"user_order_id"
+	ProductCode string                 `protobuf:"bytes,3,opt,name=ProductCode,proto3" json:"product_code"`       // @gotags: json:"product_code"
+	Description *string                `protobuf:"bytes,4,opt,name=Description,proto3,oneof" json:"description"` // @gotags: json:"description"
+	Tag         *string                `protobuf:"bytes,5,opt,name=Tag,proto3,oneof" json:"tag"`                 // @gotags: json:"tag"
+	Rating      int32                  `protobuf:"varint,6,opt,name=Rating,proto3" json:"rating"`                // @gotags: json:"rating"
+	CreatedAt   *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=CreatedAt,proto3" json:"created_at"`           // @gotags: json:"created_at"
+	UserOrder   *UserOrder             `protobuf:"bytes,8,opt,name=UserOrder,proto3" json:"user_order"`           // @gotags: json:"user_order"
 }
 
 func (x *Comment) Reset() {
@@ -263,9 +263,9 @@ type RatingFromComment struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Rating        int32 `protobuf:"varint,1,opt,name=Rating,proto3" json:"Rating,omitempty"`               // @gotags: json:"rating"
-	ResultRating  int32 `protobuf:"varint,2,opt,name=ResultRating,proto3" json:"ResultRating,omitempty"`   // @gotags: json:"result_rating"
-	ResultComment int32 `protobuf:"varint,3,opt,name=ResultComment,proto3" json:"ResultComment,omitempty"` // @gotags: json:"result_comment"
+	Rating        int32 `protobuf:"varint,1,opt,name=Rating,proto3" json:"rating"`               // @gotags: json:"rating"
+	ResultRating  int32 `protobuf:"varint,2,opt,name=ResultRating,proto3" json:"result_rating"`   // @gotags: json:"result_rating"
+	ResultComment int32 `protobuf:"varint,3,opt,name=ResultComment,proto3" json:"result_comment"` // @gotags: json:"result_comment"
 }
 
 func (x *RatingFromComment) Reset() {
@@ -326,14 +326,14 @@ type Notification struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	IdNotification int64                  `protobuf:"varint,1,opt,name=IdNotification,proto3" json:"IdNotification,omitempty"` // @gotags: json:"id_notification"
-	UserId         int64                  `protobuf:"varint,2,opt,name=UserId,proto3" json:"UserId,omitempty"`                 // @gotags: json:"user_id"
-	Title          string                 `protobuf:"bytes,3,opt,name=Title,proto3" json:"Title,omitempty"`                    // @gotags: json:"title"
-	Description    *string                `protobuf:"bytes,4,opt,name=Description,proto3,oneof" json:"Description,omitempty"`  // @gotags: json:"description"
-	URL            *string                `protobuf:"bytes,5,opt,name=URL,proto3,oneof" json:"URL,omitempty"`                  // @gotags: json:"url"
-	IsRead         bool                   `protobuf:"varint,6,opt,name=IsRead,proto3" json:"IsRead,omitempty"`                 // @gotags: json:"is_read"
-	CreatedAt      *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=CreatedAt,proto3" json:"CreatedAt,omitempty"`            // @gotags: json:"created_at"
-	User           *User                  `protobuf:"bytes,8,opt,name=User,proto3" json:"User,omitempty"`                      // @gotags: json:"user"
+	IdNotification int64                  `protobuf:"varint,1,opt,name=IdNotification,proto3" json:"id_notification"` // @gotags: json:"id_notification"
+	UserId         int64                  `protobuf:"varint,2,opt,name=UserId,proto3" json:"user_id"`                 // @gotags: json:"user_id"
+	Title          string                 `protobuf:"bytes,3,opt,name=Title,proto3" json:"title"`                    // @gotags: json:"title"
+	Description    *string                `protobuf:"bytes,4,opt,name=Description,proto3,oneof" json:"description"`  // @gotags: json:"description"
+	URL            *string                `protobuf:"bytes,5,opt,name=URL,proto3,oneof" json:"url"`                  // @gotags: json:"url"
+	IsRead         bool                   `protobuf:"varint,6,opt,name=IsRead,proto3" json:"is_read"`                 // @gotags: json:"is_read"
+	CreatedAt      *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=CreatedAt,proto3" json:"created_at"`            // @gotags: json:"created_at"
+	User           *User                  `protobuf:"bytes,8,opt,name=User,proto3" json:"user"`                      // @gotags: json:"user"
 }
 
 func (x *Notification) Reset() {
@@ -429,12 +429,12 @@ type Transaction struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	IdTransaction int64                  `protobuf:"varint,1,opt,name=IdTransaction,proto3" json:"IdTransaction,omitempty"` // @gotags: json:"id_transaction"
-	ProductName   string                 `protobuf:"bytes,2,opt,name=ProductName,proto3" json:"ProductName,omitempty"`      // @gotags: json:"product_name"
-	CustomerName  string                 `protobuf:"bytes,3,opt,name=CustomerName,proto3" json:"CustomerName,omitempty"`    // @gotags: json:"customer_name"
-	NoTransaction string                 `protobuf:"bytes,4,opt,name=NoTransaction,proto3" json:"NoTransaction,omitempty"`  // @gotags: json:"no_transaction"
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=CreatedAt,proto3" json:"CreatedAt,omitempty"`          // @gotags: json:"created_at"
-	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=UpdatedAt,proto3" json:"UpdatedAt,omitempty"`          // @gotags: json:"updated_at"
+	IdTransaction int64                  `protobuf:"varint,1,opt,name=IdTransaction,proto3" json:"id_transaction"` // @gotags: json:"id_transaction"
+	ProductName   string                 `protobuf:"bytes,2,opt,name=ProductName,proto3" json:"product_name"`      // @gotags: json:"product_name"
+	CustomerName  string                 `protobuf:"bytes,3,opt,name=CustomerName,proto3" json:"customer_name"`    // @gotags: json:"customer_name"
+	NoTransaction string                 `protobuf:"bytes,4,opt,name=NoTransaction,proto3" json:"no_transaction"`  // @gotags: json:"no_transaction"
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=CreatedAt,proto3" json:"created_at"`          // @gotags: json:"created_at"
+	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=UpdatedAt,proto3" json:"updated_at"`          // @gotags: json:"updated_at"
 }
 
 func (x *Transaction) Reset() {
@@ -516,29 +516,29 @@ type Payment struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	IdPayload         int64        `protobuf:"varint,1,opt,name=IdPayload,proto3" json:"IdPayload,omitempty"`                      // @gotags: json:"id_payload"
-	UserId            int64        `protobuf:"varint,2,opt,name=UserId,proto3" json:"UserId,omitempty"`                            // @gotags: json:"user_id"
-	OrderId           *string      `protobuf:"bytes,3,opt,name=OrderId,proto3,oneof" json:"OrderId,omitempty"`                     // @gotags: json:"order_id"
-	TransactionTime   *string      `protobuf:"bytes,4,opt,name=TransactionTime,proto3,oneof" json:"TransactionTime,omitempty"`     // @gotags: json:"transaction_time"
-	TransactionStatus *string      `protobuf:"bytes,5,opt,name=TransactionStatus,proto3,oneof" json:"TransactionStatus,omitempty"` // @gotags: json:"transaction_status"
-	TransactionId     *string      `protobuf:"bytes,6,opt,name=TransactionId,proto3,oneof" json:"TransactionId,omitempty"`         // @gotags: json:"transaction_id"
-	StatusCode        *string      `protobuf:"bytes,7,opt,name=StatusCode,proto3,oneof" json:"StatusCode,omitempty"`               // @gotags: json:"status_code"
-	SignatureKey      *string      `protobuf:"bytes,8,opt,name=SignatureKey,proto3,oneof" json:"SignatureKey,omitempty"`           // @gotags: json:"signature_key"
-	SettlementTime    *string      `protobuf:"bytes,9,opt,name=SettlementTime,proto3,oneof" json:"SettlementTime,omitempty"`       // @gotags: json:"settlement_time"
-	PaymentType       *string      `protobuf:"bytes,10,opt,name=PaymentType,proto3,oneof" json:"PaymentType,omitempty"`            // @gotags: json:"payment_type"
-	MerchantId        *string      `protobuf:"bytes,11,opt,name=MerchantId,proto3,oneof" json:"MerchantId,omitempty"`              // @gotags: json:"merchant_id"
-	GrossAmount       *string      `protobuf:"bytes,12,opt,name=GrossAmount,proto3,oneof" json:"GrossAmount,omitempty"`            // @gotags: json:"gross_amount"
-	FraudStatus       *string      `protobuf:"bytes,13,opt,name=FraudStatus,proto3,oneof" json:"FraudStatus,omitempty"`            // @gotags: json:"fraud_status"
-	BankType          *string      `protobuf:"bytes,14,opt,name=BankType,proto3,oneof" json:"BankType,omitempty"`                  // @gotags: json:"bank_type"
-	VANumber          *string      `protobuf:"bytes,15,opt,name=VANumber,proto3,oneof" json:"VANumber,omitempty"`                  // @gotags: json:"va_number"
-	BillerCode        *string      `protobuf:"bytes,16,opt,name=BillerCode,proto3,oneof" json:"BillerCode,omitempty"`              // @gotags: json:"biller_code"
-	BillKey           *string      `protobuf:"bytes,17,opt,name=BillKey,proto3,oneof" json:"BillKey,omitempty"`                    // @gotags: json:"bill_key"
-	ReceiptNumber     *string      `protobuf:"bytes,18,opt,name=ReceiptNumber,proto3,oneof" json:"ReceiptNumber,omitempty"`        // @gotags: json:"receipt_number"
-	Address           *string      `protobuf:"bytes,19,opt,name=Address,proto3,oneof" json:"Address,omitempty"`                    // @gotags: json:"address"
-	Courier           *string      `protobuf:"bytes,20,opt,name=Courier,proto3,oneof" json:"Courier,omitempty"`                    // @gotags: json:"courier"
-	CourierService    *string      `protobuf:"bytes,21,opt,name=CourierService,proto3,oneof" json:"CourierService,omitempty"`      // @gotags: json:"courier_service"
-	User              *User        `protobuf:"bytes,22,opt,name=User,proto3" json:"User,omitempty"`                                // @gotags: json:"user"
-	UserOrder         []*UserOrder `protobuf:"bytes,23,rep,name=UserOrder,proto3" json:"UserOrder,omitempty"`                      // @gotags: json:"user_order"
+	IdPayload         int64        `protobuf:"varint,1,opt,name=IdPayload,proto3" json:"id_payload"`                      // @gotags: json:"id_payload"
+	UserId            int64        `protobuf:"varint,2,opt,name=UserId,proto3" json:"user_id"`                            // @gotags: json:"user_id"
+	OrderId           *string      `protobuf:"bytes,3,opt,name=OrderId,proto3,oneof" json:"order_id"`                     // @gotags: json:"order_id"
+	TransactionTime   *string      `protobuf:"bytes,4,opt,name=TransactionTime,proto3,oneof" json:"transaction_time"`     // @gotags: json:"transaction_time"
+	TransactionStatus *string      `protobuf:"bytes,5,opt,name=TransactionStatus,proto3,oneof" json:"transaction_status"` // @gotags: json:"transaction_status"
+	TransactionId     *string      `protobuf:"bytes,6,opt,name=TransactionId,proto3,oneof" json:"transaction_id"`         // @gotags: json:"transaction_id"
+	StatusCode        *string      `protobuf:"bytes,7,opt,name=StatusCode,proto3,oneof" json:"status_code"`               // @gotags: json:"status_code"
+	SignatureKey      *string      `protobuf:"bytes,8,opt,name=SignatureKey,proto3,oneof" json:"signature_key"`           // @gotags: json:"signature_key"
+	SettlementTime    *string      `protobuf:"bytes,9,opt,name=SettlementTime,proto3,oneof" json:"settlement_time"`       // @gotags: json:"settlement_time"
+	PaymentType       *string      `protobuf:"bytes,10,opt,name=PaymentType,proto3,oneof" json:"payment_type"`            // @gotags: json:"payment_type"
+	MerchantId        *string      `protobuf:"bytes,11,opt,name=MerchantId,proto3,oneof" json:"merchant_id"`              // @gotags: json:"merchant_id"
+	GrossAmount       *string      `protobuf:"bytes,12,opt,name=GrossAmount,proto3,oneof" json:"gross_amount"`            // @gotags: json:"gross_amount"
+	FraudStatus       *string      `protobuf:"bytes,13,opt,name=FraudStatus,proto3,oneof" json:"fraud_status"`            // @gotags: json:"fraud_status"
+	BankType          *string      `protobuf:"bytes,14,opt,name=BankType,proto3,oneof" json:"bank_type"`                  // @gotags: json:"bank_type"
+	VANumber          *string      `protobuf:"bytes,15,opt,name=VANumber,proto3,oneof" json:"va_number"`                  // @gotags: json:"va_number"
+	BillerCode        *string      `protobuf:"bytes,16,opt,name=BillerCode,proto3,oneof" json:"biller_code"`              // @gotags: json:"biller_code"
+	BillKey           *string      `protobuf:"bytes,17,opt,name=BillKey,proto3,oneof" json:"bill_key"`                    // @gotags: json:"bill_key"
+	ReceiptNumber     *string      `protobuf:"bytes,18,opt,name=ReceiptNumber,proto3,oneof" json:"receipt_number"`        // @gotags: json:"receipt_number"
+	Address           *string      `protobuf:"bytes,19,opt,name=Address,proto3,oneof" json:"address"`                    // @gotags: json:"address"
+	Courier           *string      `protobuf:"bytes,20,opt,name=Courier,proto3,oneof" json:"courier"`                    // @gotags: json:"courier"
+	CourierService    *string      `protobuf:"bytes,21,opt,name=CourierService,proto3,oneof" json:"courier_service"`      // @gotags: json:"courier_service"
+	User              *User        `protobuf:"bytes,22,opt,name=User,proto3" json:"user"`                                // @gotags: json:"user"
+	UserOrder         []*UserOrder `protobuf:"bytes,23,rep,name=UserOrder,proto3" json:"user_order"`                      // @gotags: json:"user_order"
 }
 
 func (x *Payment) Reset() {
@@ -739,17 +739,17 @@ type Product struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	IdProduct   int64                  `protobuf:"varint,1,opt,name=IdProduct,proto3" json:"IdProduct,omitempty"`          // @gotags: json:"id_product"
-	Code        string                 `protobuf:"bytes,2,opt,name=Code,proto3" json:"Code,omitempty"`                     // @gotags: json:"code"
-	Name        string                 `protobuf:"bytes,3,opt,name=Name,proto3" json:"Name,omitempty"`                     // @gotags: json:"name"
-	Description *string                `protobuf:"bytes,4,opt,name=Description,proto3,oneof" json:"Description,omitempty"` // @gotags: json:"description"
-	Price       int32                  `protobuf:"varint,5,opt,name=Price,proto3" json:"Price,omitempty"`                  // @gotags: json:"price"
-	Category    string                 `protobuf:"bytes,6,opt,name=Category,proto3" json:"Category,omitempty"`             // @gotags: json:"category"
-	IsEmpty     bool                   `protobuf:"varint,7,opt,name=IsEmpty,proto3" json:"IsEmpty,omitempty"`              // @gotags: json:"is_empty"
-	Mass        int32                  `protobuf:"varint,8,opt,name=Mass,proto3" json:"Mass,omitempty"`                    // @gotags: json:"mass"
-	Image       *string                `protobuf:"bytes,9,opt,name=Image,proto3,oneof" json:"Image,omitempty"`             // @gotags: json:"image"
-	CreatedAt   *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=CreatedAt,proto3" json:"CreatedAt,omitempty"`          // @gotags: json:"created_at"
-	UpdatedAt   *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=UpdatedAt,proto3" json:"UpdatedAt,omitempty"`          // @gotags: json:"updated_at"
+	IdProduct   int64                  `protobuf:"varint,1,opt,name=IdProduct,proto3" json:"id_product"`          // @gotags: json:"id_product"
+	Code        string                 `protobuf:"bytes,2,opt,name=Code,proto3" json:"code"`                     // @gotags: json:"code"
+	Name        string                 `protobuf:"bytes,3,opt,name=Name,proto3" json:"name"`                     // @gotags: json:"name"
+	Description *string                `protobuf:"bytes,4,opt,name=Description,proto3,oneof" json:"description"` // @gotags: json:"description"
+	Price       int32                  `protobuf:"varint,5,opt,name=Price,proto3" json:"price"`                  // @gotags: json:"price"
+	Category    string                 `protobuf:"bytes,6,opt,name=Category,proto3" json:"category"`             // @gotags: json:"category"
+	IsEmpty     bool                   `protobuf:"varint,7,opt,name=IsEmpty,proto3" json:"is_empty"`              // @gotags: json:"is_empty"
+	Mass        int32                  `protobuf:"varint,8,opt,name=Mass,proto3" json:"mass"`                    // @gotags: json:"mass"
+	Image       *string                `protobuf:"bytes,9,opt,name=Image,proto3,oneof" json:"image"`             // @gotags: json:"image"
+	CreatedAt   *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=CreatedAt,proto3" json:"created_at"`          // @gotags: json:"created_at"
+	UpdatedAt   *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=UpdatedAt,proto3" json:"updated_at"`          // @gotags: json:"updated_at"
 }
 
 func (x *Product) Reset() {
@@ -866,15 +866,15 @@ type ProductRecommendation struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	AprioriId          int64   `protobuf:"varint,1,opt,name=AprioriId,proto3" json:"AprioriId,omitempty"`                        // @gotags: json:"apriori_id"
-	AprioriCode        string  `protobuf:"bytes,2,opt,name=AprioriCode,proto3" json:"AprioriCode,omitempty"`                     // @gotags: json:"apriori_code"
-	AprioriItem        string  `protobuf:"bytes,3,opt,name=AprioriItem,proto3" json:"AprioriItem,omitempty"`                     // @gotags: json:"apriori_item"
-	AprioriDiscount    float32 `protobuf:"fixed32,4,opt,name=AprioriDiscount,proto3" json:"AprioriDiscount,omitempty"`           // @gotags: json:"apriori_discount"
-	AprioriDescription *string `protobuf:"bytes,5,opt,name=AprioriDescription,proto3,oneof" json:"AprioriDescription,omitempty"` // @gotags: json:"apriori_description"
-	AprioriImage       *string `protobuf:"bytes,6,opt,name=AprioriImage,proto3,oneof" json:"AprioriImage,omitempty"`             // @gotags: json:"apriori_image"
-	ProductTotalPrice  int32   `protobuf:"varint,7,opt,name=ProductTotalPrice,proto3" json:"ProductTotalPrice,omitempty"`        // @gotags: json:"product_total_price"
-	PriceDiscount      int32   `protobuf:"varint,8,opt,name=PriceDiscount,proto3" json:"PriceDiscount,omitempty"`                // @gotags: json:"price_discount"
-	Mass               int32   `protobuf:"varint,9,opt,name=Mass,proto3" json:"Mass,omitempty"`                                  // @gotags: json:"mass"
+	AprioriId          int64   `protobuf:"varint,1,opt,name=AprioriId,proto3" json:"apriori_id"`                        // @gotags: json:"apriori_id"
+	AprioriCode        string  `protobuf:"bytes,2,opt,name=AprioriCode,proto3" json:"apriori_code"`                     // @gotags: json:"apriori_code"
+	AprioriItem        string  `protobuf:"bytes,3,opt,name=AprioriItem,proto3" json:"apriori_item"`                     // @gotags: json:"apriori_item"
+	AprioriDiscount    float32 `protobuf:"fixed32,4,opt,name=AprioriDiscount,proto3" json:"apriori_discount"`           // @gotags: json:"apriori_discount"
+	AprioriDescription *string `protobuf:"bytes,5,opt,name=AprioriDescription,proto3,oneof" json:"apriori_description"` // @gotags: json:"apriori_description"
+	AprioriImage       *string `protobuf:"bytes,6,opt,name=AprioriImage,proto3,oneof" json:"apriori_image"`             // @gotags: json:"apriori_image"
+	ProductTotalPrice  int32   `protobuf:"varint,7,opt,name=ProductTotalPrice,proto3" json:"product_total_price"`        // @gotags: json:"product_total_price"
+	PriceDiscount      int32   `protobuf:"varint,8,opt,name=PriceDiscount,proto3" json:"price_discount"`                // @gotags: json:"price_discount"
+	Mass               int32   `protobuf:"varint,9,opt,name=Mass,proto3" json:"mass"`                                  // @gotags: json:"mass"
 }
 
 func (x *ProductRecommendation) Reset() {
@@ -977,17 +977,17 @@ type User struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	IdUser       int64                  `protobuf:"varint,1,opt,name=IdUser,proto3" json:"IdUser,omitempty"`             // @gotags: json:"id_user"
-	Role         int32                  `protobuf:"varint,2,opt,name=Role,proto3" json:"Role,omitempty"`                 // @gotags: json:"role"
-	Name         string                 `protobuf:"bytes,3,opt,name=Name,proto3" json:"Name,omitempty"`                  // @gotags: json:"name"
-	Email        string                 `protobuf:"bytes,4,opt,name=Email,proto3" json:"Email,omitempty"`                // @gotags: json:"email"
-	Address      string                 `protobuf:"bytes,5,opt,name=Address,proto3" json:"Address,omitempty"`            // @gotags: json:"address"
-	Phone        string                 `protobuf:"bytes,6,opt,name=Phone,proto3" json:"Phone,omitempty"`                // @gotags: json:"phone"
-	Password     string                 `protobuf:"bytes,7,opt,name=Password,proto3" json:"Password,omitempty"`          // @gotags: json:"password"
-	CreatedAt    *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=CreatedAt,proto3" json:"CreatedAt,omitempty"`        // @gotags: json:"created_at"
-	UpdatedAt    *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=UpdatedAt,proto3" json:"UpdatedAt,omitempty"`        // @gotags: json:"updated_at"
-	Notification []*Notification        `protobuf:"bytes,10,rep,name=Notification,proto3" json:"Notification,omitempty"` // @gotags: json:"notification"
-	Payment      []*Payment             `protobuf:"bytes,11,rep,name=Payment,proto3" json:"Payment,omitempty"`           // @gotags: json:"payment"
+	IdUser       int64                  `protobuf:"varint,1,opt,name=IdUser,proto3" json:"id_user"`             // @gotags: json:"id_user"
+	Role         int32                  `protobuf:"varint,2,opt,name=Role,proto3" json:"role"`                 // @gotags: json:"role"
+	Name         string                 `protobuf:"bytes,3,opt,name=Name,proto3" json:"name"`                  // @gotags: json:"name"
+	Email        string                 `protobuf:"bytes,4,opt,name=Email,proto3" json:"email"`                // @gotags: json:"email"
+	Address      string                 `protobuf:"bytes,5,opt,name=Address,proto3" json:"address"`            // @gotags: json:"address"
+	Phone        string                 `protobuf:"bytes,6,opt,name=Phone,proto3" json:"phone"`                // @gotags: json:"phone"
+	Password     string                 `protobuf:"bytes,7,opt,name=Password,proto3" json:"password"`          // @gotags: json:"password"
+	CreatedAt    *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=CreatedAt,proto3" json:"created_at"`        // @gotags: json:"created_at"
+	UpdatedAt    *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=UpdatedAt,proto3" json:"updated_at"`        // @gotags: json:"updated_at"
+	Notification []*Notification        `protobuf:"bytes,10,rep,name=Notification,proto3" json:"notification"` // @gotags: json:"notification"
+	Payment      []*Payment             `protobuf:"bytes,11,rep,name=Payment,proto3" json:"payment"`           // @gotags: json:"payment"
 }
 
 func (x *User) Reset() {
@@ -1104,19 +1104,19 @@ type Apriori struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	IdApriori   int64                  `protobuf:"varint,1,opt,name=IdApriori,proto3" json:"IdApriori,omitempty"`          // @gotags: json:"id_apriori"
-	Code        string                 `protobuf:"bytes,2,opt,name=Code,proto3" json:"Code,omitempty"`                     // @gotags: json:"code"
-	Item        string                 `protobuf:"bytes,3,opt,name=Item,proto3" json:"Item,omitempty"`                     // @gotags: json:"item"
-	Discount    float32                `protobuf:"fixed32,4,opt,name=Discount,proto3" json:"Discount,omitempty"`           // @gotags: json:"discount"
-	Support     float32                `protobuf:"fixed32,5,opt,name=Support,proto3" json:"Support,omitempty"`             // @gotags: json:"support"
-	Confidence  float32                `protobuf:"fixed32,6,opt,name=Confidence,proto3" json:"Confidence,omitempty"`       // @gotags: json:"confidence"
-	RangeDate   string                 `protobuf:"bytes,7,opt,name=RangeDate,proto3" json:"RangeDate,omitempty"`           // @gotags: json:"range_date"
-	IsActive    bool                   `protobuf:"varint,8,opt,name=IsActive,proto3" json:"IsActive,omitempty"`            // @gotags: json:"is_active"
-	Description *string                `protobuf:"bytes,9,opt,name=Description,proto3,oneof" json:"Description,omitempty"` // @gotags: json:"description"
-	Mass        int32                  `protobuf:"varint,10,opt,name=Mass,proto3" json:"Mass,omitempty"`                   // @gotags: json:"mass"
-	Image       *string                `protobuf:"bytes,11,opt,name=Image,proto3,oneof" json:"Image,omitempty"`            // @gotags: json:"image"
-	CreatedAt   *timestamppb.Timestamp `protobuf:"bytes,12,opt,name=CreatedAt,proto3" json:"CreatedAt,omitempty"`          // @gotags: json:"created_at"
-	UserOrder   *UserOrder             `protobuf:"bytes,13,opt,name=UserOrder,proto3" json:"UserOrder,omitempty"`          // @gotags: json:"user_order"
+	IdApriori   int64                  `protobuf:"varint,1,opt,name=IdApriori,proto3" json:"id_apriori"`          // @gotags: json:"id_apriori"
+	Code        string                 `protobuf:"bytes,2,opt,name=Code,proto3" json:"code"`                     // @gotags: json:"code"
+	Item        string                 `protobuf:"bytes,3,opt,name=Item,proto3" json:"item"`                     // @gotags: json:"item"
+	Discount    float32                `protobuf:"fixed32,4,opt,name=Discount,proto3" json:"discount"`           // @gotags: json:"discount"
+	Support     float32                `protobuf:"fixed32,5,opt,name=Support,proto3" json:"support"`             // @gotags: json:"support"
+	Confidence  float32                `protobuf:"fixed32,6,opt,name=Confidence,proto3" json:"confidence"`       // @gotags: json:"confidence"
+	RangeDate   string                 `protobuf:"bytes,7,opt,name=RangeDate,proto3" json:"range_date"`           // @gotags: json:"range_date"
+	IsActive    bool                   `protobuf:"varint,8,opt,name=IsActive,proto3" json:"is_active"`            // @gotags: json:"is_active"
+	Description *string                `protobuf:"bytes,9,opt,name=Description,proto3,oneof" json:"description"` // @gotags: json:"description"
+	Mass        int32                  `protobuf:"varint,10,opt,name=Mass,proto3" json:"mass"`                   // @gotags: json:"mass"
+	Image       *string                `protobuf:"bytes,11,opt,name=Image,proto3,oneof" json:"image"`            // @gotags: json:"image"
+	CreatedAt   *timestamppb.Timestamp `protobuf:"bytes,12,opt,name=CreatedAt,proto3" json:"created_at"`          // @gotags: json:"created_at"
+	UserOrder   *UserOrder             `protobuf:"bytes,13,opt,name=UserOrder,proto3" json:"user_order"`          // @gotags: json:"user_order"
 }
 
 func (x *Apriori) Reset() {
@@ -1247,14 +1247,14 @@ type GenerateApriori struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	ItemSet     []string `protobuf:"bytes,1,rep,name=ItemSet,proto3" json:"ItemSet,omitempty"`          // @gotags: json:"item_set"
-	Support     float32  `protobuf:"fixed32,2,opt,name=Support,proto3" json:"Support,omitempty"`        // @gotags: json:"support"
-	Iterate     int32    `protobuf:"varint,3,opt,name=Iterate,proto3" json:"Iterate,omitempty"`         // @gotags: json:"iterate"
-	Transaction int32    `protobuf:"varint,4,opt,name=Transaction,proto3" json:"Transaction,omitempty"` // @gotags: json:"transaction"
-	Confidence  float32  `protobuf:"fixed32,5,opt,name=Confidence,proto3" json:"Confidence,omitempty"`  // @gotags: json:"confidence"
-	Discount    float32  `protobuf:"fixed32,6,opt,name=Discount,proto3" json:"Discount,omitempty"`      // @gotags: json:"discount"
-	Description string   `protobuf:"bytes,7,opt,name=Description,proto3" json:"Description,omitempty"`  // @gotags: json:"description"
-	RangeDate   string   `protobuf:"bytes,8,opt,name=RangeDate,proto3" json:"RangeDate,omitempty"`      // @gotags: json:"range_date"
+	ItemSet     []string `protobuf:"bytes,1,rep,name=ItemSet,proto3" json:"item_set"`          // @gotags: json:"item_set"
+	Support     float32  `protobuf:"fixed32,2,opt,name=Support,proto3" json:"support"`        // @gotags: json:"support"
+	Iterate     int32    `protobuf:"varint,3,opt,name=Iterate,proto3" json:"iterate"`         // @gotags: json:"iterate"
+	Transaction int32    `protobuf:"varint,4,opt,name=Transaction,proto3" json:"transaction"` // @gotags: json:"transaction"
+	Confidence  float32  `protobuf:"fixed32,5,opt,name=Confidence,proto3" json:"confidence"`  // @gotags: json:"confidence"
+	Discount    float32  `protobuf:"fixed32,6,opt,name=Discount,proto3" json:"discount"`      // @gotags: json:"discount"
+	Description string   `protobuf:"bytes,7,opt,name=Description,proto3" json:"description"`  // @gotags: json:"description"
+	RangeDate   string   `protobuf:"bytes,8,opt,name=RangeDate,proto3" json:"range_date"`      // @gotags: json:"range_date"
 }
 
 func (x *GenerateApriori) Reset() {
@@ -1350,15 +1350,15 @@ type UserOrder struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	IdOrder        int64    `protobuf:"varint,1,opt,name=IdOrder,proto3" json:"IdOrder,omitempty"`                     // @gotags: json:"id_order"
-	PayloadId      int64    `protobuf:"varint,2,opt,name=PayloadId,proto3" json:"PayloadId,omitempty"`                 // @gotags: json:"payload_id"
-	Code           *string  `protobuf:"bytes,3,opt,name=Code,proto3,oneof" json:"Code,omitempty"`                      // @gotags: json:"code"
-	Name           *string  `protobuf:"bytes,4,opt,name=Name,proto3,oneof" json:"Name,omitempty"`                      // @gotags: json:"name"
-	Price          *int64   `protobuf:"varint,5,opt,name=Price,proto3,oneof" json:"Price,omitempty"`                   // @gotags: json:"price"
-	Image          *string  `protobuf:"bytes,6,opt,name=Image,proto3,oneof" json:"Image,omitempty"`                    // @gotags: json:"image"
-	Quantity       *int32   `protobuf:"varint,7,opt,name=Quantity,proto3,oneof" json:"Quantity,omitempty"`             // @gotags: json:"quantity"
-	TotalPriceItem *int64   `protobuf:"varint,8,opt,name=TotalPriceItem,proto3,oneof" json:"TotalPriceItem,omitempty"` // @gotags: json:"total_price_item"
-	Payment        *Payment `protobuf:"bytes,9,opt,name=Payment,proto3" json:"Payment,omitempty"`                      // @gotags: json:"payment"
+	IdOrder        int64    `protobuf:"varint,1,opt,name=IdOrder,proto3" json:"id_order"`                     // @gotags: json:"id_order"
+	PayloadId      int64    `protobuf:"varint,2,opt,name=PayloadId,proto3" json:"payload_id"`                 // @gotags: json:"payload_id"
+	Code           *string  `protobuf:"bytes,3,opt,name=Code,proto3,oneof" json:"code"`                      // @gotags: json:"code"
+	Name           *string  `protobuf:"bytes,4,opt,name=Name,proto3,oneof" json:"name"`                      // @gotags: json:"name"
+	Price          *int64   `protobuf:"varint,5,opt,name=Price,proto3,oneof" json:"price"`                   // @gotags: json:"price"
+	Image          *string  `protobuf:"bytes,6,opt,name=Image,proto3,oneof" json:"image"`                    // @gotags: json:"image"
+	Quantity       *int32   `protobuf:"varint,7,opt,name=Quantity,proto3,oneof" json:"quantity"`             // @gotags: json:"quantity"
+	TotalPriceItem *int64   `protobuf:"varint,8,opt,name=TotalPriceItem,proto3,oneof" json:"total_price_item"` // @gotags: json:"total_price_item"
+	Payment        *Payment `protobuf:"bytes,9,opt,name=Payment,proto3" json:"payment"`                      // @gotags: json:"payment"
 }
 
 func (x *UserOrder) Reset() {

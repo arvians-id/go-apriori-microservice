@@ -1,9 +1,3 @@
-proto:
-	protoc services/*/proto/*.proto --go_out=plugins=grpc:.
-
-inject:
-	protoc-go-inject-tag -input=./adapter/pb/*.pb.go
-
 main:
 	go run adapter/main.go
 

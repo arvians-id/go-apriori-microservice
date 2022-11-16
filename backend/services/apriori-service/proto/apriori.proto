@@ -41,7 +41,7 @@ message GetAprioriByCodeAndIdRequest {
 }
 
 message GetAprioriByCodeAndIdResponse {
-  proto.ProductRecommendation productRecommendation = 1;
+  ProductRecommendation productRecommendation = 1;
 }
 
 message CreateAprioriRequest {
@@ -51,7 +51,8 @@ message CreateAprioriRequest {
     float Support = 3;
     float Confidence = 4;
     string RangeDate = 5;
-    string CreatedAt = 6;
+    bool IsActive = 6;
+    string CreatedAt = 7;
   }
 
   repeated Create CreateAprioriRequest = 1;

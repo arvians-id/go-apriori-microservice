@@ -1,0 +1,17 @@
+{
+	"ulid": "01GHZTZZDMG6V5TAYPAVEM8HPX",
+	"minTime": 1668575333877,
+	"maxTime": 1668578400000,
+	"stats": {
+		"numSamples": 1015,
+		"numSeries": 5,
+		"numChunks": 5
+	},
+	"compaction": {
+		"level": 1,
+		"sources": [
+			"01GHZTZZDMG6V5TAYPAVEM8HPX"
+		]
+	},
+	"version": 1
+}

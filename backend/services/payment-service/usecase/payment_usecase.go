@@ -125,6 +125,37 @@ func (service *PaymentService) FindByOrderId(ctx context.Context, req *pb.GetPay
 	}, nil
 }
 
+func (service *PaymentService) OnlyCreate(ctx context.Context, req *pb.OnlyCreatePaymentRequest) (*pb.GetPaymentResponse, error) {
+	tx, err := service.DB.Begin()
+	if err != nil {
+		log.Println("[PaymentService][CreateOrUpdate] problem in db transaction, err: ", err.Error())
+		return nil, err
+	}
+	defer util.CommitOrRollback(tx)
+
+	canceled := "canceled"
+	orderID := util.RandomString(20)
+	timeNow := time.Now().Format("2006-01-02 15:04:05")
+	paymentRequest := model.Payment{
+		UserId:            req.UserId,
+		OrderId:           &orderID,
+		TransactionStatus: &canceled,
+		TransactionTime:   &timeNow,
+		Address:           &req.Address,
+		Courier:           &req.Courier,
+		CourierService:    &req.CourierService,
+	}
+	payment, err := service.PaymentRepository.Create(ctx, tx, &paymentRequest)
+	if err != nil {
+		log.Println("[PaymentService][GetToken][Create] problem in getting from repository, err: ", err.Error())
+		return nil, err
+	}
+
+	return &pb.GetPaymentResponse{
+		Payment: payment.ToProtoBuff(),
+	}, nil
+}
+
 func (service *PaymentService) CreateOrUpdate(ctx context.Context, req *pb.CreatePaymentRequest) (*pb.GetCreatePaymentResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
@@ -299,6 +330,7 @@ func (service *PaymentService) Delete(ctx context.Context, req *pb.GetPaymentByO
 
 	return nil, nil
 }
+
 func (service *PaymentService) GetToken(ctx context.Context, req *pb.GetPaymentTokenRequest) (*pb.GetPaymentTokenResponse, error) {
 	var getClient = func() {
 		service.SnapGateway = midtrans.SnapGateway{

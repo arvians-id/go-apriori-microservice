@@ -15,7 +15,7 @@ func NewNotificationRepository() NotificationRepository {
 }
 
 func (repository *NotificationRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) ([]*model.Notification, error) {
-	query := `SELECT n.*, u.name, u.email FROM notifications n LEFT JOIN users u ON u.id_user = n.user_id ORDER BY n.created_at DESC`
+	query := `SELECT n.*, u.name, u.email FROM notifications n LEFT JOIN users u ON u.id_user = n.user_id ORDER BY n.id_notification DESC`
 	rows, err := tx.QueryContext(ctx, query)
 	if err != nil {
 		log.Println("[NotificationRepository][FindAll] problem querying to db, err: ", err.Error())
@@ -57,7 +57,7 @@ func (repository *NotificationRepositoryImpl) FindAll(ctx context.Context, tx *s
 }
 
 func (repository *NotificationRepositoryImpl) FindAllByUserId(ctx context.Context, tx *sql.Tx, userId int64) ([]*model.Notification, error) {
-	query := `SELECT * FROM notifications WHERE user_id = $1 ORDER BY created_at DESC`
+	query := `SELECT * FROM notifications WHERE user_id = $1 ORDER BY id_notification DESC`
 	rows, err := tx.QueryContext(ctx, query, userId)
 	if err != nil {
 		log.Println("[NotificationRepository][FindAllByUserId] problem querying to db, err: ", err.Error())
