@@ -118,7 +118,7 @@ func (service *NotificationService) MarkAll(ctx context.Context, req *pb.GetNoti
 
 	err = service.NotificationRepository.MarkAll(ctx, tx, req.UserId)
 	if err != nil {
-		log.Println("[NotificationService][Create][MarkAll] problem in getting from repository, err: ", err.Error())
+		log.Println("[NotificationService][MarkAll][MarkAll] problem in getting from repository, err: ", err.Error())
 		return new(empty.Empty), err
 	}
 

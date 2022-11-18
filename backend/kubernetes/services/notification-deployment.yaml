@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apriori-notification
+  labels:
+    app: apriori-notification
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: apriori-notification
+  template:
+    metadata:
+      labels:
+        app: apriori-notification
+    spec:
+      containers:
+        - name: apriori-notification
+          image: apriori-notification:latest
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 50053
+          envFrom:
+            - configMapRef:
+                name: env-prod-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: apriori-notification
+spec:
+  selector:
+    app: apriori-notification
+  ports:
+    - port: 50053
+      targetPort: 50053

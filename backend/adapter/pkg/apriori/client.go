@@ -136,7 +136,7 @@ func (client *ServiceClient) Update(c *gin.Context) {
 		go func() {
 			err = client.StorageS3.UploadToAWS(file, fileName, header.Header.Get("Content-Type"))
 			if err != nil {
-				log.Println("[Product][Create][UploadFileS3Test] error upload file S3, err: ", err.Error())
+				log.Println("[Apriori][Update][UploadToAWS] error upload file to S3, err: ", err.Error())
 			}
 		}()
 		filePath = path

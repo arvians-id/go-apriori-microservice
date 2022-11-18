@@ -31,7 +31,7 @@ func (client *TransactionServiceClient) FindAllItemSet(ctx context.Context, star
 
 	response, err := client.Client.FindAllItemSet(ctx, request)
 	if err != nil {
-		log.Println("[TransactionServiceClient][FindAllItemSet] problem calling transaction service, err: ", err.Error())
+		log.Println("[TransactionServiceClient][FindAllItemSet] problem calling find all item set on transaction service, err: ", err.Error())
 		return nil, err
 	}
 

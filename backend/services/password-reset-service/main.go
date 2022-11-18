@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc"
 	"log"
 	"net"
+	"strings"
 )
 
 func NewInitializedDatabase(configuration *config.Config) (*sql.DB, error) {
@@ -42,12 +43,13 @@ func main() {
 		log.Fatalln("Failed at config", err)
 	}
 
-	connection, err := net.Listen("tcp", configuration.PasswordResetSvcUrl)
+	port := ":" + strings.Split(configuration.PasswordResetSvcUrl, ":")[1]
+	connection, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Fatalln("Failed at listening", err)
 	}
 
-	fmt.Println("Password Reset service is running on port", configuration.PasswordResetSvcUrl)
+	fmt.Println("Password Reset service is running on port", port)
 
 	services, err := NewInitializedServices(configuration)
 	if err != nil {

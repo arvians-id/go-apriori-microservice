@@ -135,7 +135,6 @@ var _ = Describe("Auth API", func() {
 					var responseBody map[string]interface{}
 					_ = json.NewDecoder(writer.Result().Body).Decode(&responseBody)
 
-					log.Println(responseBody)
 					Expect(int(responseBody["code"].(float64))).To(Equal(http.StatusBadRequest))
 					Expect(responseBody["status"]).To(Equal("rpc error: code = Unknown desc = wrong password"))
 					Expect(responseBody["data"]).To(BeNil())

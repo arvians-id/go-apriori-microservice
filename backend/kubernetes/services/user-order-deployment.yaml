@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apriori-user-order
+  labels:
+    app: apriori-user-order
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: apriori-user-order
+  template:
+    metadata:
+      labels:
+        app: apriori-user-order
+    spec:
+      containers:
+        - name: apriori-user-order
+          image: apriori-user-order:latest
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 50058
+          envFrom:
+            - configMapRef:
+                name: env-prod-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: apriori-user-order
+spec:
+  selector:
+    app: apriori-user-order
+  ports:
+    - port: 50058
+      targetPort: 50058

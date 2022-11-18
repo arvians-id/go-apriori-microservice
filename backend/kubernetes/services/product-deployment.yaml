@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apriori-product
+  labels:
+    app: apriori-product
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: apriori-product
+  template:
+    metadata:
+      labels:
+        app: apriori-product
+    spec:
+      containers:
+        - name: apriori-product
+          image: apriori-product:latest
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 50056
+          envFrom:
+            - configMapRef:
+                name: env-prod-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: apriori-product
+spec:
+  selector:
+    app: apriori-product
+  ports:
+    - port: 50056
+      targetPort: 50056

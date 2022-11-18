@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apriori-transaction
+  labels:
+    app: apriori-transaction
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: apriori-transaction
+  template:
+    metadata:
+      labels:
+        app: apriori-transaction
+    spec:
+      containers:
+        - name: apriori-transaction
+          image: apriori-transaction:latest
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 50057
+          envFrom:
+            - configMapRef:
+                name: env-prod-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: apriori-transaction
+spec:
+  selector:
+    app: apriori-transaction
+  ports:
+    - port: 50057
+      targetPort: 50057

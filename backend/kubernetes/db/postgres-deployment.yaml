@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apriori-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: apriori-postgres
+  template:
+    metadata:
+      labels:
+        app: apriori-postgres
+    spec:
+      containers:
+        - name: apriori-postgres
+          image: postgres:latest
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - configMapRef:
+                name: postgres-config
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: apriori
+      volumes:
+        - name: apriori
+          persistentVolumeClaim:
+            claimName: postgres-pv-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: apriori-postgres
+  labels:
+    app: apriori-postgres
+spec:
+  selector:
+    app: apriori-postgres
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432

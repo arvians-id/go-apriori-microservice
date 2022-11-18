@@ -27,7 +27,7 @@ func NewAprioriServiceClient(configuration *config.Config) AprioriServiceClient 
 func (client *AprioriServiceClient) FindAllByActive(ctx context.Context) (*pb.ListAprioriResponse, error) {
 	response, err := client.Client.FindAllByActive(ctx, new(empty.Empty))
 	if err != nil {
-		log.Println("[TransactionServiceClient][FindAllItemSet] problem calling transaction service, err: ", err.Error())
+		log.Println("[AprioriServiceClient][FindAllByActive] problem calling find all by active on apriori service, err: ", err.Error())
 		return nil, err
 	}
 

@@ -31,7 +31,7 @@ func (client *UserServiceClient) FindByEmail(ctx context.Context, email string) 
 
 	response, err := client.Client.FindByEmail(ctx, request)
 	if err != nil {
-		log.Println("[TransactionServiceClient][FindAllItemSet] problem calling transaction service, err: ", err.Error())
+		log.Println("[UserServiceClient][FindByEmail] problem calling find by email on product service, err: ", err.Error())
 		return nil, err
 	}
 
@@ -41,7 +41,7 @@ func (client *UserServiceClient) FindByEmail(ctx context.Context, email string) 
 func (client *UserServiceClient) UpdatePassword(ctx context.Context, req *pb.UpdateUserPasswordRequest) (*empty.Empty, error) {
 	response, err := client.Client.UpdatePassword(ctx, req)
 	if err != nil {
-		log.Println("[TransactionServiceClient][FindAllItemSet] problem calling transaction service, err: ", err.Error())
+		log.Println("[UserServiceClient][UpdatePassword] problem calling update password on product service, err: ", err.Error())
 		return nil, err
 	}
 

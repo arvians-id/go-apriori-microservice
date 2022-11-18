@@ -128,7 +128,7 @@ func (service *PaymentService) FindByOrderId(ctx context.Context, req *pb.GetPay
 func (service *PaymentService) OnlyCreate(ctx context.Context, req *pb.OnlyCreatePaymentRequest) (*pb.GetPaymentResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
-		log.Println("[PaymentService][CreateOrUpdate] problem in db transaction, err: ", err.Error())
+		log.Println("[PaymentService][OnlyCreate] problem in db transaction, err: ", err.Error())
 		return nil, err
 	}
 	defer util.CommitOrRollback(tx)
@@ -147,7 +147,7 @@ func (service *PaymentService) OnlyCreate(ctx context.Context, req *pb.OnlyCreat
 	}
 	payment, err := service.PaymentRepository.Create(ctx, tx, &paymentRequest)
 	if err != nil {
-		log.Println("[PaymentService][GetToken][Create] problem in getting from repository, err: ", err.Error())
+		log.Println("[PaymentService][OnlyCreate][Create] problem in getting from repository, err: ", err.Error())
 		return nil, err
 	}
 
@@ -169,7 +169,7 @@ func (service *PaymentService) CreateOrUpdate(ctx context.Context, req *pb.Creat
 	requestPayment := make(map[string]interface{})
 	err = json.Unmarshal(req.Payment, &requestPayment)
 	if err != nil {
-		log.Println("[PaymentController][Notification] unable to unmarshal json, err: ", err.Error())
+		log.Println("[PaymentService][CreateOrUpdate][JSON] unable to unmarshal json, err: ", err.Error())
 		return &pb.GetCreatePaymentResponse{
 			IsSuccess: false,
 		}, err

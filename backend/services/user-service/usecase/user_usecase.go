@@ -232,7 +232,7 @@ func (service *UserService) UpdatePassword(ctx context.Context, req *pb.UpdateUs
 	if service.DB != nil {
 		transaction, err := service.DB.Begin()
 		if err != nil {
-			log.Println("[UserService][Update] problem in db transaction, err: ", err.Error())
+			log.Println("[UserService][UpdatePassword] problem in db transaction, err: ", err.Error())
 			return new(empty.Empty), err
 		}
 		tx = transaction
@@ -241,7 +241,7 @@ func (service *UserService) UpdatePassword(ctx context.Context, req *pb.UpdateUs
 
 	timeNow, err := time.Parse(util.TimeFormat, time.Now().Format(util.TimeFormat))
 	if err != nil {
-		log.Println("[UserService][Update] problem in parsing to time, err: ", err.Error())
+		log.Println("[UserService][UpdatePassword] problem in parsing to time, err: ", err.Error())
 		return new(empty.Empty), err
 	}
 

@@ -40,11 +40,11 @@ message GetVerifyCredentialRequest {
 }
 
 message CreateUserRequest {
-  string Name = 2;
-  string Email = 3;
-  string Address = 4;
-  string Phone = 5;
-  string Password = 6;
+  string Name = 1;
+  string Email = 2;
+  string Address = 3;
+  string Phone = 4;
+  string Password = 5;
 }
 
 message UpdateUserRequest {

@@ -30,7 +30,7 @@ func (client *ProductServiceClient) FindByName(ctx context.Context, name string)
 
 	response, err := client.Client.FindByName(ctx, request)
 	if err != nil {
-		log.Println("[TransactionServiceClient][FindAllItemSet] problem calling transaction service, err: ", err.Error())
+		log.Println("[ProductServiceClient][FindByName] problem calling find by name on product service, err: ", err.Error())
 		return nil, err
 	}
 

@@ -58,7 +58,7 @@ func (service *PasswordResetService) CreateOrUpdateByEmail(ctx context.Context, 
 	user, err := service.UserService.FindByEmail(ctx, req.Email)
 	if err != nil {
 		log.Println("error1", err)
-		log.Println("[NotificationService][CreateOrUpdateByEmail][FindByEmail] problem in getting from repository, err: ", err.Error())
+		log.Println("[PasswordResetService][CreateOrUpdateByEmail][FindByEmail] problem in getting from repository, err: ", err.Error())
 		return nil, err
 	}
 
@@ -68,7 +68,7 @@ func (service *PasswordResetService) CreateOrUpdateByEmail(ctx context.Context, 
 		// Create new data if not exists
 		passwordReset, err := service.PasswordResetRepository.Create(ctx, tx, &passwordResetRequest)
 		if err != nil {
-			log.Println("[NotificationService][CreateOrUpdateByEmail][Create] problem in getting from repository, err: ", err.Error())
+			log.Println("[PasswordResetService][CreateOrUpdateByEmail][Create] problem in getting from repository, err: ", err.Error())
 			return nil, err
 		}
 
@@ -80,7 +80,7 @@ func (service *PasswordResetService) CreateOrUpdateByEmail(ctx context.Context, 
 	// Update data if exists
 	passwordReset, err := service.PasswordResetRepository.Update(ctx, tx, &passwordResetRequest)
 	if err != nil {
-		log.Println("[NotificationService][CreateOrUpdateByEmail][Update] problem in getting from repository, err: ", err.Error())
+		log.Println("[PasswordResetService][CreateOrUpdateByEmail][Update] problem in getting from repository, err: ", err.Error())
 		return nil, err
 	}
 
@@ -105,7 +105,7 @@ func (service *PasswordResetService) Verify(ctx context.Context, req *pb.GetVeri
 
 	reset, err := service.PasswordResetRepository.FindByEmailAndToken(ctx, tx, &passwordResetRequest)
 	if err != nil {
-		log.Println("[NotificationService][Verify][FindByEmailAndToken] problem in getting from repository, err: ", err.Error())
+		log.Println("[PasswordResetService][Verify][FindByEmailAndToken] problem in getting from repository, err: ", err.Error())
 		return new(empty.Empty), err
 	}
 
@@ -116,7 +116,7 @@ func (service *PasswordResetService) Verify(ctx context.Context, req *pb.GetVeri
 	if now.Unix() > reset.Expired {
 		err := service.PasswordResetRepository.Delete(ctx, tx, reset.Email)
 		if err != nil {
-			log.Println("[NotificationService][Verify][Delete] problem in getting from repository, err: ", err.Error())
+			log.Println("[PasswordResetService][Verify][Delete] problem in getting from repository, err: ", err.Error())
 			return new(empty.Empty), err
 		}
 
@@ -127,14 +127,14 @@ func (service *PasswordResetService) Verify(ctx context.Context, req *pb.GetVeri
 	// Check if email is exists in table users
 	user, err := service.UserService.FindByEmail(ctx, req.Email)
 	if err != nil {
-		log.Println("[NotificationService][Verify][FindByEmail] problem in getting from repository, err: ", err.Error())
+		log.Println("[PasswordResetService][Verify][FindByEmail] problem in getting from repository, err: ", err.Error())
 		return new(empty.Empty), err
 	}
 
 	// Update the password
 	password, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
-		log.Println("[NotificationService][Verify] problem in generating password hashed, err: ", err.Error())
+		log.Println("[PasswordResetService][Verify] problem in generating password hashed, err: ", err.Error())
 		return new(empty.Empty), err
 	}
 
@@ -143,14 +143,14 @@ func (service *PasswordResetService) Verify(ctx context.Context, req *pb.GetVeri
 		Password: string(password),
 	})
 	if err != nil {
-		log.Println("[NotificationService][Verify][UpdatePassword] problem in getting from repository, err: ", err.Error())
+		log.Println("[PasswordResetService][Verify][UpdatePassword] problem in getting from repository, err: ", err.Error())
 		return new(empty.Empty), err
 	}
 
 	// Delete data from table password_reset
 	err = service.PasswordResetRepository.Delete(ctx, tx, user.User.Email)
 	if err != nil {
-		log.Println("[NotificationService][Verify][Delete] problem in getting from repository, err: ", err.Error())
+		log.Println("[PasswordResetService][Verify][Delete] problem in getting from repository, err: ", err.Error())
 		return new(empty.Empty), err
 	}
 

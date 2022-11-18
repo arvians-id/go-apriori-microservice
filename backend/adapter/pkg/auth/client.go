@@ -189,7 +189,7 @@ func (client *ServiceClient) ForgotPassword(c *gin.Context) {
 		return
 	}
 
-	message := fmt.Sprintf("%s/jwt/reset-password?signature=%v", client.AppUrlFE, result.PasswordReset.Token)
+	message := fmt.Sprintf("%s/auth/reset-password?signature=%v", client.AppUrlFE, result.PasswordReset.Token)
 	emailService := model.EmailService{
 		ToEmail: result.PasswordReset.Email,
 		Subject: "Forgot Password",

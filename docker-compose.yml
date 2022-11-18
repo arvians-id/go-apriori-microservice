@@ -1,6 +1,7 @@
 version: "3"
 services:
   db:
+    container_name: apriori-postgres
     image: postgres
     environment:
       POSTGRES_USER: root
@@ -16,6 +17,7 @@ services:
       - thesis
     restart: always
   cache:
+    container_name: apriori-cache-1
     image: redis:6
     ports:
       - "6379:6379"
@@ -43,10 +45,10 @@ services:
       - ./backend/monitoring/prometheus:/etc/prometheus/
       - ./backend/monitoring/prometheus/prometheus-data:/prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
     ports:
       - "9090:9090"
     restart: always
@@ -94,157 +96,168 @@ services:
       - nsqlookupd
     networks:
       - thesis
-#  adapter:
-#    build: ./backend/adapter
-#    env_file:
-#      - ./backend/adapter/config/envs/prod.env
-#    ports:
-#      - "8086:8080"
-#    restart: always
-#    depends_on:
-#      - nsqlookupd
-#    networks:
-#      - thesis
-#  apriori:
-#    build: ./backend/services/apriori-service
-#    env_file:
-#      - ./backend/services/apriori-service/config/envs/prod.env
-#    ports:
-#      - "50050:50050"
-#    restart: always
-#    depends_on:
-#      - db
-#      - cache
-#      - messagebroker
-#      - adapter
-#    networks:
-#      - thesis
-#  category:
-#    build: ./backend/services/category-service
-#    env_file:
-#      - ./backend/services/category-service/config/envs/prod.env
-#    ports:
-#      - "50051:50051"
-#    restart: always
-#    depends_on:
-#      - db
-#      - cache
-#      - messagebroker
-#      - adapter
-#    networks:
-#      - thesis
-#  comment:
-#    build: ./backend/services/comment-service
-#    env_file:
-#      - ./backend/services/comment-service/config/envs/prod.env
-#    ports:
-#      - "50052:50052"
-#    restart: always
-#    depends_on:
-#      - db
-#      - cache
-#      - messagebroker
-#      - adapter
-#    networks:
-#      - thesis
-#  notification:
-#    build: ./backend/services/notification-service
-#    env_file:
-#      - ./backend/services/notification-service/config/envs/prod.env
-#    ports:
-#      - "50053:50053"
-#    restart: always
-#    depends_on:
-#      - db
-#      - cache
-#      - messagebroker
-#      - adapter
-#    networks:
-#      - thesis
-#  password:
-#    build: ./backend/services/password-reset-service
-#    env_file:
-#      - ./backend/services/password-reset-service/config/envs/prod.env
-#    ports:
-#      - "50054:50054"
-#    restart: always
-#    depends_on:
-#      - db
-#      - cache
-#      - messagebroker
-#      - adapter
-#    networks:
-#      - thesis
-#  payment:
-#    build: ./backend/services/payment-service
-#    env_file:
-#      - ./backend/services/payment-service/config/envs/prod.env
-#    ports:
-#      - "50055:50055"
-#    restart: always
-#    depends_on:
-#      - db
-#      - cache
-#      - messagebroker
-#      - adapter
-#    networks:
-#      - thesis
-#  product:
-#    build: ./backend/services/product-service
-#    env_file:
-#      - ./backend/services/product-service/config/envs/prod.env
-#    ports:
-#      - "50056:50056"
-#    restart: always
-#    depends_on:
-#      - db
-#      - cache
-#      - messagebroker
-#      - adapter
-#    networks:
-#      - thesis
-#  transaction:
-#    build: ./backend/services/transaction-service
-#    env_file:
-#      - ./backend/services/transaction-service/config/envs/prod.env
-#    ports:
-#      - "50057:50057"
-#    restart: always
-#    depends_on:
-#      - db
-#      - cache
-#      - messagebroker
-#      - adapter
-#    networks:
-#      - thesis
-#  order:
-#    build: ./backend/services/user-order-service
-#    env_file:
-#      - ./backend/services/user-order-service/config/envs/prod.env
-#    ports:
-#      - "50058:50058"
-#    restart: always
-#    depends_on:
-#      - db
-#      - cache
-#      - messagebroker
-#      - adapter
-#    networks:
-#      - thesis
-#  user:
-#    build: ./backend/services/user-service
-#    env_file:
-#      - ./backend/services/user-service/config/envs/prod.env
-#    ports:
-#      - "50059:50059"
-#    restart: always
-#    depends_on:
-#      - db
-#      - cache
-#      - messagebroker
-#      - adapter
-#    networks:
-#      - thesis
+  adapter:
+    container_name: apriori-adapter
+    image: apriori-adapter:latest
+    env_file:
+      - ./backend/adapter/config/envs/prod.env
+    ports:
+      - "8080:8080"
+    restart: always
+    depends_on:
+      - nsqlookupd
+    networks:
+      - thesis
+  apriori:
+    container_name: apriori-apriori
+    image: apriori-apriori:latest
+    env_file:
+      - ./backend/services/apriori-service/config/envs/prod.env
+    ports:
+      - "50050:50050"
+    restart: always
+    depends_on:
+      - db
+      - cache
+      - messagebroker
+      - adapter
+    networks:
+      - thesis
+  category:
+    container_name: apriori-category
+    image: apriori-category:latest
+    env_file:
+      - ./backend/services/category-service/config/envs/prod.env
+    ports:
+      - "50051:50051"
+    restart: always
+    depends_on:
+      - db
+      - cache
+      - messagebroker
+      - adapter
+    networks:
+      - thesis
+  comment:
+    container_name: apriori-comment
+    image: apriori-comment:latest
+    env_file:
+      - ./backend/services/comment-service/config/envs/prod.env
+    ports:
+      - "50052:50052"
+    restart: always
+    depends_on:
+      - db
+      - cache
+      - messagebroker
+      - adapter
+    networks:
+      - thesis
+  notification:
+    container_name: apriori-notification
+    image: apriori-notification:latest
+    env_file:
+      - ./backend/services/notification-service/config/envs/prod.env
+    ports:
+      - "50053:50053"
+    restart: always
+    depends_on:
+      - db
+      - cache
+      - messagebroker
+      - adapter
+    networks:
+      - thesis
+  password:
+    container_name: apriori-password-reset
+    image: apriori-password-reset:latest
+    env_file:
+      - ./backend/services/password-reset-service/config/envs/prod.env
+    ports:
+      - "50054:50054"
+    restart: always
+    depends_on:
+      - db
+      - cache
+      - messagebroker
+      - adapter
+    networks:
+      - thesis
+  payment:
+    container_name: apriori-payment
+    image: apriori-payment:latest
+    env_file:
+      - ./backend/services/payment-service/config/envs/prod.env
+    ports:
+      - "50055:50055"
+    restart: always
+    depends_on:
+      - db
+      - cache
+      - messagebroker
+      - adapter
+    networks:
+      - thesis
+  product:
+    container_name: apriori-product
+    image: apriori-product:latest
+    env_file:
+      - ./backend/services/product-service/config/envs/prod.env
+    ports:
+      - "50056:50056"
+    restart: always
+    depends_on:
+      - db
+      - cache
+      - messagebroker
+      - adapter
+    networks:
+      - thesis
+  transaction:
+    container_name: apriori-transaction
+    image: apriori-transaction:latest
+    env_file:
+      - ./backend/services/transaction-service/config/envs/prod.env
+    ports:
+      - "50057:50057"
+    restart: always
+    depends_on:
+      - db
+      - cache
+      - messagebroker
+      - adapter
+    networks:
+      - thesis
+  order:
+    container_name: apriori-user-order
+    image: apriori-user-order:latest
+    env_file:
+      - ./backend/services/user-order-service/config/envs/prod.env
+    ports:
+      - "50058:50058"
+    restart: always
+    depends_on:
+      - db
+      - cache
+      - messagebroker
+      - adapter
+    networks:
+      - thesis
+  user:
+    container_name: apriori-user
+    image: apriori-user:latest
+    env_file:
+      - ./backend/services/user-service/config/envs/prod.env
+    ports:
+      - "50059:50059"
+    restart: always
+    depends_on:
+      - db
+      - cache
+      - messagebroker
+      - adapter
+    networks:
+      - thesis
 
 networks:
   thesis:

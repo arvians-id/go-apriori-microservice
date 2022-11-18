@@ -18,6 +18,7 @@ import (
 	"github.com/arvians-id/go-apriori-microservice/adapter/third-party/jwt"
 	messaging "github.com/arvians-id/go-apriori-microservice/adapter/third-party/message-queue"
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
 )
 
@@ -42,14 +43,24 @@ func main() {
 		NsqdAddress: "nsqd:4150",
 	})
 
+	// Other routes
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "Welcome to Apriori Algorithm API. Created By https://github.com/arvians-id",
+		})
+	})
+
+	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
+
 	// Services
+	payment.RegisterRoutes(router, configuration, messagingProducer)
+	router.Use(middleware.SetupXApiKeyMiddleware(configuration))
 	user.RegisterRoutes(router, configuration)
 	apriori.RegisterRoutes(router, configuration)
 	auth.RegisterRoutes(router, configuration, jwtAuth, messagingProducer)
 	category.RegisterRoutes(router, configuration)
 	comment.RegisterRoutes(router, configuration)
 	notification.RegisterRoutes(router, configuration)
-	payment.RegisterRoutes(router, configuration, messagingProducer)
 	product.RegisterRoutes(router, configuration, storageS3)
 	raja_ongkir.RegisterRoutes(router, configuration)
 	transaction.RegisterRoutes(router, configuration, storageS3)

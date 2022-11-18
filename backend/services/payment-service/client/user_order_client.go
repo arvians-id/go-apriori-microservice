@@ -30,7 +30,7 @@ func (client *UserOrderServiceClient) FindAllByPayloadId(ctx context.Context, pa
 
 	response, err := client.Client.FindAllByPayloadId(ctx, request)
 	if err != nil {
-		log.Println("[TransactionServiceClient][FindAllItemSet] problem calling transaction service, err: ", err.Error())
+		log.Println("[UserOrderServiceClient][FindAllByPayloadId] problem calling find all by payload id on user order service, err: ", err.Error())
 		return nil, err
 	}
 
@@ -40,7 +40,7 @@ func (client *UserOrderServiceClient) FindAllByPayloadId(ctx context.Context, pa
 func (client *UserOrderServiceClient) Create(ctx context.Context, req *pb.CreateUserOrderRequest) (*pb.GetUserOrderResponse, error) {
 	response, err := client.Client.Create(ctx, req)
 	if err != nil {
-		log.Println("[TransactionServiceClient][FindAllItemSet] problem calling transaction service, err: ", err.Error())
+		log.Println("[UserOrderServiceClient][Create] problem calling create on user order service, err: ", err.Error())
 		return nil, err
 	}
 

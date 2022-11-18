@@ -30,7 +30,7 @@ func (client *UserServiceClient) FindById(ctx context.Context, id int64) (*pb.Ge
 
 	response, err := client.Client.FindById(ctx, request)
 	if err != nil {
-		log.Println("[TransactionServiceClient][FindAllItemSet] problem calling transaction service, err: ", err.Error())
+		log.Println("[UserServiceClient][FindById] problem calling find by id on user service, err: ", err.Error())
 		return nil, err
 	}
 

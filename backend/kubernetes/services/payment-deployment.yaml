@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apriori-payment
+  labels:
+    app: apriori-payment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: apriori-payment
+  template:
+    metadata:
+      labels:
+        app: apriori-payment
+    spec:
+      containers:
+        - name: apriori-payment
+          image: apriori-payment:latest
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 50055
+          envFrom:
+            - configMapRef:
+                name: env-prod-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: apriori-payment
+spec:
+  selector:
+    app: apriori-payment
+  ports:
+    - port: 50055
+      targetPort: 50055

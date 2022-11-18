@@ -26,7 +26,7 @@ func NewTransactionServiceClient(configuration *config.Config) TransactionServic
 func (client *TransactionServiceClient) Create(ctx context.Context, req *pb.CreateTransactionRequest) (*pb.GetTransactionResponse, error) {
 	response, err := client.Client.Create(ctx, req)
 	if err != nil {
-		log.Println("[TransactionServiceClient][FindAllItemSet] problem calling transaction service, err: ", err.Error())
+		log.Println("[TransactionServiceClient][FindAllItemSet] problem calling create on transaction service, err: ", err.Error())
 		return nil, err
 	}
 

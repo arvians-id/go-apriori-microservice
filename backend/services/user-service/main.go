@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc"
 	"log"
 	"net"
+	"strings"
 )
 
 func NewInitializedDatabase(configuration *config.Config) (*sql.DB, error) {
@@ -39,12 +40,13 @@ func main() {
 		log.Fatalln("Failed at config", err)
 	}
 
-	connection, err := net.Listen("tcp", configuration.UserSvcUrl)
+	port := ":" + strings.Split(configuration.UserSvcUrl, ":")[1]
+	connection, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Fatalln("Failed at listening", err)
 	}
 
-	fmt.Println("User service is running on port", configuration.UserSvcUrl)
+	fmt.Println("User service is running on port", port)
 
 	services, err := NewInitializedServices(configuration)
 	if err != nil {

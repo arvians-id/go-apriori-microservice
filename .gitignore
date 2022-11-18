@@ -4,6 +4,7 @@ node_modules
 
 *.env
 gin-bin.exe
+/backend/kubernetes/environment
 
 # Log files
 npm-debug.log*
