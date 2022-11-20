@@ -159,6 +159,6 @@ func (service *CommentService) Create(ctx context.Context, req *pb.CreateComment
 	}
 
 	return &pb.GetCommentResponse{
-		Comment: comment.ToProtoBuff(),
+		Comment: comment.ToProtoBuffWithoutRelation(),
 	}, nil
 }

@@ -51,7 +51,7 @@ func (payment *Payment) ToProtoBuff() *pb.Payment {
 		Address:           payment.Address,
 		Courier:           payment.Courier,
 		CourierService:    payment.CourierService,
-		//User:              payment.User.ToProtoBuff(),
+		User:              payment.User.ToProtoBuff(),
 		//UserOrder:         payment.UserOrder[0].ToListProtoBuff(),
 	}
 }

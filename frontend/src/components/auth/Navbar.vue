@@ -11,7 +11,7 @@
         <div class="navbar-collapse-header">
           <div class="row">
             <div class="col-6 collapse-brand">
-              <router-link :to="{ name: 'jwt.login' }" style="font-family: 'Fugaz One', cursive;">
+              <router-link :to="{ name: 'auth.login' }" style="font-family: 'Fugaz One', cursive;">
                 RYZYOLSHOP
               </router-link>
             </div>
@@ -25,17 +25,17 @@
         </div>
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
-            <router-link :to="{ name: 'jwt.login' }" class="nav-link">
+            <router-link :to="{ name: 'auth.login' }" class="nav-link">
               <span class="nav-link-inner--text">Login</span>
             </router-link>
           </li>
           <li class="nav-item">
-            <router-link :to="{ name: 'jwt.register' }" class="nav-link">
+            <router-link :to="{ name: 'auth.register' }" class="nav-link">
               <span class="nav-link-inner--text">Register</span>
             </router-link>
           </li>
           <li class="nav-item">
-            <router-link :to="{ name: 'jwt.forgot-password' }" class="nav-link">
+            <router-link :to="{ name: 'auth.forgot-password' }" class="nav-link">
               <span class="nav-link-inner--text">Reset Password</span>
             </router-link>
           </li>

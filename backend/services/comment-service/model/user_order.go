@@ -24,7 +24,7 @@ func (userOrder *UserOrder) ToProtoBuff() *pb.UserOrder {
 		Image:          userOrder.Image,
 		Quantity:       userOrder.Quantity,
 		TotalPriceItem: userOrder.TotalPriceItem,
-		//Payment:        userOrder.Payment.ToProtoBuff(),
+		Payment:        userOrder.Payment.ToProtoBuff(),
 	}
 }
 

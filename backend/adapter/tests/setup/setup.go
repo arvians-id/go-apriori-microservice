@@ -40,7 +40,7 @@ func ModuleSetup(configuration *config.Config) (*gin.Engine, *sql.DB) {
 
 	// Services
 	user.RegisterRoutes(router, configuration)
-	apriori.RegisterRoutes(router, configuration)
+	apriori.RegisterRoutes(router, configuration, storageS3)
 	auth.RegisterRoutes(router, configuration, jwtAuth, messagingProducer)
 	category.RegisterRoutes(router, configuration)
 	comment.RegisterRoutes(router, configuration)

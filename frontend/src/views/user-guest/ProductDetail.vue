@@ -352,21 +352,6 @@
                       </div>
                     </div>
                   </div>
-                  <div class="col-12 col-md-6 col-lg-4">
-                    <div class="card card-pricing border-0 mb-4">
-                      <div class="embed-responsive embed-responsive-16by9">
-                        <img class="card-img-top embed-responsive-item" src="//placekitten.com/300/200" alt="Preview Image">
-                      </div>
-                      <div class="card-body pb-3">
-                        <p>This is title of products</p>
-                        <p class="card-title mb-1">This is title</p>
-                        <p class="font-weight-bold">This is price of product</p>
-                        <div class="card-footer p-0 pt-2 m-0 text-center">
-                          <p class="w-25 d-inline">this is discount</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
@@ -437,7 +422,7 @@ import Topbar from "@/components/guest/Topbar.vue"
 import Header from "@/components/guest/Header.vue"
 import Footer from "@/components/guest/Footer.vue"
 import axios from "axios";
-import authHeader from "@/service/jwt-header";
+import authHeader from "@/service/auth-header";
 
 export default {
   components: {

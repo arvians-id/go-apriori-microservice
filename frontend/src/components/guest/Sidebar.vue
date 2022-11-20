@@ -96,7 +96,7 @@
 </style>
 
 <script>
-import authHeader from "@/service/jwt-header";
+import authHeader from "@/service/auth-header";
 import axios from "axios";
 import getRoles from "@/service/get-roles";
 
@@ -148,7 +148,7 @@ export default {
               localStorage.removeItem("refresh-token")
               alert(response.data.status)
               this.$router.push({
-                name: 'jwt.login'
+                name: 'auth.login'
               })
             }
           }).catch(error => {

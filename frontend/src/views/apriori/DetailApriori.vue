@@ -55,7 +55,7 @@
               <div class="row d-flex justify-content-center" v-else>
                 <div class="col-12 col-lg-4 text-center mb-2">
                   <img :src="apriori.apriori_image" class="img-fluid mb-2" width="500">
-                  <router-link :to="{ name: 'apriori.edit', params: { code: apriori.apriori_code, id: this.$route.params.id } }"  class="btn btn-primary btn-block mb-2">Edit</router-link>
+                  <router-link :to="{ name: 'apriori.edit', params: { code: apriori.apriori_code, id: this.$route.params.id } }" v-if="apriori.apriori_code !== 'notfound' "  class="btn btn-primary btn-block mb-2">Edit</router-link>
                 </div>
                 <div class="col-12 col-lg-6">
                   <div class="text-left">
@@ -109,7 +109,7 @@ import Topbar from "@/components/admin/Topbar.vue"
 import Header from "@/components/admin/Header.vue"
 import Footer from "@/components/admin/Footer.vue"
 import axios from "axios";
-import authHeader from "@/service/jwt-header";
+import authHeader from "@/service/auth-header";
 
 export default {
   components: {
@@ -123,7 +123,17 @@ export default {
   },
   data: function () {
     return {
-      apriori: [],
+      apriori: {
+        apriori_id: 0,
+        apriori_code: "notfound",
+        apriori_item: "item not found in database",
+        apriori_discount: 0,
+        apriori_description: "Description not found in database",
+        apriori_image: "https://my-apriori-bucket.s3.ap-southeast-1.amazonaws.com/assets/no-image.png",
+        product_total_price: 0,
+        price_discount: 0,
+        mass: 0
+      },
       isLoading: true
     };
   },

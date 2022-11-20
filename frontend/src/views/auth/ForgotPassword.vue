@@ -37,11 +37,11 @@
 </template>
 
 <script>
-import Footer from "@/components/jwt/Footer.vue"
-import Navbar from "@/components/jwt/Navbar.vue"
-import Header from "@/components/jwt/Header.vue"
+import Footer from "@/components/auth/Footer.vue"
+import Navbar from "@/components/auth/Navbar.vue"
+import Header from "@/components/auth/Header.vue"
 import axios from "axios";
-import authHeader from "@/service/jwt-header";
+import authHeader from "@/service/auth-header";
 
 export default {
   components: {
@@ -66,7 +66,7 @@ export default {
             if(response.data.code === 200) {
               alert("Verification has been sent to your mail")
               this.$router.push({
-                name: 'jwt.forgot-password'
+                name: 'auth.forgot-password'
               })
               this.user.email = ""
             }

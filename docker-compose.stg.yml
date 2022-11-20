@@ -1,6 +1,7 @@
 version: "3"
 services:
   db:
+    container_name: apriori-postgres
     image: postgres
     environment:
       POSTGRES_USER: root
@@ -16,50 +17,41 @@ services:
       - thesis
     restart: always
   cache:
+    container_name: apriori-cache-1
     image: redis:6
     ports:
       - "6379:6379"
     networks:
       - thesis
     restart: always
-  nsqlookupd:
-    image: nsqio/nsq
+  grafana:
+    image: grafana/grafana:latest
     ports:
-      - "4160:4160"
-      - "4161:4161"
-    command: /nsqlookupd
+      - "3000:3000"
+    volumes:
+      - ./backend/monitoring/grafana/grafana-data:/var/lib/grafana
+      - ./backend/monitoring/grafana/grafana-data:/etc/grafana/provisioning/datasources
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=Rahasia123
+    depends_on:
+      - prometheus
     networks:
       - thesis
     restart: always
-  nsqd:
-    image: nsqio/nsq
+  prometheus:
+    image: prom/prometheus:v2.27.1
+    volumes:
+      - ./backend/monitoring/prometheus:/etc/prometheus/
+      - ./backend/monitoring/prometheus/prometheus-data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
     ports:
-      - "4150:4150"
-      - "4151:4151"
-    depends_on:
-      - nsqlookupd
-    command: /nsqd -lookupd-tcp-address=nsqlookupd:4160 -broadcast-address=nsqd
-    networks:
-      - thesis
+      - "9090:9090"
     restart: always
-  nsqadmin:
-    image: nsqio/nsq
-    ports:
-      - "4171:4171"
-    depends_on:
-      - nsqlookupd
-      - nsqd
-    command: /nsqadmin -lookupd-http-address=nsqlookupd:4161
-    networks:
-      - thesis
-    restart: always
-  messagebroker:
-    build: ./backend/services/message-service
-    ports:
-      - "8082:8080"
-    restart: always
-    depends_on:
-      - nsqlookupd
     networks:
       - thesis
 

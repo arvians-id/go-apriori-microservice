@@ -26,7 +26,19 @@ func (comment *Comment) ToProtoBuff() *pb.Comment {
 		Tag:         comment.Tag,
 		Rating:      comment.Rating,
 		CreatedAt:   timestamppb.New(comment.CreatedAt),
-		//UserOrder:   comment.UserOrder.ToProtoBuff(),
+		UserOrder:   comment.UserOrder.ToProtoBuff(),
+	}
+}
+
+func (comment *Comment) ToProtoBuffWithoutRelation() *pb.Comment {
+	return &pb.Comment{
+		IdComment:   comment.IdComment,
+		UserOrderId: comment.UserOrderId,
+		ProductCode: comment.ProductCode,
+		Description: comment.Description,
+		Tag:         comment.Tag,
+		Rating:      comment.Rating,
+		CreatedAt:   timestamppb.New(comment.CreatedAt),
 	}
 }
 

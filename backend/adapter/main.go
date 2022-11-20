@@ -56,7 +56,7 @@ func main() {
 	payment.RegisterRoutes(router, configuration, messagingProducer)
 	router.Use(middleware.SetupXApiKeyMiddleware(configuration))
 	user.RegisterRoutes(router, configuration)
-	apriori.RegisterRoutes(router, configuration)
+	apriori.RegisterRoutes(router, configuration, storageS3)
 	auth.RegisterRoutes(router, configuration, jwtAuth, messagingProducer)
 	category.RegisterRoutes(router, configuration)
 	comment.RegisterRoutes(router, configuration)

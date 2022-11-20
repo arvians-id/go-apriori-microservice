@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from "vue-router";
 import NotFound from "../views/NotFound.vue";
-import authHeader from "@/service/jwt-header";
+import authHeader from "@/service/auth-header";
 import axios from "axios";
-import AuthRouter from "@/router/jwt-router";
+import AuthRouter from "@/router/auth-router";
 import TransactionRouter from "@/router/transaction-router";
 import ProductRouter from "@/router/product-router";
 import CategoryRouter from "@/router/category-router";

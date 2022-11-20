@@ -223,7 +223,7 @@ func (repository *ProductRepositoryImpl) FindByCode(ctx context.Context, tx *sql
 }
 
 func (repository *ProductRepositoryImpl) Create(ctx context.Context, tx *sql.Tx, product *model.Product) (*model.Product, error) {
-	id := 0
+	var id int64
 	query := `INSERT INTO products (code,name,description,price,category,is_empty,mass,image,created_at,updated_at) 
 			  VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING id_product`
 	row := tx.QueryRowContext(
@@ -246,7 +246,7 @@ func (repository *ProductRepositoryImpl) Create(ctx context.Context, tx *sql.Tx,
 		return nil, err
 	}
 
-	product.IdProduct = int64(id)
+	product.IdProduct = id
 
 	return product, nil
 }

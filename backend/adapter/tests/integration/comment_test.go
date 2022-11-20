@@ -189,6 +189,7 @@ var _ = Describe("Comment API", func() {
 
 				var responseBodyCreateComment map[string]interface{}
 				_ = json.NewDecoder(writer.Result().Body).Decode(&responseBodyCreateComment)
+				log.Println(responseBodyCreateComment)
 				idComment := int(responseBodyCreateComment["data"].(map[string]interface{})["id_comment"].(float64))
 
 				// Find By Id Comment

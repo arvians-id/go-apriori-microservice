@@ -104,7 +104,7 @@ import Sidebar from "@/components/admin/Sidebar.vue"
 import Topbar from "@/components/admin/Topbar.vue"
 import Header from "@/components/admin/Header.vue"
 import Footer from "@/components/admin/Footer.vue"
-import authHeader from "@/service/jwt-header";
+import authHeader from "@/service/auth-header";
 
 export default {
   components: {

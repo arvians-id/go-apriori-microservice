@@ -339,8 +339,6 @@ var _ = Describe("Auth API", func() {
 				var responseBody map[string]interface{}
 				_ = json.NewDecoder(writer.Result().Body).Decode(&responseBody)
 
-				log.Println(responseBody)
-
 				Expect(int(responseBody["code"].(float64))).To(Equal(http.StatusOK))
 				Expect(responseBody["status"]).To(Equal("mail sent successfully"))
 				Expect(responseBody["data"].(map[string]interface{})["signature"]).ShouldNot(BeNil())

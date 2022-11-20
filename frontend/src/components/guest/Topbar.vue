@@ -34,7 +34,7 @@
                             <h4 class="mb-0 text-sm">{{ item.title }}</h4>
                           </div>
                           <div class="text-right text-muted">
-                            <small>{{ item.created_at.split(" ")[0] }} {{ item.created_at.split(" ")[1] }}</small>
+                            <small>{{ item.created_at }}</small>
                           </div>
                         </div>
                         <p class="text-sm mb-0">{{ item.description.length > 50 ? item.description.slice(0, 50) + "..." : item.description }}</p>
@@ -49,7 +49,7 @@
                             <h4 class="mb-0 text-sm">{{ item.title }}</h4>
                           </div>
                           <div class="text-right text-muted">
-                            <small>{{ item.created_at.split(" ")[0] }} {{ item.created_at.split(" ")[1] }}</small>
+                            <small>{{ item.created_at }}</small>
                           </div>
                         </div>
                         <p class="text-sm mb-0">{{ item.description.length > 50 ? item.description.slice(0, 50) + "..." : item.description }}</p>
@@ -162,7 +162,7 @@
         </ul>
         <ul class="navbar-nav align-items-center ml-auto ml-md-0" v-else>
           <li class="nav-item dropdown">
-            <router-link class="nav-link pr-0" :to="{ name: 'jwt.login' }" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <router-link class="nav-link pr-0" :to="{ name: 'auth.login' }" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <div class="media align-items-center">
                 <div class="media-body ml-2">
                   <span class="mb-0 text-sm text-white font-weight-bold">Login</span>
@@ -178,7 +178,7 @@
 
 <script>
 
-import authHeader from "@/service/jwt-header";
+import authHeader from "@/service/auth-header";
 import axios from "axios";
 import getRoles from "@/service/get-roles";
 
@@ -224,7 +224,7 @@ export default {
               localStorage.removeItem("refresh-token")
               alert(response.data.status)
               this.$router.push({
-                name: 'jwt.login'
+                name: 'auth.login'
               })
             }
           }).catch(error => {

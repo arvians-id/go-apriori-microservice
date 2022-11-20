@@ -18,7 +18,7 @@ import (
 
 type ServiceClient struct {
 	AprioriService pb.AprioriServiceClient
-	StorageS3      aws.StorageS3
+	StorageS3      *aws.StorageS3
 }
 
 func NewAprioriServiceClient(configuration *config.Config) pb.AprioriServiceClient {
@@ -30,9 +30,10 @@ func NewAprioriServiceClient(configuration *config.Config) pb.AprioriServiceClie
 	return pb.NewAprioriServiceClient(connection)
 }
 
-func RegisterRoutes(router *gin.Engine, configuration *config.Config) *ServiceClient {
+func RegisterRoutes(router *gin.Engine, configuration *config.Config, storageS3 *aws.StorageS3) *ServiceClient {
 	serviceClient := &ServiceClient{
 		AprioriService: NewAprioriServiceClient(configuration),
+		StorageS3:      storageS3,
 	}
 
 	authorized := router.Group("/api", middleware.AuthJwtMiddleware(configuration))
@@ -117,7 +118,7 @@ func (client *ServiceClient) FindByCodeAndId(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", apriori)
+	response.ReturnSuccessOK(c, "OK", apriori.GetProductRecommendation())
 }
 
 func (client *ServiceClient) Update(c *gin.Context) {
@@ -139,6 +140,7 @@ func (client *ServiceClient) Update(c *gin.Context) {
 				log.Println("[Apriori][Update][UploadToAWS] error upload file to S3, err: ", err.Error())
 			}
 		}()
+		log.Println(path)
 		filePath = path
 	}
 
@@ -247,5 +249,5 @@ func (client *ServiceClient) Generate(c *gin.Context) {
 		return
 	}
 
-	response.ReturnSuccessOK(c, "OK", apriori)
+	response.ReturnSuccessOK(c, "OK", apriori.GetGenerateApriori())
 }

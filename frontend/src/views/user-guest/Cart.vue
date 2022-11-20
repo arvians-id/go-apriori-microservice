@@ -185,7 +185,7 @@ import Topbar from "@/components/guest/Topbar.vue"
 import Header from "@/components/guest/Header.vue"
 import Footer from "@/components/guest/Footer.vue"
 import axios from "axios";
-import authHeader from "@/service/jwt-header";
+import authHeader from "@/service/auth-header";
 import getRoles from "@/service/get-roles";
 
 export default {
@@ -336,7 +336,7 @@ export default {
     },
     async submit() {
       if(authHeader()["Authorization"] === undefined) {
-        this.$router.push({ name: 'jwt.login' })
+        this.$router.push({ name: 'auth.login' })
       } else {
         getRoles().then(response => {
           let formData = new FormData()

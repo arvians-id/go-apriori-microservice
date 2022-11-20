@@ -37,7 +37,7 @@ func (storageS3 *StorageS3) DefaultPath() string {
 func (storageS3 *StorageS3) GenerateNewFile(fileName string) (string, string) {
 	headerFileName := strings.Split(fileName, ".")
 	randomName := util.RandomString(10) + "." + headerFileName[len(headerFileName)-1]
-	filePath := fmt.Sprintf("https://%s.s3.%s.amazonaws.com/assets/%s", storageS3.MyBucket, storageS3.MyRegion, randomName)
+	filePath := fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s", storageS3.MyBucket, storageS3.MyRegion, randomName)
 	return filePath, randomName
 }
 

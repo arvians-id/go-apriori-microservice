@@ -389,7 +389,6 @@ func (service *PaymentService) GetToken(ctx context.Context, req *pb.GetPaymentT
 		log.Println("[PaymentService][GetToken] problem in db transaction, err: ", err.Error())
 		return nil, err
 	}
-	defer util.CommitOrRollback(tx)
 
 	canceled := "canceled"
 	timeNow := time.Now().Format("2006-01-02 15:04:05")
@@ -404,9 +403,11 @@ func (service *PaymentService) GetToken(ctx context.Context, req *pb.GetPaymentT
 	}
 	payment, err := service.PaymentRepository.Create(ctx, tx, &paymentRequest)
 	if err != nil {
-		log.Println("[PaymentService][GetToken][Create] problem in getting from repository, err: ", err.Error())
+		log.Println("[PaymentService][GetToken][CreatePayment] problem in getting from repository, err: ", err.Error())
 		return nil, err
 	}
+	util.CommitOrRollback(tx)
+
 	// Send id payload
 	snapRequest.CustomField2 = util.IntToStr(int(payment.IdPayload))
 	snapRequest.CustomField3 = req.CustomerName
@@ -417,7 +418,7 @@ func (service *PaymentService) GetToken(ctx context.Context, req *pb.GetPaymentT
 		return nil, err
 	}
 
-	var tokenResponse map[string]string
+	var tokenResponse = make(map[string]string)
 	tokenResponse["clientKey"] = service.ClientKey
 	tokenResponse["token"] = token.Token
 
@@ -438,7 +439,7 @@ func (service *PaymentService) GetToken(ctx context.Context, req *pb.GetPaymentT
 			TotalPriceItem: &totalPriceItem,
 		})
 		if err != nil {
-			log.Println("[PaymentService][GetToken][Create] problem in getting from repository, err: ", err.Error())
+			log.Println("[PaymentService][GetToken][CreateUserOrder] problem in getting from repository, err: ", err.Error())
 			return nil, err
 		}
 	}

@@ -61,7 +61,7 @@ type Config struct {
 	MidtransServerKey string `mapstructure:"MIDTRANS_SERVER_KEY"`
 	MidtransClientKey string `mapstructure:"MIDTRANS_CLIENT_KEY"`
 
-	RajaOngkirSecretKey string `mapstructure:"RAJAONGKIR_SECRET_KEY"`
+	RajaOngkirSecretKey string `mapstructure:"RAJA_ONGKIR_SECRET_KEY"`
 }
 
 func LoadConfig(filenames ...string) (c *Config, err error) {
@@ -71,7 +71,7 @@ func LoadConfig(filenames ...string) (c *Config, err error) {
 		viper.AddConfigPath("./config/envs")
 	}
 
-	viper.SetConfigName("prod")
+	viper.SetConfigName("test")
 	viper.SetConfigType("env")
 
 	viper.AutomaticEnv()
