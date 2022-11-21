@@ -20,11 +20,11 @@
               </div>
               <!-- Card body -->
               <div class="card-body">
-                 <form @submit.prevent="submit" method="POST">
+                <form @submit.prevent="submit" method="POST">
                   <div class="form-group">
                     <label class="form-control-label">Product Name</label> <small class="text-danger">*use ctrl for selecting the product</small>
                     <select multiple class="form-control" v-model="transaction.product_name" required>
-                        <option v-for="(item) in products" :key="item.id_product">{{ item.name }}</option>
+                      <option v-for="(item) in products" :key="item.id_product">{{ item.name }}</option>
                     </select>
                   </div>
                   <div class="form-group">
@@ -50,25 +50,26 @@ import Topbar from "@/components/admin/Topbar.vue"
 import Header from "@/components/admin/Header.vue"
 import Footer from "@/components/admin/Footer.vue"
 import axios from "axios";
+import $ from "jquery";
 import authHeader from "@/service/auth-header";
-import gql from 'graphql-tag'
-
 export default {
-  apollo: {
-    products: gql`query {
-      products: ProductFindAllByAdmin {
-        id_product
-        name
-        created_at
-        updated_at
-      }
-    }`,
-  },
   components: {
     Footer,
     Sidebar,
     Header,
     Topbar
+  },
+  mounted() {
+    axios.get(`${process.env.VUE_APP_SERVICE_URL}/products`, { headers: authHeader() }).then((response) => {
+      this.products = response.data.data;
+      setTimeout(function(){
+        $('#datatable').DataTable();
+      }, 0);
+    }).catch(error => {
+      if (error.response.status === 400 || error.response.status === 404) {
+        console.log(error.response.data.status)
+      }
+    });
   },
   data: function () {
     return {
@@ -85,20 +86,19 @@ export default {
         let productName = this.transaction.product_name
         this.transaction.product_name = productName.join(", ")
       }
-
       axios.post(`${process.env.VUE_APP_SERVICE_URL}/transactions`, this.transaction, { headers: authHeader() })
-            .then(response => {
-              if(response.data.code === 200) {
-                alert(response.data.status)
-                this.$router.push({
-                  name: 'transaction'
-                })
-              }
-            }).catch(error => {
-              if (error.response.status === 400 || error.response.status === 404) {
-                alert(error.response.data.status)
-              }
-            })
+          .then(response => {
+            if(response.data.code === 200) {
+              alert(response.data.status)
+              this.$router.push({
+                name: 'transaction'
+              })
+            }
+          }).catch(error => {
+        if (error.response.status === 400 || error.response.status === 404) {
+          alert(error.response.data.status)
+        }
+      })
     }
   }
 }

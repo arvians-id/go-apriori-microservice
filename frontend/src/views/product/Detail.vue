@@ -96,9 +96,9 @@
                           </div>
                           <div class="tab-pane fade" id="lainnya" role="tabpanel" aria-labelledby="lainnya-tab">
                             <p class="font-weight-bold mb-0 mt-2">Tanggal Dibuat</p>
-                            <p>{{ product.created_at }}</p>
+                            <p>{{ toDateTime(product.created_at.seconds) }}</p>
                             <p class="font-weight-bold mb-0 mt-2">Terakhir Diubah</p>
-                            <p>{{ product.updated_at }}</p>
+                            <p>{{ toDateTime(product.updated_at.seconds) }}</p>
                           </div>
                         </div>
                       </div>
@@ -127,6 +127,7 @@ import Header from "@/components/admin/Header.vue"
 import Footer from "@/components/admin/Footer.vue"
 import axios from "axios";
 import authHeader from "@/service/auth-header";
+import toDateTime from "@/service/util";
 
 export default {
   components: {
@@ -145,6 +146,9 @@ export default {
     };
   },
   methods: {
+    toDateTime(unix){
+      return toDateTime(unix)
+    },
     async fetchData() {
       await axios.get(`${process.env.VUE_APP_SERVICE_URL}/products/${this.$route.params.code}`, { headers: authHeader() }).then((response) => {
         this.product = response.data.data;

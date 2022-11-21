@@ -34,7 +34,7 @@
                             <h4 class="mb-0 text-sm">{{ item.title }}</h4>
                           </div>
                           <div class="text-right text-muted">
-                            <small>{{ item.created_at }}</small>
+                            <small>{{ toDateTime(item.created_at.seconds) }}</small>
                           </div>
                         </div>
                         <p class="text-sm mb-0">{{ item.description.length > 50 ? item.description.slice(0, 50) + "..." : item.description }}</p>
@@ -49,7 +49,7 @@
                             <h4 class="mb-0 text-sm">{{ item.title }}</h4>
                           </div>
                           <div class="text-right text-muted">
-                            <small>{{ item.created_at }}</small>
+                            <small>{{ toDateTime(item.created_at.seconds) }}</small>
                           </div>
                         </div>
                         <p class="text-sm mb-0">{{ item.description.length > 50 ? item.description.slice(0, 50) + "..." : item.description }}</p>
@@ -181,6 +181,7 @@
 import authHeader from "@/service/auth-header";
 import axios from "axios";
 import getRoles from "@/service/get-roles";
+import toDateTime from "@/service/util";
 
 export default {
   props: {
@@ -216,6 +217,9 @@ export default {
     }
   },
   methods: {
+    toDateTime(unix){
+      return toDateTime(unix)
+    },
     submit() {
       axios.delete(`${process.env.VUE_APP_SERVICE_URL}/auth/logout`,{ headers: authHeader() })
           .then(response => {

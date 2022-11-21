@@ -65,7 +65,7 @@
                   <td>{{ item.code }}</td>
                   <td>{{ item.range_date }}</td>
                   <td>{{ item.is_active === false ? "Non Active" : "Active" }}</td>
-                  <td>{{ item.created_at }}</td>
+                  <td>{{ toDateTime(item.created_at.seconds) }}</td>
                   <td class="text-center">
                     <router-link :to="{ name: 'apriori.detail', params: { code: item.code } }" class="btn btn-secondary btn-sm">Detail</router-link>
                     <form @submit.prevent="activate(item.code)" method="POST" class="d-inline mr-1">
@@ -100,6 +100,7 @@ import Topbar from "@/components/admin/Topbar.vue"
 import Header from "@/components/admin/Header.vue"
 import Footer from "@/components/admin/Footer.vue"
 import authHeader from "@/service/auth-header";
+import toDateTime from "@/service/util";
 
 export default {
   components: {
@@ -118,6 +119,9 @@ export default {
     };
   },
   methods: {
+    toDateTime(unix){
+      return toDateTime(unix)
+    },
     async fetchData() {
       await axios.get(`${process.env.VUE_APP_SERVICE_URL}/apriori`, { headers: authHeader() }).then((response) => {
         this.apriories = response.data.data;

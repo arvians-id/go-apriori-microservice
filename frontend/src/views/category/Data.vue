@@ -62,8 +62,8 @@
                 <tr v-for="(item,i) in categories" :key="item.id_category">
                   <td>{{ (i++) + 1 }}</td>
                   <td>{{ item.name }}</td>
-                  <td>{{ item.created_at }}</td>
-                  <td>{{ item.updated_at }}</td>
+                  <td>{{ toDateTime(item.created_at.seconds) }}</td>
+                  <td>{{ toDateTime(item.updated_at.seconds) }}</td>
                   <td class="text-center">
                     <router-link :to="{ name: 'category.edit', params: { id: item.id_category } }" class="btn btn-primary btn-sm">Edit</router-link>
                     <form @submit.prevent="submit(item.id_category)" method="POST" class="d-inline">
@@ -95,6 +95,7 @@ import Topbar from "@/components/admin/Topbar.vue"
 import Header from "@/components/admin/Header.vue"
 import Footer from "@/components/admin/Footer.vue"
 import authHeader from "@/service/auth-header";
+import toDateTime from "@/service/util";
 
 export default {
   components: {
@@ -113,6 +114,9 @@ export default {
     };
   },
   methods: {
+    toDateTime(unix){
+      return toDateTime(unix)
+    },
     async fetchData() {
       await axios.get(`${process.env.VUE_APP_SERVICE_URL}/categories`, { headers: authHeader() }).then((response) => {
         this.categories = response.data.data;

@@ -60,7 +60,7 @@
                         <div class="checklist-info">
                           <h5 class="checklist-title mb-0">{{ item.title }}</h5>
                           <small class="d-block">{{ item.description }}</small>
-                          <small>{{ item.created_at }}</small>
+                          <small>{{ toDateTime(item.created_at.seconds) }}</small>
                         </div>
                         <form @submit.prevent="mark(item.id_notification)" method="POST" v-if="!item.is_read">
                           <button class="btn btn-sm btn-success">Tandai dibaca</button>
@@ -72,7 +72,7 @@
                         <div class="checklist-info">
                           <h5 class="checklist-title mb-0">{{ item.title }}</h5>
                           <small class="d-block">{{ item.description }}</small>
-                          <small>{{ item.created_at }}</small>
+                          <small>{{ toDateTime(item.created_at.seconds) }}</small>
                         </div>
                         <form @submit.prevent="mark(item.id_notification)" method="POST" v-if="!item.is_read">
                           <button class="btn btn-sm btn-success">Tandai dibaca</button>
@@ -114,6 +114,7 @@ import Header from "@/components/guest/Header.vue"
 import Footer from "@/components/guest/Footer.vue"
 import axios from "axios";
 import authHeader from "@/service/auth-header";
+import toDateTime from "@/service/util";
 
 export default {
   components: {
@@ -142,6 +143,9 @@ export default {
     document.getElementsByTagName("body")[0].classList.remove("bg-default");
   },
   methods: {
+    toDateTime(unix){
+      return toDateTime(unix)
+    },
     fetchData() {
       localStorage.getItem("my-carts")
           ? (this.carts = JSON.parse(localStorage.getItem("my-carts")))

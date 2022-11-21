@@ -234,9 +234,9 @@
                             </div>
                             <div class="tab-pane fade" id="lainnya" role="tabpanel" aria-labelledby="lainnya-tab">
                               <p class="font-weight-bold mb-0 mt-2">Tanggal Dibuat</p>
-                              <p>{{ product.created_at }}</p>
+                              <p>{{ toDateTime(product.created_at.seconds) }}</p>
                               <p class="font-weight-bold mb-0 mt-2">Terakhir Diubah</p>
-                              <p>{{ product.updated_at }}</p>
+                              <p>{{ toDateTime(product.updated_at.seconds) }}</p>
                             </div>
                           </div>
                         </div>
@@ -250,7 +250,7 @@
                             <img src="https://my-apriori-bucket.s3.ap-southeast-1.amazonaws.com/assets/user.png" width="53" class="mr-3" alt="...">
                             <div class="media-body">
                               <h4 class="mt-0 mb-0">{{ item.user_order.payment.user.name }}</h4>
-                              <small>{{ item.created_at }}</small>
+                              <small>{{ toDateTime(item.created_at.seconds) }}</small>
                               <div class="mb-2">
                                 <i class="fas fa-star text-warning" v-for="itemRating in item.rating" :key="itemRating"></i>
                               </div>
@@ -423,6 +423,7 @@ import Header from "@/components/guest/Header.vue"
 import Footer from "@/components/guest/Footer.vue"
 import axios from "axios";
 import authHeader from "@/service/auth-header";
+import toDateTime from "@/service/util";
 
 export default {
   components: {
@@ -469,6 +470,9 @@ export default {
     };
   },
   methods: {
+    toDateTime(unix){
+      return toDateTime(unix)
+    },
     allFetch(){
       this.fetchCategories()
       this.fetchData()

@@ -69,8 +69,8 @@
                     <td>{{ item.no_transaction }}</td>
                     <td>{{ item.customer_name }}</td>
                     <td>{{ item.product_name }}</td>
-                    <td>{{ item.created_at }}</td>
-                    <td>{{ item.updated_at }}</td>
+                    <td>{{ toDateTime(item.created_at.seconds) }}</td>
+                    <td>{{ toDateTime(item.updated_at.seconds) }}</td>
                     <td class="text-center">
                       <router-link :to="{ name: 'transaction.edit', params: { no_transaction: item.no_transaction } }" class="btn btn-primary btn-sm">Edit</router-link>
                       <form @submit.prevent="submit(item.no_transaction)" method="POST" class="d-inline">
@@ -105,6 +105,7 @@ import Topbar from "@/components/admin/Topbar.vue"
 import Header from "@/components/admin/Header.vue"
 import Footer from "@/components/admin/Footer.vue"
 import authHeader from "@/service/auth-header";
+import toDateTime from "@/service/util";
 
 export default {
   components: {
@@ -123,6 +124,9 @@ export default {
     };
   },
   methods: {
+    toDateTime(unix){
+      return toDateTime(unix)
+    },
      async fetchData() {
       await axios.get(`${process.env.VUE_APP_SERVICE_URL}/transactions`, { headers: authHeader() }).then((response) => {
         this.transactions = response.data.data;
