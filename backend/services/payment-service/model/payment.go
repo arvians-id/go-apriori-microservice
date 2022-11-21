@@ -51,8 +51,33 @@ func (payment *Payment) ToProtoBuff() *pb.Payment {
 		Address:           payment.Address,
 		Courier:           payment.Courier,
 		CourierService:    payment.CourierService,
-		//User:              payment.User.ToProtoBuff(),
-		//UserOrder:         payment.UserOrder[0].ToListProtoBuff(),
+		User:              payment.User.ToProtoBuff(),
+	}
+}
+
+func (payment *Payment) ToProtoBuffWithoutRelation() *pb.Payment {
+	return &pb.Payment{
+		IdPayload:         payment.IdPayload,
+		UserId:            payment.UserId,
+		OrderId:           payment.OrderId,
+		TransactionTime:   payment.TransactionTime,
+		TransactionStatus: payment.TransactionStatus,
+		TransactionId:     payment.TransactionId,
+		StatusCode:        payment.StatusCode,
+		SignatureKey:      payment.SignatureKey,
+		SettlementTime:    payment.SettlementTime,
+		PaymentType:       payment.PaymentType,
+		MerchantId:        payment.MerchantId,
+		GrossAmount:       payment.GrossAmount,
+		FraudStatus:       payment.FraudStatus,
+		BankType:          payment.BankType,
+		VANumber:          payment.VANumber,
+		BillerCode:        payment.BillerCode,
+		BillKey:           payment.BillKey,
+		ReceiptNumber:     payment.ReceiptNumber,
+		Address:           payment.Address,
+		Courier:           payment.Courier,
+		CourierService:    payment.CourierService,
 	}
 }
 

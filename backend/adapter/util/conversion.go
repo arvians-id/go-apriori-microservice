@@ -16,6 +16,11 @@ func IntToStr(number int) string {
 	return str
 }
 
+func Int64ToStr(number int64) string {
+	str := strconv.FormatInt(number, 10)
+	return str
+}
+
 func StrToBool(str string) bool {
 	boolean, _ := strconv.ParseBool(str)
 	return boolean

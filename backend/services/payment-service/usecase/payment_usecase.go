@@ -98,7 +98,7 @@ func (service *PaymentService) FindAllByUserId(ctx context.Context, req *pb.GetP
 
 	var paymentListResponse []*pb.Payment
 	for _, payment := range payments {
-		paymentListResponse = append(paymentListResponse, payment.ToProtoBuff())
+		paymentListResponse = append(paymentListResponse, payment.ToProtoBuffWithoutRelation())
 	}
 
 	return &pb.ListPaymentResponse{
@@ -121,7 +121,7 @@ func (service *PaymentService) FindByOrderId(ctx context.Context, req *pb.GetPay
 	}
 
 	return &pb.GetPaymentResponse{
-		Payment: payment.ToProtoBuff(),
+		Payment: payment.ToProtoBuffWithoutRelation(),
 	}, nil
 }
 
@@ -152,7 +152,7 @@ func (service *PaymentService) OnlyCreate(ctx context.Context, req *pb.OnlyCreat
 	}
 
 	return &pb.GetPaymentResponse{
-		Payment: payment.ToProtoBuff(),
+		Payment: payment.ToProtoBuffWithoutRelation(),
 	}, nil
 }
 
@@ -257,11 +257,9 @@ func (service *PaymentService) CreateOrUpdate(ctx context.Context, req *pb.Creat
 				productName = append(productName, *item.Name)
 			}
 
-			orderId := requestPayment["order_id"].(string)
 			_, err = service.TransactionService.Create(ctx, &pb.CreateTransactionRequest{
-				ProductName:   strings.ToLower(strings.Join(productName, ", ")),
-				CustomerName:  requestPayment["custom_field3"].(string),
-				NoTransaction: &orderId,
+				ProductName:  strings.ToLower(strings.Join(productName, ", ")),
+				CustomerName: requestPayment["custom_field3"].(string),
 			})
 			if err != nil {
 				log.Println("[PaymentService][CreateOrUpdate][TransactionCreate] problem in getting from repository, err: ", err.Error())
@@ -304,7 +302,7 @@ func (service *PaymentService) UpdateReceiptNumber(ctx context.Context, req *pb.
 	}
 
 	return &pb.GetPaymentResponse{
-		Payment: payment.ToProtoBuff(),
+		Payment: payment.ToProtoBuffWithoutRelation(),
 	}, nil
 }
 
@@ -312,23 +310,23 @@ func (service *PaymentService) Delete(ctx context.Context, req *pb.GetPaymentByO
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[PaymentService][Delete] problem in db transaction, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 	defer util.CommitOrRollback(tx)
 
 	payment, err := service.PaymentRepository.FindByOrderId(ctx, tx, req.OrderId)
 	if err != nil {
 		log.Println("[PaymentService][Delete][FindByOrderId] problem in getting from repository, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 
 	err = service.PaymentRepository.Delete(ctx, tx, payment.OrderId)
 	if err != nil {
 		log.Println("[PaymentService][Delete][FindByOrderId] problem in getting from repository, err: ", err.Error())
-		return nil, err
+		return new(empty.Empty), err
 	}
 
-	return nil, nil
+	return new(empty.Empty), nil
 }
 
 func (service *PaymentService) GetToken(ctx context.Context, req *pb.GetPaymentTokenRequest) (*pb.GetPaymentTokenResponse, error) {

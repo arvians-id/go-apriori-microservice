@@ -86,9 +86,10 @@ services:
       - thesis
     restart: always
   messagebroker:
-    build: ./backend/services/message-service
+    container_name: apriori-message-broker
+    image: apriori-message-broker:latest
     env_file:
-      - ./backend/services/message-service/config/envs/prod.env
+      - ./backend/services/message-service/config/envs/test.env
     ports:
       - "8085:8080"
     restart: always
@@ -100,7 +101,7 @@ services:
     container_name: apriori-adapter
     image: apriori-adapter:latest
     env_file:
-      - ./backend/adapter/config/envs/prod.env
+      - ./backend/adapter/config/envs/test.env
     ports:
       - "8080:8080"
     restart: always
@@ -112,7 +113,7 @@ services:
     container_name: apriori-apriori
     image: apriori-apriori:latest
     env_file:
-      - ./backend/services/apriori-service/config/envs/prod.env
+      - ./backend/services/apriori-service/config/envs/test.env
     ports:
       - "50050:50050"
     restart: always
@@ -127,7 +128,7 @@ services:
     container_name: apriori-category
     image: apriori-category:latest
     env_file:
-      - ./backend/services/category-service/config/envs/prod.env
+      - ./backend/services/category-service/config/envs/test.env
     ports:
       - "50051:50051"
     restart: always
@@ -142,7 +143,7 @@ services:
     container_name: apriori-comment
     image: apriori-comment:latest
     env_file:
-      - ./backend/services/comment-service/config/envs/prod.env
+      - ./backend/services/comment-service/config/envs/test.env
     ports:
       - "50052:50052"
     restart: always
@@ -157,7 +158,7 @@ services:
     container_name: apriori-notification
     image: apriori-notification:latest
     env_file:
-      - ./backend/services/notification-service/config/envs/prod.env
+      - ./backend/services/notification-service/config/envs/test.env
     ports:
       - "50053:50053"
     restart: always
@@ -172,7 +173,7 @@ services:
     container_name: apriori-password-reset
     image: apriori-password-reset:latest
     env_file:
-      - ./backend/services/password-reset-service/config/envs/prod.env
+      - ./backend/services/password-reset-service/config/envs/test.env
     ports:
       - "50054:50054"
     restart: always
@@ -187,7 +188,7 @@ services:
     container_name: apriori-payment
     image: apriori-payment:latest
     env_file:
-      - ./backend/services/payment-service/config/envs/prod.env
+      - ./backend/services/payment-service/config/envs/test.env
     ports:
       - "50055:50055"
     restart: always
@@ -202,7 +203,7 @@ services:
     container_name: apriori-product
     image: apriori-product:latest
     env_file:
-      - ./backend/services/product-service/config/envs/prod.env
+      - ./backend/services/product-service/config/envs/test.env
     ports:
       - "50056:50056"
     restart: always
@@ -217,7 +218,7 @@ services:
     container_name: apriori-transaction
     image: apriori-transaction:latest
     env_file:
-      - ./backend/services/transaction-service/config/envs/prod.env
+      - ./backend/services/transaction-service/config/envs/test.env
     ports:
       - "50057:50057"
     restart: always
@@ -232,7 +233,7 @@ services:
     container_name: apriori-user-order
     image: apriori-user-order:latest
     env_file:
-      - ./backend/services/user-order-service/config/envs/prod.env
+      - ./backend/services/user-order-service/config/envs/test.env
     ports:
       - "50058:50058"
     restart: always
@@ -247,7 +248,7 @@ services:
     container_name: apriori-user
     image: apriori-user:latest
     env_file:
-      - ./backend/services/user-service/config/envs/prod.env
+      - ./backend/services/user-service/config/envs/test.env
     ports:
       - "50059:50059"
     restart: always

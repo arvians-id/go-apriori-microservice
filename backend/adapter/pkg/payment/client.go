@@ -244,6 +244,11 @@ func (client *ServiceClient) Delete(c *gin.Context) {
 		OrderId: orderIdParam,
 	})
 	if err != nil {
+		if err.Error() == util.ErrorNotFound {
+			response.ReturnErrorNotFound(c, err, nil)
+			return
+		}
+
 		response.ReturnErrorInternalServerError(c, err, nil)
 		return
 	}
