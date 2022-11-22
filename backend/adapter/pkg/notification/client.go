@@ -7,8 +7,8 @@ import (
 	"github.com/arvians-id/go-apriori-microservice/adapter/pb"
 	"github.com/arvians-id/go-apriori-microservice/adapter/response"
 	"github.com/gin-gonic/gin"
-	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"log"
 	"strconv"
 )
@@ -43,7 +43,7 @@ func RegisterRoutes(router *gin.Engine, configuration *config.Config) *ServiceCl
 }
 
 func (client *ServiceClient) FindAll(c *gin.Context) {
-	notifications, err := client.NotificationService.FindAll(c.Request.Context(), new(empty.Empty))
+	notifications, err := client.NotificationService.FindAll(c.Request.Context(), new(emptypb.Empty))
 	if err != nil {
 		response.ReturnErrorInternalServerError(c, err, nil)
 		return

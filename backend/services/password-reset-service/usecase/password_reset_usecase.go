@@ -11,8 +11,8 @@ import (
 	"github.com/arvians-id/go-apriori-microservice/services/password-reset-service/pb"
 	"github.com/arvians-id/go-apriori-microservice/services/password-reset-service/repository"
 	"github.com/arvians-id/go-apriori-microservice/services/password-reset-service/util"
-	"github.com/golang/protobuf/ptypes/empty"
 	"golang.org/x/crypto/bcrypt"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"log"
 	"strconv"
 	"time"
@@ -89,11 +89,11 @@ func (service *PasswordResetService) CreateOrUpdateByEmail(ctx context.Context, 
 	}, nil
 }
 
-func (service *PasswordResetService) Verify(ctx context.Context, req *pb.GetVerifyRequest) (*empty.Empty, error) {
+func (service *PasswordResetService) Verify(ctx context.Context, req *pb.GetVerifyRequest) (*emptypb.Empty, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[PasswordResetService][Verify] problem in db transaction, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 	defer util.CommitOrRollback(tx)
 
@@ -106,7 +106,7 @@ func (service *PasswordResetService) Verify(ctx context.Context, req *pb.GetVeri
 	reset, err := service.PasswordResetRepository.FindByEmailAndToken(ctx, tx, &passwordResetRequest)
 	if err != nil {
 		log.Println("[PasswordResetService][Verify][FindByEmailAndToken] problem in getting from repository, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 
 	// Check token expired
@@ -117,10 +117,10 @@ func (service *PasswordResetService) Verify(ctx context.Context, req *pb.GetVeri
 		err := service.PasswordResetRepository.Delete(ctx, tx, reset.Email)
 		if err != nil {
 			log.Println("[PasswordResetService][Verify][Delete] problem in getting from repository, err: ", err.Error())
-			return new(empty.Empty), err
+			return new(emptypb.Empty), err
 		}
 
-		return new(empty.Empty), errors.New("reset password verification is expired")
+		return new(emptypb.Empty), errors.New("reset password verification is expired")
 	}
 
 	// if not
@@ -128,14 +128,14 @@ func (service *PasswordResetService) Verify(ctx context.Context, req *pb.GetVeri
 	user, err := service.UserService.FindByEmail(ctx, req.Email)
 	if err != nil {
 		log.Println("[PasswordResetService][Verify][FindByEmail] problem in getting from repository, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 
 	// Update the password
 	password, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		log.Println("[PasswordResetService][Verify] problem in generating password hashed, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 
 	_, err = service.UserService.UpdatePassword(ctx, &pb.UpdateUserPasswordRequest{
@@ -144,15 +144,15 @@ func (service *PasswordResetService) Verify(ctx context.Context, req *pb.GetVeri
 	})
 	if err != nil {
 		log.Println("[PasswordResetService][Verify][UpdatePassword] problem in getting from repository, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 
 	// Delete data from table password_reset
 	err = service.PasswordResetRepository.Delete(ctx, tx, user.User.Email)
 	if err != nil {
 		log.Println("[PasswordResetService][Verify][Delete] problem in getting from repository, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 
-	return new(empty.Empty), nil
+	return new(emptypb.Empty), nil
 }

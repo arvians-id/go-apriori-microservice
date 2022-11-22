@@ -10,8 +10,8 @@ import (
 	"github.com/arvians-id/go-apriori-microservice/services/payment-service/pb"
 	"github.com/arvians-id/go-apriori-microservice/services/payment-service/repository"
 	"github.com/arvians-id/go-apriori-microservice/services/payment-service/util"
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/veritrans/go-midtrans"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"log"
 	"reflect"
 	"strings"
@@ -58,7 +58,7 @@ func (service *PaymentService) GetClient() {
 	}
 }
 
-func (service *PaymentService) FindAll(ctx context.Context, empty *empty.Empty) (*pb.ListPaymentResponse, error) {
+func (service *PaymentService) FindAll(ctx context.Context, empty *emptypb.Empty) (*pb.ListPaymentResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[PaymentService][FindAll] problem in db transaction, err: ", err.Error())
@@ -306,27 +306,27 @@ func (service *PaymentService) UpdateReceiptNumber(ctx context.Context, req *pb.
 	}, nil
 }
 
-func (service *PaymentService) Delete(ctx context.Context, req *pb.GetPaymentByOrderIdRequest) (*empty.Empty, error) {
+func (service *PaymentService) Delete(ctx context.Context, req *pb.GetPaymentByOrderIdRequest) (*emptypb.Empty, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[PaymentService][Delete] problem in db transaction, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 	defer util.CommitOrRollback(tx)
 
 	payment, err := service.PaymentRepository.FindByOrderId(ctx, tx, req.OrderId)
 	if err != nil {
 		log.Println("[PaymentService][Delete][FindByOrderId] problem in getting from repository, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 
 	err = service.PaymentRepository.Delete(ctx, tx, payment.OrderId)
 	if err != nil {
 		log.Println("[PaymentService][Delete][FindByOrderId] problem in getting from repository, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 
-	return new(empty.Empty), nil
+	return new(emptypb.Empty), nil
 }
 
 func (service *PaymentService) GetToken(ctx context.Context, req *pb.GetPaymentTokenRequest) (*pb.GetPaymentTokenResponse, error) {

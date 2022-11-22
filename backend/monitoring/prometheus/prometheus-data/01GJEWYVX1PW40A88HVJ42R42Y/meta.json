@@ -1,0 +1,17 @@
+{
+	"ulid": "01GJEWYVX1PW40A88HVJ42R42Y",
+	"minTime": 1669017608147,
+	"maxTime": 1669024800000,
+	"stats": {
+		"numSamples": 250,
+		"numSeries": 5,
+		"numChunks": 5
+	},
+	"compaction": {
+		"level": 1,
+		"sources": [
+			"01GJEWYVX1PW40A88HVJ42R42Y"
+		]
+	},
+	"version": 1
+}

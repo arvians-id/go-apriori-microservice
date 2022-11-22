@@ -6,6 +6,7 @@ import (
 	"github.com/arvians-id/go-apriori-microservice/services/category-service/config"
 	"github.com/arvians-id/go-apriori-microservice/services/category-service/pb"
 	"github.com/arvians-id/go-apriori-microservice/services/category-service/repository"
+	"github.com/arvians-id/go-apriori-microservice/services/category-service/third-party/redis"
 	"github.com/arvians-id/go-apriori-microservice/services/category-service/usecase"
 	"google.golang.org/grpc"
 	"log"
@@ -28,8 +29,12 @@ func NewInitializedServices(configuration *config.Config) (pb.CategoryServiceSer
 		return nil, err
 	}
 
+	// Third party
+	redisLib := redis.NewCacheService(configuration)
+
+	// Main App
 	categoryRepository := repository.NewCategoryRepository()
-	categoryService := usecase.NewCategoryService(categoryRepository, db)
+	categoryService := usecase.NewCategoryServiceCache(categoryRepository, redisLib, db)
 
 	return categoryService, nil
 }

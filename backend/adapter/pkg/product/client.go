@@ -8,8 +8,8 @@ import (
 	"github.com/arvians-id/go-apriori-microservice/adapter/third-party/aws"
 	"github.com/arvians-id/go-apriori-microservice/adapter/util"
 	"github.com/gin-gonic/gin"
-	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"log"
 	"strings"
 )
@@ -54,7 +54,7 @@ func RegisterRoutes(router *gin.Engine, configuration *config.Config, storageS3 
 }
 
 func (client *ServiceClient) FindAllByAdmin(c *gin.Context) {
-	products, err := client.ProductService.FindAllByAdmin(c.Request.Context(), new(empty.Empty))
+	products, err := client.ProductService.FindAllByAdmin(c.Request.Context(), new(emptypb.Empty))
 	if err != nil {
 		response.ReturnErrorInternalServerError(c, err, nil)
 		return

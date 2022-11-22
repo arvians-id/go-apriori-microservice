@@ -8,8 +8,8 @@ import (
 	"github.com/arvians-id/go-apriori-microservice/adapter/response"
 	"github.com/arvians-id/go-apriori-microservice/adapter/util"
 	"github.com/gin-gonic/gin"
-	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"log"
 	"strconv"
 )
@@ -100,7 +100,7 @@ func (client *ServiceClient) UpdateProfile(c *gin.Context) {
 }
 
 func (client *ServiceClient) FindAll(c *gin.Context) {
-	users, err := client.UserService.FindAll(c.Request.Context(), new(empty.Empty))
+	users, err := client.UserService.FindAll(c.Request.Context(), new(emptypb.Empty))
 	if err != nil {
 		response.ReturnErrorInternalServerError(c, err, nil)
 		return

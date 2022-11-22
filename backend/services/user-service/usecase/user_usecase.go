@@ -8,7 +8,6 @@ import (
 	"github.com/arvians-id/go-apriori-microservice/services/user-service/pb"
 	"github.com/arvians-id/go-apriori-microservice/services/user-service/repository"
 	"github.com/arvians-id/go-apriori-microservice/services/user-service/util"
-	"github.com/golang/protobuf/ptypes/empty"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"log"
@@ -27,7 +26,7 @@ func NewUserService(userRepository repository.UserRepository, db *sql.DB) pb.Use
 	}
 }
 
-func (service *UserService) FindAll(ctx context.Context, empty *empty.Empty) (*pb.ListUserResponse, error) {
+func (service *UserService) FindAll(ctx context.Context, empty *emptypb.Empty) (*pb.ListUserResponse, error) {
 	var tx *sql.Tx
 	if service.DB != nil {
 		transaction, err := service.DB.Begin()
@@ -233,7 +232,7 @@ func (service *UserService) UpdatePassword(ctx context.Context, req *pb.UpdateUs
 		transaction, err := service.DB.Begin()
 		if err != nil {
 			log.Println("[UserService][UpdatePassword] problem in db transaction, err: ", err.Error())
-			return new(empty.Empty), err
+			return new(emptypb.Empty), err
 		}
 		tx = transaction
 	}
@@ -242,7 +241,7 @@ func (service *UserService) UpdatePassword(ctx context.Context, req *pb.UpdateUs
 	timeNow, err := time.Parse(util.TimeFormat, time.Now().Format(util.TimeFormat))
 	if err != nil {
 		log.Println("[UserService][UpdatePassword] problem in parsing to time, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 
 	err = service.UserRepository.UpdatePassword(ctx, tx, &model.User{
@@ -252,10 +251,10 @@ func (service *UserService) UpdatePassword(ctx context.Context, req *pb.UpdateUs
 	})
 	if err != nil {
 		log.Println("[UserService][UpdatePassword] problem in getting from repository, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 
-	return new(empty.Empty), nil
+	return new(emptypb.Empty), nil
 }
 
 func (service *UserService) Delete(ctx context.Context, req *pb.GetUserByIdRequest) (*emptypb.Empty, error) {
@@ -264,7 +263,7 @@ func (service *UserService) Delete(ctx context.Context, req *pb.GetUserByIdReque
 		transaction, err := service.DB.Begin()
 		if err != nil {
 			log.Println("[UserService][Delete] problem in db transaction, err: ", err.Error())
-			return new(empty.Empty), err
+			return new(emptypb.Empty), err
 		}
 		tx = transaction
 	}
@@ -273,14 +272,14 @@ func (service *UserService) Delete(ctx context.Context, req *pb.GetUserByIdReque
 	user, err := service.UserRepository.FindById(ctx, tx, req.Id)
 	if err != nil {
 		log.Println("[UserService][Delete][FindById] problem in getting from repository, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 
 	err = service.UserRepository.Delete(ctx, tx, user.IdUser)
 	if err != nil {
 		log.Println("[UserService][Delete][Delete] problem in getting from repository, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 
-	return new(empty.Empty), nil
+	return new(emptypb.Empty), nil
 }

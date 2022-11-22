@@ -7,7 +7,7 @@ import (
 	"github.com/arvians-id/go-apriori-microservice/services/notification-service/pb"
 	"github.com/arvians-id/go-apriori-microservice/services/notification-service/repository"
 	"github.com/arvians-id/go-apriori-microservice/services/notification-service/util"
-	"github.com/golang/protobuf/ptypes/empty"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"log"
 	"strings"
 	"time"
@@ -28,7 +28,7 @@ func NewNotificationService(
 	}
 }
 
-func (service *NotificationService) FindAll(ctx context.Context, empty *empty.Empty) (*pb.ListNotificationResponse, error) {
+func (service *NotificationService) FindAll(ctx context.Context, empty *emptypb.Empty) (*pb.ListNotificationResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[NotificationService][FindAll] problem in db transaction, err: ", err.Error())
@@ -108,36 +108,36 @@ func (service *NotificationService) Create(ctx context.Context, req *pb.CreateNo
 	}, nil
 }
 
-func (service *NotificationService) MarkAll(ctx context.Context, req *pb.GetNotificationByUserIdRequest) (*empty.Empty, error) {
+func (service *NotificationService) MarkAll(ctx context.Context, req *pb.GetNotificationByUserIdRequest) (*emptypb.Empty, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[NotificationService][MarkAll] problem in db transaction, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 	defer util.CommitOrRollback(tx)
 
 	err = service.NotificationRepository.MarkAll(ctx, tx, req.UserId)
 	if err != nil {
 		log.Println("[NotificationService][MarkAll][MarkAll] problem in getting from repository, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 
-	return new(empty.Empty), nil
+	return new(emptypb.Empty), nil
 }
 
-func (service *NotificationService) Mark(ctx context.Context, req *pb.GetNotificationByIdRequest) (*empty.Empty, error) {
+func (service *NotificationService) Mark(ctx context.Context, req *pb.GetNotificationByIdRequest) (*emptypb.Empty, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[NotificationService][Mark] problem in db transaction, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 	defer util.CommitOrRollback(tx)
 
 	err = service.NotificationRepository.Mark(ctx, tx, req.Id)
 	if err != nil {
 		log.Println("[NotificationService][Create][Mark] problem in getting from repository, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 
-	return new(empty.Empty), nil
+	return new(emptypb.Empty), nil
 }

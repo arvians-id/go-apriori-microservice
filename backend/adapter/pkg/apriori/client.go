@@ -9,8 +9,8 @@ import (
 	"github.com/arvians-id/go-apriori-microservice/adapter/third-party/aws"
 	"github.com/arvians-id/go-apriori-microservice/adapter/util"
 	"github.com/gin-gonic/gin"
-	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"log"
 	"strconv"
 	"strings"
@@ -57,7 +57,7 @@ func RegisterRoutes(router *gin.Engine, configuration *config.Config, storageS3 
 }
 
 func (client *ServiceClient) FindAll(c *gin.Context) {
-	apriories, err := client.AprioriService.FindAll(c.Request.Context(), new(empty.Empty))
+	apriories, err := client.AprioriService.FindAll(c.Request.Context(), new(emptypb.Empty))
 	if err != nil {
 		response.ReturnErrorInternalServerError(c, err, nil)
 		return
@@ -67,7 +67,7 @@ func (client *ServiceClient) FindAll(c *gin.Context) {
 }
 
 func (client *ServiceClient) FindAllByActive(c *gin.Context) {
-	apriories, err := client.AprioriService.FindAllByActive(c.Request.Context(), new(empty.Empty))
+	apriories, err := client.AprioriService.FindAllByActive(c.Request.Context(), new(emptypb.Empty))
 	if err != nil {
 		if err.Error() == util.ErrorNotFound {
 			response.ReturnErrorNotFound(c, err, nil)

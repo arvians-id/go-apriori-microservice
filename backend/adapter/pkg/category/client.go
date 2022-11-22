@@ -7,8 +7,8 @@ import (
 	"github.com/arvians-id/go-apriori-microservice/adapter/response"
 	"github.com/arvians-id/go-apriori-microservice/adapter/util"
 	"github.com/gin-gonic/gin"
-	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"log"
 	"strconv"
 )
@@ -48,7 +48,7 @@ func RegisterRoutes(router *gin.Engine, configuration *config.Config) *ServiceCl
 }
 
 func (client *ServiceClient) FindAll(c *gin.Context) {
-	categories, err := client.CategoryService.FindAll(c.Request.Context(), new(empty.Empty))
+	categories, err := client.CategoryService.FindAll(c.Request.Context(), new(emptypb.Empty))
 	if err != nil {
 		response.ReturnErrorInternalServerError(c, err, nil)
 		return

@@ -7,7 +7,6 @@ import (
 	"github.com/arvians-id/go-apriori-microservice/services/transaction-service/pb"
 	"github.com/arvians-id/go-apriori-microservice/services/transaction-service/repository"
 	"github.com/arvians-id/go-apriori-microservice/services/transaction-service/util"
-	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"log"
 	"strings"
@@ -29,7 +28,7 @@ func NewTransactionService(
 	}
 }
 
-func (service *TransactionService) FindAll(ctx context.Context, empty *empty.Empty) (*pb.ListTransactionsResponse, error) {
+func (service *TransactionService) FindAll(ctx context.Context, empty *emptypb.Empty) (*pb.ListTransactionsResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[TransactionService][FindAll] problem in db transaction, err: ", err.Error())
@@ -134,18 +133,18 @@ func (service *TransactionService) Create(ctx context.Context, req *pb.CreateTra
 	}, nil
 }
 
-func (service *TransactionService) CreateByCSV(ctx context.Context, req *pb.CreateTransactionByCSVRequest) (*empty.Empty, error) {
+func (service *TransactionService) CreateByCSV(ctx context.Context, req *pb.CreateTransactionByCSVRequest) (*emptypb.Empty, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[TransactionService][CreateByCsv] problem in db transaction, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 	defer util.CommitOrRollback(tx)
 
 	data, err := util.OpenCsvFile(req.FilePath)
 	if err != nil {
 		log.Println("[TransactionService][CreateByCsv] problem in db transaction, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 
 	var transactions []*model.Transaction
@@ -163,10 +162,10 @@ func (service *TransactionService) CreateByCSV(ctx context.Context, req *pb.Crea
 	err = service.TransactionRepository.CreateByCsv(ctx, tx, transactions)
 	if err != nil {
 		log.Println("[TransactionService][CreateByCsv][CreateByCsv] problem in getting from repository, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 
-	return new(empty.Empty), nil
+	return new(emptypb.Empty), nil
 }
 
 func (service *TransactionService) Update(ctx context.Context, req *pb.UpdateTransactionRequest) (*pb.GetTransactionResponse, error) {
@@ -210,38 +209,38 @@ func (service *TransactionService) Delete(ctx context.Context, req *pb.GetTransa
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[TransactionService][Delete] problem in db transaction, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 	defer util.CommitOrRollback(tx)
 
 	transaction, err := service.TransactionRepository.FindByNoTransaction(ctx, tx, req.NoTransaction)
 	if err != nil {
 		log.Println("[TransactionService][Delete][FindByNoTransaction] problem in getting from repository, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 
 	err = service.TransactionRepository.Delete(ctx, tx, transaction.NoTransaction)
 	if err != nil {
 		log.Println("[TransactionService][Delete][Delete] problem in getting from repository, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 
-	return new(empty.Empty), nil
+	return new(emptypb.Empty), nil
 }
 
-func (service *TransactionService) Truncate(ctx context.Context, emptys *empty.Empty) (*emptypb.Empty, error) {
+func (service *TransactionService) Truncate(ctx context.Context, emptys *emptypb.Empty) (*emptypb.Empty, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[TransactionService][Truncate] problem in db transaction, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 	defer util.CommitOrRollback(tx)
 
 	err = service.TransactionRepository.Truncate(ctx, tx)
 	if err != nil {
 		log.Println("[TransactionService][Truncate][Truncate] problem in getting from repository, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 
-	return new(empty.Empty), nil
+	return new(emptypb.Empty), nil
 }

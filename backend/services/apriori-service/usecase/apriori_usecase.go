@@ -11,7 +11,6 @@ import (
 	"github.com/arvians-id/go-apriori-microservice/services/apriori-service/repository"
 	"github.com/arvians-id/go-apriori-microservice/services/apriori-service/third-party/aws"
 	"github.com/arvians-id/go-apriori-microservice/services/apriori-service/util"
-	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"log"
 	"math"
@@ -161,14 +160,14 @@ func (service *AprioriService) Create(ctx context.Context, req *pb.CreateApriori
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[AprioriService][Create] problem in db transaction, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 	defer util.CommitOrRollback(tx)
 
 	timeNow, err := time.Parse(util.TimeFormat, time.Now().Format(util.TimeFormat))
 	if err != nil {
 		log.Println("[AprioriService][Create] problem in parsing to time, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 
 	var aprioriRequests []*model.Apriori
@@ -191,10 +190,10 @@ func (service *AprioriService) Create(ctx context.Context, req *pb.CreateApriori
 	err = service.AprioriRepository.Create(ctx, tx, aprioriRequests)
 	if err != nil {
 		log.Println("[AprioriService][Create][Create] problem in getting from repository, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 
-	return new(empty.Empty), nil
+	return new(emptypb.Empty), nil
 }
 
 func (service *AprioriService) Update(ctx context.Context, req *pb.UpdateAprioriRequest) (*pb.GetAprioriResponse, error) {
@@ -235,20 +234,20 @@ func (service *AprioriService) UpdateStatus(ctx context.Context, req *pb.GetApri
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[AprioriService][UpdateStatus] problem in db transaction, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 	defer util.CommitOrRollback(tx)
 
 	apriories, err := service.AprioriRepository.FindAllByCode(ctx, tx, req.Code)
 	if err != nil {
 		log.Println("[AprioriService][UpdateStatus][FindAllByCode] problem in getting from repository, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 
 	err = service.AprioriRepository.UpdateAllStatus(ctx, tx, false)
 	if err != nil {
 		log.Println("[AprioriService][UpdateStatus][UpdateAllStatus] problem in getting from repository, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 
 	status := true
@@ -259,37 +258,37 @@ func (service *AprioriService) UpdateStatus(ctx context.Context, req *pb.GetApri
 	err = service.AprioriRepository.UpdateStatusByCode(ctx, tx, apriories[0].Code, status)
 	if err != nil {
 		log.Println("[AprioriService][UpdateStatus][UpdateStatusByCode] problem in getting from repository, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 
-	return new(empty.Empty), nil
+	return new(emptypb.Empty), nil
 }
 
 func (service *AprioriService) Delete(ctx context.Context, req *pb.GetAprioriByCodeRequest) (*emptypb.Empty, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[AprioriService][Delete] problem in db transaction, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 	defer util.CommitOrRollback(tx)
 
 	apriories, err := service.AprioriRepository.FindAllByCode(ctx, tx, req.Code)
 	if err != nil {
 		log.Println("[AprioriService][Delete][FindAllByCode] problem in getting from repository, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 
 	err = service.AprioriRepository.Delete(ctx, tx, apriories[0].Code)
 	if err != nil {
 		log.Println("[AprioriService][Delete][Delete] problem in getting from repository, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 
 	for _, apriori := range apriories {
 		_ = service.StorageS3.DeleteFromAWS(apriori.Image)
 	}
 
-	return new(empty.Empty), nil
+	return new(emptypb.Empty), nil
 }
 
 func (service *AprioriService) Generate(ctx context.Context, req *pb.GenerateAprioriRequest) (*pb.GetGenerateAprioriResponse, error) {

@@ -9,7 +9,7 @@ import (
 	"github.com/arvians-id/go-apriori-microservice/services/product-service/repository"
 	"github.com/arvians-id/go-apriori-microservice/services/product-service/third-party/aws"
 	"github.com/arvians-id/go-apriori-microservice/services/product-service/util"
-	"github.com/golang/protobuf/ptypes/empty"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"log"
 	"strings"
 	"time"
@@ -36,7 +36,7 @@ func NewProductService(
 	}
 }
 
-func (service *ProductService) FindAllByAdmin(ctx context.Context, empty *empty.Empty) (*pb.ListProductResponse, error) {
+func (service *ProductService) FindAllByAdmin(ctx context.Context, empty *emptypb.Empty) (*pb.ListProductResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[ProductService][FindAllByAdmin] problem in db transaction, err: ", err.Error())
@@ -294,27 +294,27 @@ func (service *ProductService) Update(ctx context.Context, req *pb.UpdateProduct
 	}, nil
 }
 
-func (service *ProductService) Delete(ctx context.Context, req *pb.GetProductByProductCodeRequest) (*empty.Empty, error) {
+func (service *ProductService) Delete(ctx context.Context, req *pb.GetProductByProductCodeRequest) (*emptypb.Empty, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		log.Println("[ProductService][Delete] problem in db transaction, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 	defer util.CommitOrRollback(tx)
 
 	product, err := service.ProductRepository.FindByCode(ctx, tx, req.Code)
 	if err != nil {
 		log.Println("[ProductService][Delete][FindByCode] problem in getting from repository, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 
 	err = service.ProductRepository.Delete(ctx, tx, product.Code)
 	if err != nil {
 		log.Println("[ProductService][Delete][FindByCode] problem in getting from repository, err: ", err.Error())
-		return new(empty.Empty), err
+		return new(emptypb.Empty), err
 	}
 
 	_ = service.StorageS3.DeleteFromAWS(product.Image)
 
-	return new(empty.Empty), nil
+	return new(emptypb.Empty), nil
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/arvians-id/go-apriori-microservice/services/user-service/config"
 	"github.com/arvians-id/go-apriori-microservice/services/user-service/pb"
 	"github.com/arvians-id/go-apriori-microservice/services/user-service/repository"
+	"github.com/arvians-id/go-apriori-microservice/services/user-service/third-party/redis"
 	"github.com/arvians-id/go-apriori-microservice/services/user-service/usecase"
 	"google.golang.org/grpc"
 	"log"
@@ -28,8 +29,10 @@ func NewInitializedServices(configuration *config.Config) (pb.UserServiceServer,
 		return nil, err
 	}
 
+	redisLib := redis.NewCacheService(configuration)
+
 	userRepository := repository.NewUserRepository()
-	userService := usecase.NewUserService(userRepository, db)
+	userService := usecase.NewUserServiceCache(userRepository, redisLib, db)
 
 	return userService, nil
 }

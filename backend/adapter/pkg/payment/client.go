@@ -12,9 +12,9 @@ import (
 	messaging "github.com/arvians-id/go-apriori-microservice/adapter/third-party/message-queue"
 	"github.com/arvians-id/go-apriori-microservice/adapter/util"
 	"github.com/gin-gonic/gin"
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/veritrans/go-midtrans"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"log"
 )
 
@@ -60,7 +60,7 @@ func RegisterRoutes(router *gin.Engine, configuration *config.Config, producer *
 }
 
 func (client *ServiceClient) FindAll(c *gin.Context) {
-	payments, err := client.PaymentService.FindAll(c.Request.Context(), new(empty.Empty))
+	payments, err := client.PaymentService.FindAll(c.Request.Context(), new(emptypb.Empty))
 	if err != nil {
 		response.ReturnErrorInternalServerError(c, err, nil)
 		return

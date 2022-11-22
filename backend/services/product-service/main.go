@@ -8,6 +8,7 @@ import (
 	"github.com/arvians-id/go-apriori-microservice/services/product-service/pb"
 	"github.com/arvians-id/go-apriori-microservice/services/product-service/repository"
 	"github.com/arvians-id/go-apriori-microservice/services/product-service/third-party/aws"
+	"github.com/arvians-id/go-apriori-microservice/services/product-service/third-party/redis"
 	"github.com/arvians-id/go-apriori-microservice/services/product-service/usecase"
 	"google.golang.org/grpc"
 	"log"
@@ -31,11 +32,12 @@ func NewInitializedServices(configuration *config.Config) (pb.ProductServiceServ
 	}
 
 	storageS3 := aws.NewStorageS3(configuration)
+	redisLib := redis.NewCacheService(configuration)
 
 	aprioriClient := client.NewAprioriServiceClient(configuration)
 
 	productRepository := repository.NewProductRepository()
-	productService := usecase.NewProductService(productRepository, aprioriClient, storageS3, db)
+	productService := usecase.NewProductServiceCache(productRepository, aprioriClient, storageS3, redisLib, db)
 
 	return productService, nil
 }

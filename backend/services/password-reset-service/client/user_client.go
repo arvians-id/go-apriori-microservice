@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/arvians-id/go-apriori-microservice/services/password-reset-service/config"
 	"github.com/arvians-id/go-apriori-microservice/services/password-reset-service/pb"
-	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"log"
 )
 
@@ -38,11 +38,11 @@ func (client *UserServiceClient) FindByEmail(ctx context.Context, email string) 
 	return response, nil
 }
 
-func (client *UserServiceClient) UpdatePassword(ctx context.Context, req *pb.UpdateUserPasswordRequest) (*empty.Empty, error) {
+func (client *UserServiceClient) UpdatePassword(ctx context.Context, req *pb.UpdateUserPasswordRequest) (*emptypb.Empty, error) {
 	response, err := client.Client.UpdatePassword(ctx, req)
 	if err != nil {
 		log.Println("[UserServiceClient][UpdatePassword] problem calling update password on product service, err: ", err.Error())
-		return nil, err
+		return new(emptypb.Empty), err
 	}
 
 	return response, nil
