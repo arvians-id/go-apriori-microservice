@@ -1,1 +1,5 @@
-docker build -t apriori-message-broker .
+# Build image
+docker build -t arvians/apriori-message-broker .
+
+# Push image
+docker push arvians/apriori-message-broker

@@ -17,7 +17,7 @@ services:
       - thesis
     restart: always
   cache:
-    container_name: apriori-cache-1
+    container_name: apriori-cache
     image: redis:6
     ports:
       - "6379:6379"
@@ -25,6 +25,7 @@ services:
       - thesis
     restart: always
   grafana:
+    container_name: apriori-grafana
     image: grafana/grafana:latest
     ports:
       - "3000:3000"
@@ -35,11 +36,12 @@ services:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=Rahasia123
     depends_on:
-      - prometheus
+      - apriori-prometheus
     networks:
       - thesis
     restart: always
   prometheus:
+    container_name: apriori-prometheus
     image: prom/prometheus:v2.27.1
     volumes:
       - ./backend/monitoring/prometheus:/etc/prometheus/

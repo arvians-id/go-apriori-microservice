@@ -1,1 +1,5 @@
-docker build -t apriori-product .
+# Build image
+docker build -t arvians/apriori-product .
+
+# Push image
+docker push arvians/apriori-product
