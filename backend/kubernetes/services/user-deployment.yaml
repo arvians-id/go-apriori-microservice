@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: apriori-user
-          image: apriori-user:latest
+          image: arvians/apriori-user:latest
           imagePullPolicy: "IfNotPresent"
           ports:
             - containerPort: 50059

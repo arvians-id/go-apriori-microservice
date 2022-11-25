@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: apriori-transaction
-          image: apriori-transaction:latest
+          image: arvians/apriori-transaction:latest
           imagePullPolicy: "IfNotPresent"
           ports:
             - containerPort: 50057

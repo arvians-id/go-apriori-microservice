@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: apriori-comment
-          image: apriori-comment:latest
+          image: arvians/apriori-comment:latest
           imagePullPolicy: "IfNotPresent"
           ports:
             - containerPort: 50052

@@ -6,6 +6,7 @@ kubectl apply -f environment/prod-config.yaml
 kubectl apply -f environment/prod-secret.yaml
 
 kubectl apply -f adapter.yaml
+kubectl apply -f third-party/redis/redis-deployment.yaml
 
 kubectl apply -f services/apriori-deployment.yaml
 kubectl apply -f services/category-deployment.yaml
