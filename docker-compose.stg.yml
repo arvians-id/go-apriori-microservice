@@ -24,38 +24,6 @@ services:
     networks:
       - thesis
     restart: always
-  grafana:
-    container_name: apriori-grafana
-    image: grafana/grafana:latest
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./backend/monitoring/grafana/grafana-data:/var/lib/grafana
-      - ./backend/monitoring/grafana/grafana-data:/etc/grafana/provisioning/datasources
-    environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=Rahasia123
-    depends_on:
-      - apriori-prometheus
-    networks:
-      - thesis
-    restart: always
-  prometheus:
-    container_name: apriori-prometheus
-    image: prom/prometheus:v2.27.1
-    volumes:
-      - ./backend/monitoring/prometheus:/etc/prometheus/
-      - ./backend/monitoring/prometheus/prometheus-data:/prometheus
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-      - "--storage.tsdb.path=/prometheus"
-      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
-      - "--web.console.templates=/usr/share/prometheus/consoles"
-    ports:
-      - "9090:9090"
-    restart: always
-    networks:
-      - thesis
 
 networks:
   thesis:
