@@ -25,7 +25,7 @@ func main() {
 	mailConsumer := messaging.ConsumerConfig{
 		Topic:         topicMail,
 		Channel:       channelMail,
-		LookupAddress: "nsqlookupd:4161",
+		LookupAddress: "nsq-release-nsqlookupd-0.nsq-release-nsqlookupd:4161",
 		MaxAttempts:   10,
 		MaxInFlight:   100,
 		Handler:       mailHandler.SendEmailWithText,

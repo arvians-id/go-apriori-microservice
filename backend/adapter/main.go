@@ -40,7 +40,7 @@ func main() {
 	jwtAuth := jwt.NewJsonWebToken(configuration)
 	storageS3 := aws.NewStorageS3(configuration)
 	messagingProducer := messaging.NewProducer(messaging.ProducerConfig{
-		NsqdAddress: "nsqd:4150",
+		NsqdAddress: "nsq-release-nsqd:4150",
 	})
 
 	// Other routes
