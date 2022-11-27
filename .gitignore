@@ -5,6 +5,9 @@ node_modules
 *.env
 gin-bin.exe
 /backend/kubernetes/environment
+/backend/database/postgres/postgres-data
+/backend/monitoring/grafana/grafana-data
+/backend/monitoring/prometheus/prometheus-data
 
 # Log files
 npm-debug.log*
