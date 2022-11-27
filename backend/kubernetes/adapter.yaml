@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: apriori-adapter
-          image: apriori-adapter:latest
+          image: arvians/apriori-adapter:latest
           imagePullPolicy: "IfNotPresent"
           ports:
             - containerPort: 8080

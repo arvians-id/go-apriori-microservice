@@ -90,8 +90,6 @@ services:
   messagebroker:
     container_name: apriori-message-broker
     image: arvians/apriori-message-broker:latest
-    env_file:
-      - ./backend/services/message-service/config/envs/prod.env
     ports:
       - "8085:8080"
     restart: always
@@ -102,8 +100,6 @@ services:
   adapter:
     container_name: apriori-adapter
     image: arvians/apriori-adapter:latest
-    env_file:
-      - ./backend/adapter/config/envs/prod.env
     ports:
       - "8080:8080"
     restart: always
@@ -114,151 +110,101 @@ services:
   apriori:
     container_name: apriori-apriori
     image: arvians/apriori-apriori:latest
-    env_file:
-      - ./backend/services/apriori-service/config/envs/prod.env
     ports:
       - "50050:50050"
     restart: always
     depends_on:
       - db
-      - cache
-      - messagebroker
-      - adapter
     networks:
       - thesis
   category:
     container_name: apriori-category
     image: arvians/apriori-category:latest
-    env_file:
-      - ./backend/services/category-service/config/envs/prod.env
     ports:
       - "50051:50051"
     restart: always
     depends_on:
       - db
-      - cache
-      - messagebroker
-      - adapter
     networks:
       - thesis
   comment:
     container_name: apriori-comment
     image: arvians/apriori-comment:latest
-    env_file:
-      - ./backend/services/comment-service/config/envs/prod.env
     ports:
       - "50052:50052"
     restart: always
     depends_on:
       - db
-      - cache
-      - messagebroker
-      - adapter
     networks:
       - thesis
   notification:
     container_name: apriori-notification
     image: arvians/apriori-notification:latest
-    env_file:
-      - ./backend/services/notification-service/config/envs/prod.env
     ports:
       - "50053:50053"
     restart: always
     depends_on:
       - db
-      - cache
-      - messagebroker
-      - adapter
     networks:
       - thesis
   password:
     container_name: apriori-password-reset
     image: arvians/apriori-password-reset:latest
-    env_file:
-      - ./backend/services/password-reset-service/config/envs/prod.env
     ports:
       - "50054:50054"
     restart: always
     depends_on:
       - db
-      - cache
-      - messagebroker
-      - adapter
     networks:
       - thesis
   payment:
     container_name: apriori-payment
     image: arvians/apriori-payment:latest
-    env_file:
-      - ./backend/services/payment-service/config/envs/prod.env
     ports:
       - "50055:50055"
     restart: always
     depends_on:
       - db
-      - cache
-      - messagebroker
-      - adapter
     networks:
       - thesis
   product:
     container_name: apriori-product
     image: arvians/apriori-product:latest
-    env_file:
-      - ./backend/services/product-service/config/envs/prod.env
     ports:
       - "50056:50056"
     restart: always
     depends_on:
       - db
-      - cache
-      - messagebroker
-      - adapter
     networks:
       - thesis
   transaction:
     container_name: apriori-transaction
     image: arvians/apriori-transaction:latest
-    env_file:
-      - ./backend/services/transaction-service/config/envs/prod.env
     ports:
       - "50057:50057"
     restart: always
     depends_on:
       - db
-      - cache
-      - messagebroker
-      - adapter
     networks:
       - thesis
   order:
     container_name: apriori-user-order
     image: arvians/apriori-user-order:latest
-    env_file:
-      - ./backend/services/user-order-service/config/envs/prod.env
     ports:
       - "50058:50058"
     restart: always
     depends_on:
       - db
-      - cache
-      - messagebroker
-      - adapter
     networks:
       - thesis
   user:
     container_name: apriori-user
     image: arvians/apriori-user:latest
-    env_file:
-      - ./backend/services/user-service/config/envs/prod.env
     ports:
       - "50059:50059"
     restart: always
     depends_on:
       - db
-      - cache
-      - messagebroker
-      - adapter
     networks:
       - thesis
 

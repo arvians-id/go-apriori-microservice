@@ -1,25 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: apriori-apriori
+  name: apriori-message-broker
   labels:
-    app: apriori-apriori
+    app: apriori-message-broker
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: apriori-apriori
+      app: apriori-message-broker
   template:
     metadata:
       labels:
-        app: apriori-apriori
+        app: apriori-message-broker
     spec:
       containers:
-        - name: apriori-apriori
-          image: arvians/apriori-apriori:latest
+        - name: apriori-message-broker
+          image: arvians/apriori-message-broker:latest
           imagePullPolicy: "IfNotPresent"
           ports:
-            - containerPort: 50050
+            - containerPort: 8080
           envFrom:
             - configMapRef:
                 name: env-prod-config
@@ -27,10 +27,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: apriori-apriori
+  name: apriori-message-broker
 spec:
   selector:
-    app: apriori-apriori
+    app: apriori-message-broker
   ports:
-    - port: 50050
-      targetPort: 50050
+    - port: 8080
+      targetPort: 8085

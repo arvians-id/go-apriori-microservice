@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: apriori-notification
-          image: apriori-notification:latest
+          image: arvians/apriori-notification:latest
           imagePullPolicy: "IfNotPresent"
           ports:
             - containerPort: 50053

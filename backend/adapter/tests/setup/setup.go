@@ -39,13 +39,14 @@ func ModuleSetup(configuration *config.Config) (*gin.Engine, *sql.DB) {
 	})
 
 	// Services
+	payment.RegisterRoutes(router, configuration, messagingProducer)
+	router.Use(middleware.SetupXApiKeyMiddleware(configuration))
 	user.RegisterRoutes(router, configuration)
 	apriori.RegisterRoutes(router, configuration, storageS3)
 	auth.RegisterRoutes(router, configuration, jwtAuth, messagingProducer)
 	category.RegisterRoutes(router, configuration)
 	comment.RegisterRoutes(router, configuration)
 	notification.RegisterRoutes(router, configuration)
-	payment.RegisterRoutes(router, configuration, messagingProducer)
 	product.RegisterRoutes(router, configuration, storageS3)
 	raja_ongkir.RegisterRoutes(router, configuration)
 	transaction.RegisterRoutes(router, configuration, storageS3)
