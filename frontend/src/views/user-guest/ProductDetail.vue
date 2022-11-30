@@ -274,16 +274,16 @@
                     </div>
                   </div>
                   <div class="col-12 col-lg-2">
-                    <h3 class="mb-0 mt-3 text-uppercase">Produk terkait</h3>
+                    <h4 class="mb-0 mt-3 text-uppercase">Produk terkait</h4>
                     <hr class="mb-3 p-0">
                     <div v-if="productSimilarCategory.length > 0">
                       <div class="card card-pricing border shadow-none" v-for="item in productSimilarCategory" :key="item.id_product">
                         <div class="embed-responsive embed-responsive-16by9">
                           <img class="card-img-top embed-responsive-item" :src="item.image" alt="Preview Image">
                         </div>
-                        <div class="card-body">
-                          <router-link :to="{ name: 'guest.product.detail', params: { code: item.code } }" class="card-title m-0">{{ item.name }}</router-link>
-                          <p class="card-text p-0 m-0">Rp. {{ item.price }}</p>
+                        <div class="card-body m-0 p-2">
+                          <router-link :to="{ name: 'guest.product.detail', params: { code: item.code } }" class="card-title m-0 h4">{{ item.name }}</router-link>
+                          <p class="card-text p-0 m-0 h5 font-weight-normal">Rp. {{ item.price }}</p>
                         </div>
                       </div>
                     </div>

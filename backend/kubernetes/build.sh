@@ -18,9 +18,9 @@ kubectl apply -f services/user-deployment.yaml
 kubectl apply -f services/message-broker-deployment.yaml
 
 helm uninstall nsq-release
-helm uninstall prometheus-release
-helm uninstall grafana-release
+#helm uninstall prometheus-release
+#helm uninstall grafana-release
 
 helm install nsq-release nsqio/nsq --set nsqlookupd.replicaCount=1,nsqd.replicaCount=1,nsqadmin.replicaCount=1,nsqadmin.service.type=NodePort,nsqadmin.service.nodePort=30000
-helm install prometheus-release prometheus/prometheus --set prometheus-node-exporter.hostRootFsMount.enabled=false
-helm install grafana-release grafana/grafana --set persistence.enabled=false
+#helm install prometheus-release prometheus/prometheus --set prometheus-node-exporter.hostRootFsMount.enabled=false
+#helm install grafana-release grafana/grafana --set persistence.enabled=false
