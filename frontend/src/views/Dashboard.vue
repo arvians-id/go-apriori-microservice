@@ -22,7 +22,7 @@
               <div class="card-body" v-if="isLoading">
                 <div class="loading-skeleton">
                   <div class="row">
-                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                    <div class="col-12 col-md-6 col-lg-4">
                       <div class="card card-pricing border-0 text-center mb-4">
                         <div class="card-header bg-transparent">
                           <p class="mt-3 mb-2">Recommendation pack</p>
@@ -36,7 +36,7 @@
                         <p class="mx-4 mb-3">Dates</p>
                       </div>
                     </div>
-                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                    <div class="col-12 col-md-6 col-lg-4">
                       <div class="card card-pricing border-0 text-center mb-4">
                         <div class="card-header bg-transparent">
                           <p class="mt-3 mb-2">Recommendation pack</p>
@@ -50,21 +50,7 @@
                         <p class="mx-4 mb-3">Dates</p>
                       </div>
                     </div>
-                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-                      <div class="card card-pricing border-0 text-center mb-4">
-                        <div class="card-header bg-transparent">
-                          <p class="mt-3 mb-2">Recommendation pack</p>
-                        </div>
-                        <div class="card-body mx-auto">
-                          <p class="mb-1 mt-3">This is discount</p>
-                          <p>This is discount</p>
-                          <p class="py-3 mt-5">This is discount</p>
-                        </div>
-                        <hr class="mb-3">
-                        <p class="mx-4 mb-3">Dates</p>
-                      </div>
-                    </div>
-                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                    <div class="col-12 col-md-6 col-lg-4">
                       <div class="card card-pricing border-0 text-center mb-4">
                         <div class="card-header bg-transparent">
                           <p class="mt-3 mb-2">Recommendation pack</p>
@@ -83,7 +69,7 @@
               </div>
               <div class="card-body" v-else>
                 <div class="row">
-                  <div class="col-12 col-md-6 col-lg-4 col-xl-3" v-for="item in apriories" :key="item.id_apriori">
+                  <div class="col-12 col-md-6 col-lg-4" v-for="item in apriories" :key="item.id_apriori">
                     <div class="card card-pricing border-0 text-center mb-4">
                       <div class="card-header bg-transparent">
                         <h4 class="text-uppercase ls-1 text-primary py-3 mb-0">
