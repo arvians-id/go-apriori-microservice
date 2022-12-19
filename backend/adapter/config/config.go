@@ -71,7 +71,7 @@ func LoadConfig(filenames ...string) (c *Config, err error) {
 		viper.AddConfigPath("./config/envs")
 	}
 
-	viper.SetConfigName("dev")
+	viper.SetConfigName("prod")
 	viper.SetConfigType("env")
 
 	viper.AutomaticEnv()
