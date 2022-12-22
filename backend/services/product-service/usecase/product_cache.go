@@ -97,7 +97,8 @@ func (service *ProductServiceCache) FindAll(ctx context.Context, req *pb.GetProd
 	}
 	defer util.CommitOrRollback(tx)
 
-	productsCache, err := service.Redis.Get(ctx, "products:all")
+	key := fmt.Sprintf("products:all;category:%s;search:%s", req.Search, req.Category)
+	productsCache, err := service.Redis.Get(ctx, key)
 	if err != redis.Nil {
 		var products []*pb.Product
 		err = json.Unmarshal(productsCache, &products)
@@ -122,7 +123,7 @@ func (service *ProductServiceCache) FindAll(ctx context.Context, req *pb.GetProd
 		productListResponse = append(productListResponse, product.ToProtoBuff())
 	}
 
-	err = service.Redis.Set(ctx, "products:all", productListResponse)
+	err = service.Redis.Set(ctx, key, productListResponse)
 	if err != nil {
 		log.Println("[ProductServiceCache][FindAllByAdmin][Set] unable to set value to redis cache, err: ", err.Error())
 		return nil, err
@@ -336,7 +337,7 @@ func (service *ProductServiceCache) Create(ctx context.Context, req *pb.CreatePr
 		return nil, err
 	}
 
-	err = service.Redis.Del(ctx, "products:all", "products:admin", "products:similar")
+	err = service.Redis.FlushDB(ctx)
 	if err != nil {
 		log.Println("[ProductServiceCache][Create][Del] unable to deleting specific key cache, err: ", err.Error())
 	}
@@ -384,7 +385,7 @@ func (service *ProductServiceCache) Update(ctx context.Context, req *pb.UpdatePr
 		return nil, err
 	}
 
-	err = service.Redis.Del(ctx, "products:all", "products:admin", "products:similar", fmt.Sprintf("product:%s", req.Code))
+	err = service.Redis.FlushDB(ctx)
 	if err != nil {
 		log.Println("[ProductServiceCache][Update][Del] unable to deleting specific key cache, err: ", err.Error())
 	}
@@ -416,7 +417,7 @@ func (service *ProductServiceCache) Delete(ctx context.Context, req *pb.GetProdu
 
 	_ = service.StorageS3.DeleteFromAWS(product.Image)
 
-	err = service.Redis.Del(ctx, "products:all", "products:admin", "products:similar", fmt.Sprintf("product:%s", req.Code))
+	err = service.Redis.FlushDB(ctx)
 	if err != nil {
 		log.Println("[ProductServiceCache][Delete][Del] unable to deleting specific key cache, err: ", err.Error())
 	}
