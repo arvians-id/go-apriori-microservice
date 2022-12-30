@@ -140,7 +140,6 @@ func (client *ServiceClient) Update(c *gin.Context) {
 				log.Println("[Apriori][Update][UploadToAWS] error upload file to S3, err: ", err.Error())
 			}
 		}()
-		log.Println(path)
 		filePath = path
 	}
 

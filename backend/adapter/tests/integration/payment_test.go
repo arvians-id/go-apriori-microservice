@@ -19,6 +19,11 @@ import (
 	"strings"
 )
 
+/*
+	Not Implemented :
+		- Pay the product /payments/pay
+*/
+
 var _ = Describe("Payment API", func() {
 	var server *gin.Engine
 	var tokenJWT string

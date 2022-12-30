@@ -23,6 +23,7 @@ import (
 /*
 	Error :
 		- Find All User Order /user-order/user
+		  - The problem is user related to the order is not exist
 */
 var _ = Describe("User Order API", func() {
 	var server *gin.Engine
@@ -205,25 +206,20 @@ var _ = Describe("User Order API", func() {
 	//
 	//			var responseBody map[string]interface{}
 	//			_ = json.NewDecoder(writer.Result().Body).Decode(&responseBody)
+	//			log.Println(responseBody)
 	//
 	//			Expect(int(responseBody["code"].(float64))).To(Equal(http.StatusOK))
 	//			Expect(responseBody["status"]).To(Equal("OK"))
 	//
 	//			userOrderResponse := responseBody["data"].([]interface{})
 	//
-	//			Expect(userOrderResponse[0].(map[string]interface{})["code"]).To(Equal(order1.Code))
-	//			Expect(userOrderResponse[0].(map[string]interface{})["name"]).To(Equal(order1.Name))
-	//			Expect(int(userOrderResponse[0].(map[string]interface{})["price"].(float64))).To(Equal(order1.Price))
-	//			Expect(userOrderResponse[0].(map[string]interface{})["image"]).To(Equal(order1.Image))
-	//			Expect(int(userOrderResponse[0].(map[string]interface{})["quantity"].(float64))).To(Equal(order1.Quantity))
-	//			Expect(int(userOrderResponse[0].(map[string]interface{})["total_price_item"].(float64))).To(Equal(order1.TotalPriceItem))
-	//
-	//			Expect(userOrderResponse[1].(map[string]interface{})["code"]).To(Equal(order2.Code))
-	//			Expect(userOrderResponse[1].(map[string]interface{})["name"]).To(Equal(order2.Name))
-	//			Expect(int(userOrderResponse[1].(map[string]interface{})["price"].(float64))).To(Equal(order2.Price))
-	//			Expect(userOrderResponse[1].(map[string]interface{})["image"]).To(Equal(order2.Image))
-	//			Expect(int(userOrderResponse[1].(map[string]interface{})["quantity"].(float64))).To(Equal(order2.Quantity))
-	//			Expect(int(userOrderResponse[1].(map[string]interface{})["total_price_item"].(float64))).To(Equal(order2.TotalPriceItem))
+	//			image := fmt.Sprintf("https://%s.s3.%s.amazonaws.com/assets/%s", configuration.AwsBucket, configuration.AwsRegion, "no-image.png")
+	//			Expect(userOrderResponse[0].(map[string]interface{})["code"]).To(Equal("aXksCj2"))
+	//			Expect(userOrderResponse[0].(map[string]interface{})["name"]).To(Equal("Bantal Biasa"))
+	//			Expect(int(userOrderResponse[0].(map[string]interface{})["price"].(float64))).To(Equal(int64(20000)))
+	//			Expect(userOrderResponse[0].(map[string]interface{})["image"]).To(Equal(image))
+	//			Expect(int(userOrderResponse[0].(map[string]interface{})["quantity"].(float64))).To(Equal(1))
+	//			Expect(int(userOrderResponse[0].(map[string]interface{})["total_price_item"].(float64))).To(Equal(20000))
 	//		})
 	//	})
 	//})
