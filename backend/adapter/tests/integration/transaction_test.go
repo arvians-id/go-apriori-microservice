@@ -1,6 +1,7 @@
 package integration
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -8,9 +9,12 @@ import (
 	"github.com/arvians-id/go-apriori-microservice/adapter/tests/setup"
 	"github.com/arvians-id/go-apriori-microservice/adapter/third-party/redis"
 	. "github.com/onsi/ginkgo/v2"
+	"io"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -150,36 +154,54 @@ var _ = Describe("Transaction API", func() {
 		})
 	})
 
-	//Describe("Create Transactions By CSV File /transactions/csv", func() {
-	//	When("file exist", func() {
-	//		It("should return error no such file", func() {
-	//			path := "./assets/example1.csv"
-	//			body := new(bytes.Buffer)
-	//			writer := multipart.NewWriter(body)
-	//			part, _ := writer.CreateFormFile("file", path)
-	//			sample, _ := os.Open(path)
-	//
-	//			_, _ = io.Copy(part, sample)
-	//			writer.Close()
-	//
-	//			// Create Transaction
-	//			request := httptest.NewRequest(http.MethodPost, "/api/transactions/csv", body)
-	//			request.Header.Add("Content-Type", writer.FormDataContentType())
-	//			request.AddCookie(cookie)
-	//			request.Header.Set("Authorization", fmt.Sprintf("Bearer %v", tokenJWT))
-	//
-	//			rec := httptest.NewRecorder()
-	//			server.ServeHTTP(rec, request)
-	//
-	//			var responseBody map[string]interface{}
-	//			_ = json.NewDecoder(writer.Result().Body).Decode(&responseBody)
-	//
-	//			Expect(int(responseBody["code"].(float64))).To(Equal(http.StatusOK))
-	//			Expect(responseBody["status"]).To(Equal("created"))
-	//			Expect(responseBody["data"]).To(BeNil())
-	//		})
-	//	})
-	//})
+	Describe("Create Transactions By CSV File /transactions/csv", func() {
+		When("file exist", func() {
+			It("should return error no such file", func() {
+				path := "./assets/example1.csv"
+				var bytesBuffer bytes.Buffer
+				w := multipart.NewWriter(&bytesBuffer)
+				dest, _ := w.CreateFormFile("file", path)
+				src, _ := os.Open(path)
+				defer src.Close()
+				_, _ = io.Copy(dest, src)
+				w.Close()
+
+				// Create Transaction
+				request := httptest.NewRequest(http.MethodPost, "/api/transactions/csv", &bytesBuffer)
+				request.Header.Add("Content-Type", w.FormDataContentType())
+				request.Header.Add("X-API-KEY", configuration.XApiKey)
+				request.AddCookie(cookie)
+				request.Header.Set("Authorization", fmt.Sprintf("Bearer %v", tokenJWT))
+
+				writer := httptest.NewRecorder()
+				server.ServeHTTP(writer, request)
+
+				var responseBodyCreate map[string]interface{}
+				_ = json.NewDecoder(writer.Result().Body).Decode(&responseBodyCreate)
+
+				Expect(int(responseBodyCreate["code"].(float64))).To(Equal(http.StatusOK))
+				Expect(responseBodyCreate["status"]).To(Equal("created"))
+				Expect(responseBodyCreate["data"]).To(BeNil())
+
+				// Find All Transaction
+				request = httptest.NewRequest(http.MethodGet, "/api/transactions", nil)
+				request.Header.Add("Content-Type", "application/json")
+				request.Header.Add("X-API-KEY", configuration.XApiKey)
+				request.AddCookie(cookie)
+				request.Header.Set("Authorization", fmt.Sprintf("Bearer %v", tokenJWT))
+
+				writer = httptest.NewRecorder()
+				server.ServeHTTP(writer, request)
+
+				var responseBody map[string]interface{}
+				_ = json.NewDecoder(writer.Result().Body).Decode(&responseBody)
+
+				Expect(int(responseBody["code"].(float64))).To(Equal(http.StatusOK))
+				Expect(responseBody["status"]).To(Equal("OK"))
+				Expect(responseBody["data"]).To(HaveLen(10))
+			})
+		})
+	})
 
 	Describe("Update Transaction /transactions/:number_transaction", func() {
 		When("the fields are incorrect", func() {
